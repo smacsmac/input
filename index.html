@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Suivi d'input · 한국어</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #14131f;
+    --surface: #1e1c30;
+    --surface-2: #29273f;
+    --border: rgba(242,240,233,0.09);
+    --text: #f2f0e9;
+    --text-muted: #a19dc2;
+    --text-faint: #6d6a8c;
+    --coral: #ff6f5e;
+    --coral-soft: #ffb3a8;
+    --coral-dim: rgba(255,111,94,0.14);
+    --teal: #52d6c9;
+    --teal-dim: rgba(82,214,201,0.14);
+    --gold: #f2c14e;
+    --shadow: 0 20px 50px -20px rgba(0,0,0,0.6);
+    --radius-lg: 24px;
+    --radius-md: 16px;
+    --radius-sm: 10px;
+    --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
+    --font-body: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+
+  *{ box-sizing: border-box; }
+
+  html, body{
+    margin:0; padding:0;
+    background: radial-gradient(ellipse 120% 80% at 50% -10%, #201e38 0%, var(--bg) 55%);
+    color: var(--text);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body{
+    min-height: 100vh;
+    padding: 32px 20px 120px;
+  }
+
+  .wrap{
+    max-width: 760px;
+    margin: 0 auto;
+  }
+
+  /* ---------- Header ---------- */
+  header{
+    display:flex;
+    align-items:flex-start;
+    justify-content: space-between;
+    margin-bottom: 28px;
+    animation: fadeSlideIn .6s ease both;
+  }
+
+  .eyebrow{
+    font-size: 12px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin: 0 0 6px;
+    font-weight: 700;
+  }
+
+  h1{
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 34px;
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+
+  h1 .hangul{ color: var(--coral); font-style: italic; font-weight: 500;}
+
+  .icon-btn{
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+    transition: all .18s ease;
+    flex-shrink: 0;
+  }
+  .icon-btn:hover{ color: var(--text); border-color: rgba(242,240,233,0.2); transform: translateY(-1px); }
+  .icon-btn:focus-visible{ outline: 2px solid var(--coral); outline-offset: 2px; }
+  .icon-btn svg{ width: 20px; height: 20px; }
+
+  /* ---------- Hero card ---------- */
+  .hero{
+    background: linear-gradient(165deg, var(--surface) 0%, var(--surface-2) 100%);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 32px;
+    box-shadow: var(--shadow);
+    display: flex;
+    gap: 28px;
+    align-items: center;
+    animation: fadeSlideIn .6s .05s ease both;
+  }
+
+  .ring-wrap{ position: relative; flex-shrink: 0; width: 168px; height: 168px; }
+  .ring-wrap svg{ width: 100%; height: 100%; transform: rotate(-90deg); }
+  .ring-track{ fill:none; stroke: rgba(242,240,233,0.07); stroke-width: 10; }
+  .ring-progress{ fill:none; stroke: url(#ringGradient); stroke-width: 10; stroke-linecap: round; transition: stroke-dashoffset .8s cubic-bezier(.16,1,.3,1); }
+  .ring-center{
+    position:absolute; inset:0;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+  }
+  .ring-level-num{ font-family: var(--font-display); font-size: 46px; font-weight: 600; line-height: 1; }
+  .ring-hangul{ font-family: var(--font-display); font-style: italic; color: var(--teal); font-size: 17px; margin-top: 4px; }
+
+  .hero-info{ flex: 1; min-width: 0; }
+  .hero-label{ font-size: 12px; text-transform: uppercase; letter-spacing: .1em; color: var(--text-faint); font-weight: 700; margin-bottom: 6px; }
+  .hero-desc{ color: var(--text-muted); font-size: 14.5px; line-height: 1.55; margin: 0 0 16px; }
+
+  .hero-progress-line{ font-size: 13.5px; color: var(--text-muted); margin-bottom: 6px; }
+  .hero-progress-line strong{ color: var(--text); font-weight: 700; }
+
+  .bar-track{ height: 7px; border-radius: 99px; background: rgba(242,240,233,0.07); overflow:hidden; }
+  .bar-fill{ height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--coral), var(--coral-soft)); transition: width .8s cubic-bezier(.16,1,.3,1); }
+
+  /* ---------- Stats row ---------- */
+  .stats-row{
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 18px;
+    animation: fadeSlideIn .6s .1s ease both;
+  }
+  .stat-chip{
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 14px 16px;
+  }
+  .stat-chip .stat-label{ font-size: 11.5px; text-transform: uppercase; letter-spacing: .08em; color: var(--text-faint); font-weight: 700; margin-bottom: 5px;}
+  .stat-chip .stat-value{ font-family: var(--font-display); font-size: 21px; font-weight: 600; }
+  .stat-chip .stat-value.accent{ color: var(--coral); }
+
+  /* ---------- Section titles ---------- */
+  .section-title{
+    font-family: var(--font-display);
+    font-size: 19px;
+    font-weight: 600;
+    margin: 34px 0 14px;
+    display:flex;
+    align-items:center;
+    gap: 10px;
+  }
+  .section-title .rule{ flex:1; height:1px; background: var(--border); }
+
+  /* ---------- Projection cards ---------- */
+  .proj-grid{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    animation: fadeSlideIn .6s .15s ease both;
+  }
+  .proj-card{
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 18px 18px 16px;
+  }
+  .proj-card .proj-icon{
+    width: 30px; height:30px; border-radius: 9px;
+    display:flex; align-items:center; justify-content:center;
+    margin-bottom: 10px;
+  }
+  .proj-card.goal .proj-icon{ background: var(--coral-dim); color: var(--coral); }
+  .proj-card.real .proj-icon{ background: var(--teal-dim); color: var(--teal); }
+  .proj-card .proj-icon svg{ width:16px; height:16px; }
+  .proj-card h3{ font-size: 13.5px; margin: 0 0 10px; font-weight: 700; color: var(--text); }
+  .proj-line{ font-size: 13px; color: var(--text-muted); margin-bottom: 8px; line-height: 1.5; }
+  .proj-line:last-child{ margin-bottom: 0; }
+  .proj-line .big{ color: var(--text); font-weight: 700; font-size: 14px; }
+  .proj-empty{ font-size: 13px; color: var(--text-faint); line-height: 1.5; }
+  .proj-empty a{ color: var(--coral); cursor:pointer; text-decoration: underline; }
+
+  /* ---------- Chart ---------- */
+  .chart-card{
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 20px;
+    animation: fadeSlideIn .6s .2s ease both;
+  }
+  .chart-empty{ color: var(--text-faint); font-size: 13.5px; text-align:center; padding: 40px 10px; }
+  .chart-svg{ width: 100%; height: auto; display:block; }
+  .chart-axis-label{ font-size: 10.5px; fill: var(--text-faint); font-family: var(--font-body); }
+  .chart-max-label{ font-size: 10.5px; fill: var(--text-faint); font-family: var(--font-body); }
+
+  /* ---------- Levels roadmap ---------- */
+  .levels-scroll{
+    display:flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    scrollbar-width: thin;
+    animation: fadeSlideIn .6s .25s ease both;
+  }
+  .level-card{
+    flex: 0 0 148px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 16px 14px;
+    position: relative;
+    transition: border-color .2s ease;
+  }
+  .level-card.done{ border-color: rgba(82,214,201,0.35); }
+  .level-card.current{ border-color: var(--coral); background: linear-gradient(165deg, var(--surface-2), var(--surface)); }
+  .level-card .lv-top{ display:flex; align-items:baseline; justify-content:space-between; margin-bottom: 8px;}
+  .level-card .lv-hangul{ font-family: var(--font-display); font-style: italic; font-size: 20px; color: var(--text-muted); }
+  .level-card.current .lv-hangul{ color: var(--coral); }
+  .level-card.done .lv-hangul{ color: var(--teal); }
+  .level-card .lv-check{ width:16px; height:16px; color: var(--teal); }
+  .level-card .lv-hours{ font-size: 12px; color: var(--text-faint); font-weight: 700; margin-bottom: 6px;}
+  .level-card .lv-desc{ font-size: 11.5px; color: var(--text-muted); line-height: 1.45; }
+
+  /* ---------- FAB ---------- */
+  .fab{
+    position: fixed;
+    right: 26px; bottom: 26px;
+    width: 62px; height: 62px;
+    border-radius: 50%;
+    background: linear-gradient(155deg, var(--coral), #ff8a6f);
+    color: #1a1220;
+    border: none;
+    box-shadow: 0 14px 30px -8px rgba(255,111,94,0.55);
+    cursor: pointer;
+    display:flex; align-items:center; justify-content:center;
+    transition: transform .18s ease, box-shadow .18s ease;
+    z-index: 30;
+  }
+  .fab:hover{ transform: translateY(-2px) scale(1.03); box-shadow: 0 18px 36px -8px rgba(255,111,94,0.65); }
+  .fab:active{ transform: translateY(0) scale(0.97); }
+  .fab:focus-visible{ outline: 2px solid var(--text); outline-offset: 3px; }
+  .fab svg{ width: 26px; height: 26px; }
+
+  /* ---------- Modal ---------- */
+  .overlay{
+    position: fixed; inset:0;
+    background: rgba(10,9,16,0.6);
+    backdrop-filter: blur(3px);
+    display:flex; align-items:flex-end; justify-content:center;
+    z-index: 40;
+    opacity:0; pointer-events:none;
+    transition: opacity .2s ease;
+  }
+  .overlay.open{ opacity:1; pointer-events:auto; }
+  @media (min-width: 640px){
+    .overlay{ align-items:center; }
+  }
+
+  .modal{
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 22px 22px 0 0;
+    padding: 26px 22px 30px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 -20px 60px rgba(0,0,0,0.5);
+    transform: translateY(24px);
+    transition: transform .25s cubic-bezier(.16,1,.3,1);
+  }
+  .overlay.open .modal{ transform: translateY(0); }
+  @media (min-width: 640px){
+    .modal{ border-radius: 22px; }
+  }
+
+  .modal h2{ font-family: var(--font-display); font-weight: 600; font-size: 20px; margin: 0 0 18px; }
+
+  .chip-row{ display:flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+  .chip{
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 9px 16px;
+    border-radius: 99px;
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: var(--font-body);
+    transition: all .15s ease;
+  }
+  .chip:hover{ border-color: var(--coral); color: var(--coral); }
+  .chip:focus-visible{ outline: 2px solid var(--coral); outline-offset: 1px; }
+
+  .divider-or{ display:flex; align-items:center; gap: 10px; color: var(--text-faint); font-size: 12px; margin: 6px 0 16px; }
+  .divider-or::before, .divider-or::after{ content:''; flex:1; height:1px; background: var(--border); }
+
+  .input-row{ display:flex; gap: 10px; margin-bottom: 18px; }
+  .input-row input[type="number"]{
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 17px;
+    font-weight: 700;
+    padding: 12px 14px;
+    border-radius: var(--radius-sm);
+    min-width: 0;
+  }
+  .input-row input[type="number"]:focus-visible{ outline: 2px solid var(--coral); outline-offset: 1px; }
+  .seg{
+    display:flex;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    overflow:hidden;
+  }
+  .seg button{
+    background: transparent;
+    border:none;
+    color: var(--text-muted);
+    padding: 12px 14px;
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 13.5px;
+    cursor:pointer;
+  }
+  .seg button.active{ background: var(--coral-dim); color: var(--coral); }
+  .seg button:focus-visible{ outline: 2px solid var(--coral); outline-offset: -2px; }
+
+  .btn-primary{
+    width: 100%;
+    background: linear-gradient(155deg, var(--coral), #ff8a6f);
+    color: #1a1220;
+    border: none;
+    padding: 14px;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-body);
+    font-weight: 800;
+    font-size: 15px;
+    cursor: pointer;
+    transition: transform .15s ease;
+  }
+  .btn-primary:hover{ transform: translateY(-1px); }
+  .btn-primary:focus-visible{ outline: 2px solid var(--text); outline-offset: 2px; }
+
+  .btn-text{
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: var(--text-faint);
+    padding: 12px;
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 13.5px;
+    cursor: pointer;
+    margin-top: 4px;
+  }
+  .btn-text:hover{ color: var(--text-muted); }
+
+  .field-label{ font-size: 12.5px; color: var(--text-muted); font-weight: 700; margin-bottom: 8px; display:block; }
+
+  @keyframes fadeSlideIn{
+    from{ opacity: 0; transform: translateY(10px); }
+    to{ opacity: 1; transform: translateY(0); }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+
+  @media (max-width: 560px){
+    .hero{ flex-direction: column; text-align:center; }
+    .hero-info{ width: 100%; }
+    .stats-row{ grid-template-columns: 1fr 1fr; }
+    .stats-row .stat-chip:last-child{ grid-column: span 2; }
+    .proj-grid{ grid-template-columns: 1fr; }
+    h1{ font-size: 28px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div>
+      <p class="eyebrow">Suivi d'input compréhensible</p>
+      <h1>Coréen <span class="hangul">한국어</span></h1>
+    </div>
+    <button class="icon-btn" id="settingsBtn" aria-label="Régler l'objectif quotidien" title="Objectif quotidien">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+    </button>
+  </header>
+
+  <section class="hero">
+    <div class="ring-wrap">
+      <svg viewBox="0 0 168 168">
+        <defs>
+          <linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#ff6f5e"/>
+            <stop offset="100%" stop-color="#ffb3a8"/>
+          </linearGradient>
+        </defs>
+        <circle class="ring-track" cx="84" cy="84" r="74"></circle>
+        <circle class="ring-progress" id="ringProgress" cx="84" cy="84" r="74"></circle>
+      </svg>
+      <div class="ring-center">
+        <div class="ring-level-num" id="ringLevelNum">1</div>
+        <div class="ring-hangul" id="ringHangul">일</div>
+      </div>
+    </div>
+    <div class="hero-info">
+      <p class="hero-label" id="heroLabel">Niveau 1</p>
+      <p class="hero-desc" id="heroDesc">Tu démarres tout juste ton apprentissage du coréen.</p>
+      <p class="hero-progress-line" id="heroProgressLine"></p>
+      <div class="bar-track"><div class="bar-fill" id="heroBarFill" style="width:0%"></div></div>
+    </div>
+  </section>
+
+  <div class="stats-row">
+    <div class="stat-chip">
+      <div class="stat-label">Total</div>
+      <div class="stat-value" id="statTotal">0h</div>
+    </div>
+    <div class="stat-chip">
+      <div class="stat-label">Aujourd'hui</div>
+      <div class="stat-value accent" id="statToday">0 min</div>
+    </div>
+    <div class="stat-chip">
+      <div class="stat-label">Objectif / jour</div>
+      <div class="stat-value" id="statGoal">—</div>
+    </div>
+  </div>
+
+  <h2 class="section-title">Estimations pour le prochain niveau<span class="rule"></span></h2>
+  <div class="proj-grid">
+    <div class="proj-card goal">
+      <div class="proj-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg></div>
+      <h3>Selon ton objectif quotidien</h3>
+      <div id="projGoalContent"></div>
+    </div>
+    <div class="proj-card real">
+      <div class="proj-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg></div>
+      <h3>Selon ton rythme réel</h3>
+      <div id="projRealContent"></div>
+    </div>
+  </div>
+
+  <h2 class="section-title">Progression cumulée<span class="rule"></span></h2>
+  <div class="chart-card" id="chartCard">
+    <div class="chart-empty">Ajoute ta première session pour voir ta progression ici.</div>
+  </div>
+
+  <h2 class="section-title">Les 7 niveaux<span class="rule"></span></h2>
+  <div class="levels-scroll" id="levelsScroll"></div>
+</div>
+
+<button class="fab" id="fabBtn" aria-label="Ajouter une session">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+</button>
+
+<!-- Add session modal -->
+<div class="overlay" id="addOverlay">
+  <div class="modal">
+    <h2>Ajouter une session</h2>
+    <div class="chip-row" id="quickChips">
+      <button class="chip" data-min="15">+15 min</button>
+      <button class="chip" data-min="30">+30 min</button>
+      <button class="chip" data-min="60">+1 h</button>
+      <button class="chip" data-min="120">+2 h</button>
+    </div>
+    <div class="divider-or">ou une durée précise</div>
+    <div class="input-row">
+      <input type="number" id="customAmount" min="1" placeholder="Durée" inputmode="numeric">
+      <div class="seg" id="addUnitSeg">
+        <button type="button" class="active" data-unit="min">min</button>
+        <button type="button" data-unit="h">h</button>
+      </div>
+    </div>
+    <button class="btn-primary" id="confirmAddBtn">Ajouter</button>
+    <button class="btn-text" id="cancelAddBtn">Annuler</button>
+  </div>
+</div>
+
+<!-- Settings modal -->
+<div class="overlay" id="settingsOverlay">
+  <div class="modal">
+    <h2>Objectif quotidien</h2>
+    <span class="field-label">Combien de temps veux-tu écouter chaque jour ?</span>
+    <div class="input-row">
+      <input type="number" id="goalAmount" min="0" placeholder="Ex. 30" inputmode="numeric">
+      <div class="seg" id="goalUnitSeg">
+        <button type="button" class="active" data-unit="min">min</button>
+        <button type="button" data-unit="h">h</button>
+      </div>
+    </div>
+    <button class="btn-primary" id="saveGoalBtn">Enregistrer</button>
+    <button class="btn-text" id="cancelGoalBtn">Annuler</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------------- Data layer ---------------- */
+  const STORAGE_KEY = 'krInputTrackerV1';
+
+  function loadData(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return { totalMinutes: 0, dailyGoalMinutes: 0, sessions: {} };
+      const parsed = JSON.parse(raw);
+      return {
+        totalMinutes: parsed.totalMinutes || 0,
+        dailyGoalMinutes: parsed.dailyGoalMinutes || 0,
+        sessions: parsed.sessions || {}
+      };
+    }catch(e){
+      console.error('Erreur de lecture des données', e);
+      return { totalMinutes: 0, dailyGoalMinutes: 0, sessions: {} };
+    }
+  }
+
+  function saveData(){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  }
+
+  let data = loadData();
+
+  /* ---------------- Levels ---------------- */
+  const LEVELS = [
+    { n:1, hours:0,    hangul:'일', title:'Débutant', desc:"Tu démarres tout juste ton apprentissage du coréen." },
+    { n:2, hours:100,  hangul:'이', title:'Niveau 2', desc:"Tu commences à suivre des vidéos très simples." },
+    { n:3, hours:300,  hangul:'삼', title:'Niveau 3', desc:"Tu comprends des vidéos pour enfants et des contenus très guidés." },
+    { n:4, hours:600,  hangul:'사', title:'Niveau 4', desc:"Tu peux suivre des vidéos de niveau intermédiaire." },
+    { n:5, hours:1200, hangul:'오', title:'Niveau 5', desc:"Tu comprends une bonne partie de YouTube sans sous-titres, à condition que le sujet soit familier." },
+    { n:6, hours:2000, hangul:'육', title:'Niveau 6', desc:"Les dramas, les podcasts et les conversations deviennent nettement plus accessibles." },
+    { n:7, hours:3000, hangul:'칠', title:'Niveau 7', desc:"Compréhension très solide de la langue courante, avec encore des difficultés sur le vocabulaire spécialisé." }
+  ];
+
+  function getLevelIndex(totalHours){
+    let idx = 0;
+    for(let i=0;i<LEVELS.length;i++){
+      if(totalHours >= LEVELS[i].hours) idx = i;
+    }
+    return idx;
+  }
+
+  /* ---------------- Date helpers ---------------- */
+  function toISODate(d){
+    const y = d.getFullYear();
+    const m = String(d.getMonth()+1).padStart(2,'0');
+    const day = String(d.getDate()).padStart(2,'0');
+    return `${y}-${m}-${day}`;
+  }
+  function todayISO(){ return toISODate(new Date()); }
+  function addDays(date, n){ return new Date(date.getTime() + n*86400000); }
+  function diffDaysInclusive(d1, d2){
+    const a = new Date(d1.getFullYear(), d1.getMonth(), d1.getDate());
+    const b = new Date(d2.getFullYear(), d2.getMonth(), d2.getDate());
+    return Math.round((b-a)/86400000) + 1;
+  }
+  function formatDateFr(date){
+    return new Intl.DateTimeFormat('fr-FR', { day:'numeric', month:'long', year:'numeric' }).format(date);
+  }
+  function formatHoursMin(totalMinutes){
+    const h = Math.floor(totalMinutes/60);
+    const m = Math.round(totalMinutes%60);
+    if(h<=0) return `${m} min`;
+    if(m===0) return `${h} h`;
+    return `${h} h ${String(m).padStart(2,'0')}`;
+  }
+  function sumMinutesInWindow(nDays){
+    let sum = 0;
+    const today = new Date();
+    for(let i=0;i<nDays;i++){
+      const key = toISODate(addDays(today, -i));
+      sum += data.sessions[key] || 0;
+    }
+    return sum;
+  }
+  function getFirstSessionDate(){
+    const keys = Object.keys(data.sessions).filter(k => data.sessions[k] > 0).sort();
+    if(keys.length === 0) return null;
+    const [y,m,d] = keys[0].split('-').map(Number);
+    return new Date(y, m-1, d);
+  }
+
+  /* ---------------- Projections ---------------- */
+  function computeProjections(){
+    const totalHours = data.totalMinutes/60;
+    const idx = getLevelIndex(totalHours);
+    const next = LEVELS[idx+1];
+    if(!next) return { maxed:true };
+
+    const remainingHours = Math.max(0, next.hours - totalHours);
+
+    const goalHoursPerDay = data.dailyGoalMinutes/60;
+    let goalDays=null, goalDate=null;
+    if(goalHoursPerDay > 0){
+      goalDays = Math.ceil(remainingHours / goalHoursPerDay);
+      goalDate = addDays(new Date(), goalDays);
+    }
+
+    const avg7 = sumMinutesInWindow(7)/60/7;
+    let days7=null, date7=null;
+    if(avg7 > 0){
+      days7 = Math.ceil(remainingHours / avg7);
+      date7 = addDays(new Date(), days7);
+    }
+
+    const firstDate = getFirstSessionDate();
+    let avgAll=0, daysAll=null, dateAll=null;
+    if(firstDate){
+      const daysSinceFirst = Math.max(1, diffDaysInclusive(firstDate, new Date()));
+      avgAll = totalHours / daysSinceFirst;
+      if(avgAll > 0){
+        daysAll = Math.ceil(remainingHours / avgAll);
+        dateAll = addDays(new Date(), daysAll);
+      }
+    }
+
+    return { maxed:false, remainingHours, next, goalHoursPerDay, goalDays, goalDate, avg7, days7, date7, avgAll, daysAll, dateAll, hasHistory: !!firstDate };
+  }
+
+  /* ---------------- Rendering ---------------- */
+  const RING_R = 74;
+  const RING_C = 2 * Math.PI * RING_R;
+
+  function render(){
+    const totalHours = data.totalMinutes/60;
+    const idx = getLevelIndex(totalHours);
+    const level = LEVELS[idx];
+    const next = LEVELS[idx+1];
+
+    // Ring + hero
+    let percent;
+    if(!next){ percent = 100; }
+    else{
+      percent = ((totalHours - level.hours) / (next.hours - level.hours)) * 100;
+      percent = Math.max(0, Math.min(100, percent));
+    }
+    const ringEl = document.getElementById('ringProgress');
+    ringEl.style.strokeDasharray = RING_C;
+    ringEl.style.strokeDashoffset = RING_C - (percent/100)*RING_C;
+
+    document.getElementById('ringLevelNum').textContent = level.n;
+    document.getElementById('ringHangul').textContent = level.hangul;
+    document.getElementById('heroLabel').textContent = `Niveau ${level.n}`;
+    document.getElementById('heroDesc').textContent = level.desc;
+    document.getElementById('heroBarFill').style.width = percent + '%';
+
+    if(next){
+      document.getElementById('heroProgressLine').innerHTML =
+        `<strong>${formatHoursMin(data.totalMinutes)}</strong> vers le niveau ${next.n} · il te reste <strong>${formatHoursMin(Math.max(0,(next.hours*60)-data.totalMinutes))}</strong> (seuil : ${next.hours} h)`;
+    } else {
+      document.getElementById('heroProgressLine').innerHTML =
+        `<strong>${formatHoursMin(data.totalMinutes)}</strong> · niveau maximum atteint 🎉`;
+    }
+
+    // Stats row
+    document.getElementById('statTotal').textContent = formatHoursMin(data.totalMinutes);
+    document.getElementById('statToday').textContent = formatHoursMin(data.sessions[todayISO()] || 0);
+    document.getElementById('statGoal').textContent = data.dailyGoalMinutes > 0 ? formatHoursMin(data.dailyGoalMinutes) : '—';
+
+    renderProjections();
+    renderLevels(idx);
+    renderChart();
+  }
+
+  function renderProjections(){
+    const p = computeProjections();
+    const goalBox = document.getElementById('projGoalContent');
+    const realBox = document.getElementById('projRealContent');
+
+    if(p.maxed){
+      goalBox.innerHTML = `<p class="proj-empty">Tu as atteint le niveau 7, le sommet de l'échelle. Beau travail ! 🎉</p>`;
+      realBox.innerHTML = `<p class="proj-empty">Continue simplement à pratiquer pour consolider ce niveau.</p>`;
+      return;
+    }
+
+    // Goal-based card
+    if(p.goalHoursPerDay > 0){
+      goalBox.innerHTML = `
+        <p class="proj-line">À raison de <span class="big">${formatHoursMin(data.dailyGoalMinutes)} / jour</span>, tu passeras niveau ${p.next.n} dans <span class="big">${p.goalDays} jour${p.goalDays>1?'s':''}</span>.</p>
+        <p class="proj-line">Date estimée : <span class="big">${formatDateFr(p.goalDate)}</span></p>
+      `;
+    } else {
+      goalBox.innerHTML = `<p class="proj-empty">Définis un <a id="proj-goal-link">objectif quotidien</a> pour voir une estimation.</p>`;
+    }
+
+    // Real pace card
+    if(!p.hasHistory){
+      realBox.innerHTML = `<p class="proj-empty">Ajoute quelques sessions pour calculer ton rythme réel.</p>`;
+    } else {
+      let html = '';
+      if(p.days7 !== null){
+        html += `<p class="proj-line">7 derniers jours : <span class="big">${formatHoursMin(p.avg7*60)} / jour</span> → niveau ${p.next.n} dans <span class="big">${p.days7} j</span> (${formatDateFr(p.date7)})</p>`;
+      } else {
+        html += `<p class="proj-line">7 derniers jours : aucune session récente.</p>`;
+      }
+      if(p.daysAll !== null){
+        html += `<p class="proj-line">Depuis le début : <span class="big">${formatHoursMin(p.avgAll*60)} / jour</span> → niveau ${p.next.n} dans <span class="big">${p.daysAll} j</span> (${formatDateFr(p.dateAll)})</p>`;
+      }
+      realBox.innerHTML = html;
+    }
+
+    const link = document.getElementById('proj-goal-link');
+    if(link) link.addEventListener('click', openSettingsModal);
+  }
+
+  function renderLevels(currentIdx){
+    const container = document.getElementById('levelsScroll');
+    container.innerHTML = '';
+    LEVELS.forEach((lv, i) => {
+      const card = document.createElement('div');
+      let cls = 'level-card';
+      if(i < currentIdx) cls += ' done';
+      else if(i === currentIdx) cls += ' current';
+      card.className = cls;
+
+      const checkSvg = i < currentIdx
+        ? `<svg class="lv-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`
+        : '';
+
+      card.innerHTML = `
+        <div class="lv-top">
+          <span class="lv-hangul">${lv.hangul}</span>
+          ${checkSvg}
+        </div>
+        <div class="lv-hours">Niveau ${lv.n} · ${lv.hours} h</div>
+        <div class="lv-desc">${lv.desc}</div>
+      `;
+      container.appendChild(card);
+    });
+  }
+
+  function renderChart(){
+    const chartCard = document.getElementById('chartCard');
+    const keys = Object.keys(data.sessions).filter(k => data.sessions[k] > 0).sort();
+
+    if(keys.length === 0){
+      chartCard.innerHTML = `<div class="chart-empty">Ajoute ta première session pour voir ta progression ici.</div>`;
+      return;
+    }
+
+    // Build cumulative points
+    let running = 0;
+    const points = keys.map(k => {
+      running += data.sessions[k];
+      const [y,m,d] = k.split('-').map(Number);
+      return { date: new Date(y, m-1, d), hours: running/60 };
+    });
+
+    // extend to today if last entry isn't today
+    const todayKey = todayISO();
+    if(keys[keys.length-1] !== todayKey){
+      const [y,m,d] = todayKey.split('-').map(Number);
+      points.push({ date: new Date(y,m-1,d), hours: running/60 });
+    }
+
+    const W = 640, H = 220, padL = 8, padR = 8, padT = 18, padB = 26;
+    const innerW = W - padL - padR, innerH = H - padT - padB;
+
+    const t0 = points[0].date.getTime();
+    const t1 = points[points.length-1].date.getTime();
+    const tSpan = Math.max(1, t1 - t0);
+    const maxHours = Math.max(...points.map(p => p.hours)) * 1.15 || 1;
+
+    function xFor(pt){ return padL + ((pt.date.getTime() - t0) / tSpan) * innerW; }
+    function yFor(pt){ return padT + innerH - (pt.hours / maxHours) * innerH; }
+
+    let linePath = '';
+    let areaPath = '';
+    points.forEach((pt, i) => {
+      const x = xFor(pt).toFixed(1), y = yFor(pt).toFixed(1);
+      linePath += (i===0 ? `M ${x} ${y}` : ` L ${x} ${y}`);
+    });
+    const lastX = xFor(points[points.length-1]).toFixed(1);
+    const firstX = xFor(points[0]).toFixed(1);
+    areaPath = `${linePath} L ${lastX} ${(padT+innerH).toFixed(1)} L ${firstX} ${(padT+innerH).toFixed(1)} Z`;
+
+    let dots = '';
+    points.forEach(pt => {
+      const x = xFor(pt).toFixed(1), y = yFor(pt).toFixed(1);
+      dots += `<circle cx="${x}" cy="${y}" r="3.2" fill="#ff6f5e" stroke="#14131f" stroke-width="1.5"><title>${formatDateFr(pt.date)} — ${pt.hours.toFixed(1)} h</title></circle>`;
+    });
+
+    const svg = `
+      <svg class="chart-svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#ff6f5e" stop-opacity="0.35"/>
+            <stop offset="100%" stop-color="#ff6f5e" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <line x1="${padL}" y1="${padT+innerH}" x2="${W-padR}" y2="${padT+innerH}" stroke="rgba(242,240,233,0.09)" stroke-width="1"/>
+        <path d="${areaPath}" fill="url(#areaGradient)" stroke="none"/>
+        <path d="${linePath}" fill="none" stroke="#ff6f5e" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+        ${dots}
+        <text x="${padL}" y="14" class="chart-max-label">${maxHours.toFixed(0)} h</text>
+        <text x="${padL}" y="${H-6}" class="chart-axis-label">${formatDateFr(points[0].date)}</text>
+        <text x="${W-padR}" y="${H-6}" class="chart-axis-label" text-anchor="end">${formatDateFr(points[points.length-1].date)}</text>
+      </svg>
+    `;
+    chartCard.innerHTML = svg;
+  }
+
+  /* ---------------- Add session modal ---------------- */
+  const addOverlay = document.getElementById('addOverlay');
+  const fabBtn = document.getElementById('fabBtn');
+  const cancelAddBtn = document.getElementById('cancelAddBtn');
+  const confirmAddBtn = document.getElementById('confirmAddBtn');
+  const customAmount = document.getElementById('customAmount');
+  const addUnitSeg = document.getElementById('addUnitSeg');
+  let addUnit = 'min';
+
+  function openAddModal(){
+    customAmount.value = '';
+    addOverlay.classList.add('open');
+    setTimeout(() => customAmount.focus(), 250);
+  }
+  function closeAddModal(){ addOverlay.classList.remove('open'); }
+
+  fabBtn.addEventListener('click', openAddModal);
+  cancelAddBtn.addEventListener('click', closeAddModal);
+  addOverlay.addEventListener('click', (e) => { if(e.target === addOverlay) closeAddModal(); });
+
+  addUnitSeg.addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if(!btn) return;
+    addUnitSeg.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    addUnit = btn.dataset.unit;
+  });
+
+  document.getElementById('quickChips').addEventListener('click', (e) => {
+    const chip = e.target.closest('.chip');
+    if(!chip) return;
+    addMinutes(Number(chip.dataset.min));
+  });
+
+  confirmAddBtn.addEventListener('click', () => {
+    const raw = Number(customAmount.value);
+    if(!raw || raw <= 0) return;
+    const minutes = addUnit === 'h' ? raw * 60 : raw;
+    addMinutes(minutes);
+  });
+
+  customAmount.addEventListener('keydown', (e) => {
+    if(e.key === 'Enter') confirmAddBtn.click();
+  });
+
+  function addMinutes(minutes){
+    data.totalMinutes += minutes;
+    const key = todayISO();
+    data.sessions[key] = (data.sessions[key] || 0) + minutes;
+    saveData();
+    render();
+    closeAddModal();
+  }
+
+  /* ---------------- Settings modal ---------------- */
+  const settingsOverlay = document.getElementById('settingsOverlay');
+  const settingsBtn = document.getElementById('settingsBtn');
+  const cancelGoalBtn = document.getElementById('cancelGoalBtn');
+  const saveGoalBtn = document.getElementById('saveGoalBtn');
+  const goalAmount = document.getElementById('goalAmount');
+  const goalUnitSeg = document.getElementById('goalUnitSeg');
+  let goalUnit = 'min';
+
+  function openSettingsModal(){
+    if(data.dailyGoalMinutes > 0){
+      if(data.dailyGoalMinutes % 60 === 0){
+        goalUnit = 'h';
+        goalAmount.value = data.dailyGoalMinutes/60;
+      } else {
+        goalUnit = 'min';
+        goalAmount.value = data.dailyGoalMinutes;
+      }
+    } else {
+      goalUnit = 'min';
+      goalAmount.value = '';
+    }
+    goalUnitSeg.querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.unit === goalUnit));
+    settingsOverlay.classList.add('open');
+    setTimeout(() => goalAmount.focus(), 250);
+  }
+  function closeSettingsModal(){ settingsOverlay.classList.remove('open'); }
+
+  settingsBtn.addEventListener('click', openSettingsModal);
+  cancelGoalBtn.addEventListener('click', closeSettingsModal);
+  settingsOverlay.addEventListener('click', (e) => { if(e.target === settingsOverlay) closeSettingsModal(); });
+
+  goalUnitSeg.addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if(!btn) return;
+    goalUnitSeg.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    goalUnit = btn.dataset.unit;
+  });
+
+  saveGoalBtn.addEventListener('click', () => {
+    const raw = Number(goalAmount.value);
+    data.dailyGoalMinutes = raw > 0 ? (goalUnit === 'h' ? raw*60 : raw) : 0;
+    saveData();
+    render();
+    closeSettingsModal();
+  });
+
+  goalAmount.addEventListener('keydown', (e) => {
+    if(e.key === 'Enter') saveGoalBtn.click();
+  });
+
+  /* ---------------- Init ---------------- */
+  render();
+})();
+</script>
+</body>
+</html>
