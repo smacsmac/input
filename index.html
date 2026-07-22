@@ -170,15 +170,50 @@
     border-radius: var(--radius-md);
     padding: 18px 18px 16px;
   }
-  .proj-card .proj-icon{
-    width: 30px; height:30px; border-radius: 9px;
+  .proj-card-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom: 14px; }
+  .proj-card h3{ font-size: 13.5px; margin: 0; font-weight: 700; color: var(--text); }
+  .proj-edit-btn{
+    background: var(--coral-dim);
+    border: none;
+    color: var(--coral);
+    width: 30px; height: 30px;
+    border-radius: 50%;
     display:flex; align-items:center; justify-content:center;
-    margin-bottom: 10px;
+    cursor:pointer;
+    flex-shrink: 0;
+    transition: transform .15s ease, background .15s ease;
   }
-  .proj-card.goal .proj-icon{ background: var(--coral-dim); color: var(--coral); }
-  .proj-card.real .proj-icon{ background: var(--teal-dim); color: var(--teal); }
-  .proj-card .proj-icon svg{ width:16px; height:16px; }
-  .proj-card h3{ font-size: 13.5px; margin: 0 0 10px; font-weight: 700; color: var(--text); }
+  .proj-edit-btn:hover{ background: rgba(255,111,94,0.24); transform: translateY(-1px); }
+  .proj-edit-btn:focus-visible{ outline: 2px solid var(--coral); outline-offset: 2px; }
+  .proj-edit-btn svg{ width: 14px; height: 14px; }
+  .proj-big-row{ display:flex; align-items:baseline; gap: 8px; margin-bottom: 4px; }
+  .proj-big-num{ font-family: var(--font-display); font-size: 32px; font-weight: 600; line-height: 1; }
+  .proj-card.real .proj-big-num{ color: var(--teal); }
+  .proj-card.goal .proj-big-num{ color: var(--coral); }
+  .proj-big-unit{ font-size: 12px; color: var(--text-faint); font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
+  .proj-card .proj-big-row + .proj-line{ margin-top: 12px; }
+  .mini-seg{
+    display:flex;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  .mini-seg button{
+    background: transparent;
+    border: none;
+    color: var(--text-faint);
+    padding: 6px 11px;
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 11px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all .15s ease;
+  }
+  .mini-seg button.active{ background: var(--teal-dim); color: var(--teal); }
+  .mini-seg button:focus-visible{ outline: 2px solid var(--teal); outline-offset: -2px; }
   .proj-line{ font-size: 13px; color: var(--text-muted); margin-bottom: 8px; line-height: 1.5; }
   .proj-line:last-child{ margin-bottom: 0; }
   .proj-line .big{ color: var(--text); font-weight: 700; font-size: 14px; }
@@ -439,13 +474,22 @@
   <h2 class="section-title">Estimations pour le prochain niveau<span class="rule"></span></h2>
   <div class="proj-grid">
     <div class="proj-card goal">
-      <div class="proj-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg></div>
-      <h3>Selon ton objectif quotidien</h3>
+      <div class="proj-card-head">
+        <h3>Selon ton objectif quotidien</h3>
+        <button class="proj-edit-btn" id="editGoalBtn" aria-label="Modifier l'objectif quotidien" title="Modifier l'objectif">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path></svg>
+        </button>
+      </div>
       <div id="projGoalContent"></div>
     </div>
     <div class="proj-card real">
-      <div class="proj-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg></div>
-      <h3>Selon ton rythme réel</h3>
+      <div class="proj-card-head">
+        <h3>Selon ton rythme réel</h3>
+        <div class="mini-seg" id="realPaceSeg">
+          <button type="button" data-mode="7d" class="active">7 j</button>
+          <button type="button" data-mode="all">Depuis le début</button>
+        </div>
+      </div>
       <div id="projRealContent"></div>
     </div>
   </div>
@@ -513,16 +557,17 @@
   function loadData(){
     try{
       const raw = localStorage.getItem(STORAGE_KEY);
-      if(!raw) return { totalMinutes: 0, dailyGoalMinutes: 0, sessions: {} };
+      if(!raw) return { totalMinutes: 0, dailyGoalMinutes: 0, sessions: {}, realPaceMode: '7d' };
       const parsed = JSON.parse(raw);
       return {
         totalMinutes: parsed.totalMinutes || 0,
         dailyGoalMinutes: parsed.dailyGoalMinutes || 0,
-        sessions: parsed.sessions || {}
+        sessions: parsed.sessions || {},
+        realPaceMode: parsed.realPaceMode === 'all' ? 'all' : '7d'
       };
     }catch(e){
       console.error('Erreur de lecture des données', e);
-      return { totalMinutes: 0, dailyGoalMinutes: 0, sessions: {} };
+      return { totalMinutes: 0, dailyGoalMinutes: 0, sessions: {}, realPaceMode: '7d' };
     }
   }
 
@@ -678,40 +723,51 @@
     const goalBox = document.getElementById('projGoalContent');
     const realBox = document.getElementById('projRealContent');
 
+    document.querySelectorAll('#realPaceSeg button').forEach(b => {
+      b.classList.toggle('active', b.dataset.mode === data.realPaceMode);
+    });
+
+    // Goal-based card: big number is always the goal itself
+    const goalBigHtml = data.dailyGoalMinutes > 0
+      ? `<div class="proj-big-row"><span class="proj-big-num">${formatHoursMin(data.dailyGoalMinutes)}</span><span class="proj-big-unit">par jour</span></div>`
+      : `<div class="proj-big-row"><span class="proj-big-num">—</span></div>`;
+
+    let goalPhrase;
     if(p.maxed){
-      goalBox.innerHTML = `<p class="proj-empty">Tu as atteint le niveau 7, le sommet de l'échelle. Beau travail ! 🎉</p>`;
-      realBox.innerHTML = `<p class="proj-empty">Continue simplement à pratiquer pour consolider ce niveau.</p>`;
+      goalPhrase = `Niveau maximum atteint 🎉`;
+    } else if(p.goalHoursPerDay > 0){
+      goalPhrase = `Tu passeras niveau ${p.next.n} dans ${p.goalDays} jour${p.goalDays>1?'s':''}, le ${formatDateFr(p.goalDate)}.`;
+    } else {
+      goalPhrase = `Définis un objectif pour voir une estimation.`;
+    }
+    goalBox.innerHTML = `${goalBigHtml}<p class="proj-line">${goalPhrase}</p>`;
+
+    // Real-pace card: big number is the 7-day average
+    if(p.maxed){
+      realBox.innerHTML = `<div class="proj-big-row"><span class="proj-big-num">—</span></div><p class="proj-line">Continue à pratiquer pour consolider ce niveau.</p>`;
       return;
     }
 
-    // Goal-based card
-    if(p.goalHoursPerDay > 0){
-      goalBox.innerHTML = `
-        <p class="proj-line">À raison de <span class="big">${formatHoursMin(data.dailyGoalMinutes)} / jour</span>, tu passeras niveau ${p.next.n} dans <span class="big">${p.goalDays} jour${p.goalDays>1?'s':''}</span>.</p>
-        <p class="proj-line">Date estimée : <span class="big">${formatDateFr(p.goalDate)}</span></p>
-      `;
-    } else {
-      goalBox.innerHTML = `<p class="proj-empty">Définis un <a id="proj-goal-link">objectif quotidien</a> pour voir une estimation.</p>`;
-    }
+    // Real-pace card: big number depends on chosen mode (7 days vs since beginning)
+    const mode = data.realPaceMode;
+    const avgMinutes = mode === 'all' ? (p.avgAll ? p.avgAll * 60 : 0) : (p.avg7 ? p.avg7 * 60 : 0);
+    const daysToGo = mode === 'all' ? p.daysAll : p.days7;
+    const dateToGo = mode === 'all' ? p.dateAll : p.date7;
+    const periodLabel = mode === 'all' ? 'depuis le début' : 'sur les 7 derniers jours';
 
-    // Real pace card
+    const realBigHtml = p.hasHistory
+      ? `<div class="proj-big-row"><span class="proj-big-num">${formatHoursMin(avgMinutes)}</span><span class="proj-big-unit">par jour</span></div>`
+      : `<div class="proj-big-row"><span class="proj-big-num">—</span></div>`;
+
+    let realPhrase;
     if(!p.hasHistory){
-      realBox.innerHTML = `<p class="proj-empty">Ajoute quelques sessions pour calculer ton rythme réel.</p>`;
+      realPhrase = `Ajoute des sessions pour calculer ton rythme réel.`;
+    } else if(daysToGo !== null){
+      realPhrase = `À ce rythme (${periodLabel}), tu passeras niveau ${p.next.n} dans ${daysToGo} jour${daysToGo>1?'s':''}, le ${formatDateFr(dateToGo)}.`;
     } else {
-      let html = '';
-      if(p.days7 !== null){
-        html += `<p class="proj-line">7 derniers jours : <span class="big">${formatHoursMin(p.avg7*60)} / jour</span> → niveau ${p.next.n} dans <span class="big">${p.days7} j</span> (${formatDateFr(p.date7)})</p>`;
-      } else {
-        html += `<p class="proj-line">7 derniers jours : aucune session récente.</p>`;
-      }
-      if(p.daysAll !== null){
-        html += `<p class="proj-line">Depuis le début : <span class="big">${formatHoursMin(p.avgAll*60)} / jour</span> → niveau ${p.next.n} dans <span class="big">${p.daysAll} j</span> (${formatDateFr(p.dateAll)})</p>`;
-      }
-      realBox.innerHTML = html;
+      realPhrase = `Aucune session cette semaine — ajoute du temps pour voir une estimation.`;
     }
-
-    const link = document.getElementById('proj-goal-link');
-    if(link) link.addEventListener('click', openSettingsModal);
+    realBox.innerHTML = `${realBigHtml}<p class="proj-line">${realPhrase}</p>`;
   }
 
   function renderLevels(currentIdx){
@@ -894,6 +950,15 @@
   function closeSettingsModal(){ settingsOverlay.classList.remove('open'); }
 
   settingsBtn.addEventListener('click', openSettingsModal);
+  document.getElementById('editGoalBtn').addEventListener('click', openSettingsModal);
+
+  document.getElementById('realPaceSeg').addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if(!btn) return;
+    data.realPaceMode = btn.dataset.mode === 'all' ? 'all' : '7d';
+    saveData();
+    renderProjections();
+  });
   cancelGoalBtn.addEventListener('click', closeSettingsModal);
   settingsOverlay.addEventListener('click', (e) => { if(e.target === settingsOverlay) closeSettingsModal(); });
 
