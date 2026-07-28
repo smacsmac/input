@@ -157,21 +157,16 @@
   }
   .section-title .rule{ flex:1; height:1px; background: var(--border); }
 
-  /* ---------- Projection cards ---------- */
-  .proj-grid{
-    display:grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 14px;
-    animation: fadeSlideIn .6s .15s ease both;
-  }
+  /* ---------- Projection card ---------- */
   .proj-card{
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
     padding: 18px 18px 16px;
+    animation: fadeSlideIn .6s .15s ease both;
   }
-  .proj-card-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom: 14px; }
-  .proj-card h3{ font-size: 13.5px; margin: 0; font-weight: 700; color: var(--text); }
+  .proj-card-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom: 14px; gap: 10px; }
+  .proj-card h3{ font-size: 13.5px; margin: 0 0 14px; font-weight: 700; color: var(--text-muted); }
   .proj-edit-btn{
     background: var(--coral-dim);
     border: none;
@@ -187,9 +182,7 @@
   .proj-edit-btn:focus-visible{ outline: 2px solid var(--coral); outline-offset: 2px; }
   .proj-edit-btn svg{ width: 14px; height: 14px; }
   .proj-big-row{ display:flex; align-items:baseline; gap: 8px; margin-bottom: 4px; }
-  .proj-big-num{ font-family: var(--font-display); font-size: 32px; font-weight: 600; line-height: 1; }
-  .proj-card.real .proj-big-num{ color: var(--teal); }
-  .proj-card.goal .proj-big-num{ color: var(--coral); }
+  .proj-big-num{ font-family: var(--font-display); font-size: 36px; font-weight: 600; line-height: 1; color: var(--coral); }
   .proj-big-unit{ font-size: 12px; color: var(--text-faint); font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
   .proj-card .proj-big-row + .proj-line{ margin-top: 12px; }
   .mini-seg{
@@ -260,6 +253,8 @@
   .level-card .lv-check{ width:16px; height:16px; color: var(--teal); }
   .level-card .lv-hours{ font-size: 12px; color: var(--text-faint); font-weight: 700; margin-bottom: 6px;}
   .level-card .lv-desc{ font-size: 11.5px; color: var(--text-muted); line-height: 1.45; }
+  .level-card .lv-date{ font-size: 11px; color: var(--text-faint); font-weight: 700; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); }
+  .level-card.current .lv-date{ color: var(--coral); }
   .level-card{ cursor: pointer; }
   .level-card:hover{ border-color: rgba(242,240,233,0.25); }
   .level-card:focus-visible{ outline: 2px solid var(--coral); outline-offset: 2px; }
@@ -492,6 +487,21 @@
 
   .field-label{ font-size: 12.5px; color: var(--text-muted); font-weight: 700; margin-bottom: 8px; display:block; }
 
+  .date-input{
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 14.5px;
+    font-weight: 700;
+    padding: 12px 14px;
+    border-radius: var(--radius-sm);
+    color-scheme: dark;
+    margin-bottom: 18px;
+  }
+  .date-input:focus-visible{ outline: 2px solid var(--coral); outline-offset: 1px; }
+
   @keyframes fadeSlideIn{
     from{ opacity: 0; transform: translateY(10px); }
     to{ opacity: 1; transform: translateY(0); }
@@ -506,8 +516,10 @@
     .hero-info{ width: 100%; }
     .stats-row{ grid-template-columns: 1fr 1fr; }
     .stats-row .stat-chip:last-child{ grid-column: span 2; }
-    .proj-grid{ grid-template-columns: 1fr; }
     h1{ font-size: 28px; }
+  }
+  @media (max-width: 400px){
+    .mini-seg button{ padding: 6px 8px; font-size: 10px; }
   }
 </style>
 </head>
@@ -568,27 +580,21 @@
   <div class="week-row" id="weekRow"></div>
 
   <h2 class="section-title">Estimations pour le prochain niveau<span class="rule"></span></h2>
-  <div class="proj-grid">
-    <div class="proj-card goal">
-      <div class="proj-card-head">
-        <h3>Selon ton objectif quotidien</h3>
-        <button class="proj-edit-btn" id="editGoalBtn" aria-label="Modifier l'objectif quotidien" title="Modifier l'objectif">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path></svg>
-        </button>
+  <div class="proj-card single">
+    <div class="proj-card-head">
+      <div class="mini-seg" id="paceModeSeg">
+        <button type="button" data-mode="7d" class="active">7 j</button>
+        <button type="button" data-mode="all">Depuis le début</button>
+        <button type="button" data-mode="goal">Obj</button>
       </div>
-      <div id="projGoalContent"></div>
+      <button class="proj-edit-btn" id="editGoalBtn" aria-label="Modifier l'objectif quotidien" title="Modifier l'objectif">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path></svg>
+      </button>
     </div>
-    <div class="proj-card real">
-      <div class="proj-card-head">
-        <h3>Selon ton rythme réel</h3>
-        <div class="mini-seg" id="realPaceSeg">
-          <button type="button" data-mode="7d" class="active">7 j</button>
-          <button type="button" data-mode="all">Depuis le début</button>
-        </div>
-      </div>
-      <div id="projRealContent"></div>
-    </div>
+    <h3 id="projModeLabel">Selon ton rythme réel (7 derniers jours)</h3>
+    <div id="projContent"></div>
   </div>
+
 
   <h2 class="section-title">Progression cumulée<span class="rule"></span></h2>
   <div class="chart-card" id="chartCard">
@@ -623,6 +629,8 @@
 <div class="overlay" id="addOverlay">
   <div class="modal">
     <h2>Ajouter une session</h2>
+    <span class="field-label">Date</span>
+    <input type="date" class="date-input" id="addDateInput">
     <div class="chip-row" id="quickChips">
       <button class="chip" data-min="15">+15 min</button>
       <button class="chip" data-min="30">+30 min</button>
@@ -669,18 +677,21 @@
   function loadData(){
     try{
       const raw = localStorage.getItem(STORAGE_KEY);
-      if(!raw) return { totalMinutes: 0, dailyGoalMinutes: 0, sessions: {}, realPaceMode: '7d', levelNotes: {} };
+      if(!raw) return { totalMinutes: 0, dailyGoalMinutes: 0, sessions: {}, paceMode: '7d', levelNotes: {} };
       const parsed = JSON.parse(raw);
+      const validModes = ['7d','all','goal'];
+      let mode = parsed.paceMode || parsed.realPaceMode || '7d';
+      if(!validModes.includes(mode)) mode = '7d';
       return {
         totalMinutes: parsed.totalMinutes || 0,
         dailyGoalMinutes: parsed.dailyGoalMinutes || 0,
         sessions: parsed.sessions || {},
-        realPaceMode: parsed.realPaceMode === 'all' ? 'all' : '7d',
+        paceMode: mode,
         levelNotes: parsed.levelNotes || {}
       };
     }catch(e){
       console.error('Erreur de lecture des données', e);
-      return { totalMinutes: 0, dailyGoalMinutes: 0, sessions: {}, realPaceMode: '7d', levelNotes: {} };
+      return { totalMinutes: 0, dailyGoalMinutes: 0, sessions: {}, paceMode: '7d', levelNotes: {} };
     }
   }
 
@@ -750,40 +761,54 @@
   }
 
   /* ---------------- Projections ---------------- */
+  function getRates(){
+    const goalHoursPerDay = data.dailyGoalMinutes/60;
+    const avg7 = sumMinutesInWindow(7)/60/7;
+    const firstDate = getFirstSessionDate();
+    let avgAll = 0;
+    if(firstDate){
+      const daysSinceFirst = Math.max(1, diffDaysInclusive(firstDate, new Date()));
+      avgAll = (data.totalMinutes/60) / daysSinceFirst;
+    }
+    return { goalHoursPerDay, avg7, avgAll, hasHistory: !!firstDate };
+  }
+
+  function rateForMode(mode, rates){
+    if(mode === 'goal') return rates.goalHoursPerDay;
+    if(mode === 'all') return rates.avgAll;
+    return rates.avg7;
+  }
+
+  function estimateDateForHours(targetHours, rate){
+    const totalHours = data.totalMinutes/60;
+    if(totalHours >= targetHours) return null;
+    if(!rate || rate <= 0) return null;
+    const remaining = targetHours - totalHours;
+    const days = Math.ceil(remaining/rate);
+    return addDays(new Date(), days);
+  }
+
+  function formatDateShort(date){
+    return `${date.getDate()}/${date.getMonth()+1}/${String(date.getFullYear()).slice(-2)}`;
+  }
+
   function computeProjections(){
     const totalHours = data.totalMinutes/60;
     const idx = getLevelIndex(totalHours);
     const next = LEVELS[idx+1];
-    if(!next) return { maxed:true };
+    const rates = getRates();
+    if(!next) return { maxed:true, rates };
 
     const remainingHours = Math.max(0, next.hours - totalHours);
-
-    const goalHoursPerDay = data.dailyGoalMinutes/60;
-    let goalDays=null, goalDate=null;
-    if(goalHoursPerDay > 0){
-      goalDays = Math.ceil(remainingHours / goalHoursPerDay);
-      goalDate = addDays(new Date(), goalDays);
+    const mode = data.paceMode;
+    const rate = rateForMode(mode, rates);
+    let days = null, date = null;
+    if(rate > 0){
+      days = Math.ceil(remainingHours / rate);
+      date = addDays(new Date(), days);
     }
 
-    const avg7 = sumMinutesInWindow(7)/60/7;
-    let days7=null, date7=null;
-    if(avg7 > 0){
-      days7 = Math.ceil(remainingHours / avg7);
-      date7 = addDays(new Date(), days7);
-    }
-
-    const firstDate = getFirstSessionDate();
-    let avgAll=0, daysAll=null, dateAll=null;
-    if(firstDate){
-      const daysSinceFirst = Math.max(1, diffDaysInclusive(firstDate, new Date()));
-      avgAll = totalHours / daysSinceFirst;
-      if(avgAll > 0){
-        daysAll = Math.ceil(remainingHours / avgAll);
-        dateAll = addDays(new Date(), daysAll);
-      }
-    }
-
-    return { maxed:false, remainingHours, next, goalHoursPerDay, goalDays, goalDate, avg7, days7, date7, avgAll, daysAll, dateAll, hasHistory: !!firstDate };
+    return { maxed:false, remainingHours, next, mode, rate, days, date, rates, hasHistory: rates.hasHistory };
   }
 
   /* ---------------- Rendering ---------------- */
@@ -834,54 +859,54 @@
 
   function renderProjections(){
     const p = computeProjections();
-    const goalBox = document.getElementById('projGoalContent');
-    const realBox = document.getElementById('projRealContent');
+    const contentBox = document.getElementById('projContent');
+    const modeLabel = document.getElementById('projModeLabel');
 
-    document.querySelectorAll('#realPaceSeg button').forEach(b => {
-      b.classList.toggle('active', b.dataset.mode === data.realPaceMode);
+    document.querySelectorAll('#paceModeSeg button').forEach(b => {
+      b.classList.toggle('active', b.dataset.mode === data.paceMode);
     });
 
-    // Goal-based card: big number is always the goal itself
-    const goalBigHtml = data.dailyGoalMinutes > 0
-      ? `<div class="proj-big-row"><span class="proj-big-num">${formatHoursMin(data.dailyGoalMinutes)}</span><span class="proj-big-unit">par jour</span></div>`
-      : `<div class="proj-big-row"><span class="proj-big-num">—</span></div>`;
+    const labels = {
+      '7d': 'Selon ton rythme réel (7 derniers jours)',
+      'all': 'Selon ton rythme réel (depuis le début)',
+      'goal': 'Selon ton objectif quotidien'
+    };
+    modeLabel.textContent = labels[data.paceMode] || labels['7d'];
 
-    let goalPhrase;
     if(p.maxed){
-      goalPhrase = `Niveau maximum atteint 🎉`;
-    } else if(p.goalHoursPerDay > 0){
-      goalPhrase = `Tu passeras niveau ${p.next.n} dans ${p.goalDays} jour${p.goalDays>1?'s':''}, le ${formatDateFr(p.goalDate)}.`;
-    } else {
-      goalPhrase = `Définis un objectif pour voir une estimation.`;
-    }
-    goalBox.innerHTML = `${goalBigHtml}<p class="proj-line">${goalPhrase}</p>`;
-
-    // Real-pace card: big number is the 7-day average
-    if(p.maxed){
-      realBox.innerHTML = `<div class="proj-big-row"><span class="proj-big-num">—</span></div><p class="proj-line">Continue à pratiquer pour consolider ce niveau.</p>`;
+      contentBox.innerHTML = `<div class="proj-big-row"><span class="proj-big-num">🎉</span></div><p class="proj-line">Niveau maximum atteint. Continue à pratiquer pour consolider ce niveau !</p>`;
       return;
     }
 
-    // Real-pace card: big number depends on chosen mode (7 days vs since beginning)
-    const mode = data.realPaceMode;
-    const avgMinutes = mode === 'all' ? (p.avgAll ? p.avgAll * 60 : 0) : (p.avg7 ? p.avg7 * 60 : 0);
-    const daysToGo = mode === 'all' ? p.daysAll : p.days7;
-    const dateToGo = mode === 'all' ? p.dateAll : p.date7;
-    const periodLabel = mode === 'all' ? 'depuis le début' : 'sur les 7 derniers jours';
+    const mode = data.paceMode;
 
-    const realBigHtml = p.hasHistory
-      ? `<div class="proj-big-row"><span class="proj-big-num">${formatHoursMin(avgMinutes)}</span><span class="proj-big-unit">par jour</span></div>`
+    if(mode === 'goal'){
+      const bigHtml = data.dailyGoalMinutes > 0
+        ? `<div class="proj-big-row"><span class="proj-big-num">${formatHoursMin(data.dailyGoalMinutes)}</span><span class="proj-big-unit">par jour</span></div>`
+        : `<div class="proj-big-row"><span class="proj-big-num">—</span></div>`;
+      const phrase = data.dailyGoalMinutes > 0
+        ? `Tu passeras niveau ${p.next.n} dans ${p.days} jour${p.days>1?'s':''}, le ${formatDateFr(p.date)}.`
+        : `Définis un objectif pour voir une estimation.`;
+      contentBox.innerHTML = `${bigHtml}<p class="proj-line">${phrase}</p>`;
+      return;
+    }
+
+    // 7d or all
+    const bigHtml = p.hasHistory
+      ? `<div class="proj-big-row"><span class="proj-big-num">${formatHoursMin(p.rate*60)}</span><span class="proj-big-unit">par jour</span></div>`
       : `<div class="proj-big-row"><span class="proj-big-num">—</span></div>`;
 
-    let realPhrase;
+    let phrase;
     if(!p.hasHistory){
-      realPhrase = `Ajoute des sessions pour calculer ton rythme réel.`;
-    } else if(daysToGo !== null){
-      realPhrase = `À ce rythme (${periodLabel}), tu passeras niveau ${p.next.n} dans ${daysToGo} jour${daysToGo>1?'s':''}, le ${formatDateFr(dateToGo)}.`;
+      phrase = `Ajoute des sessions pour calculer ton rythme réel.`;
+    } else if(p.days !== null){
+      phrase = `À ce rythme, tu passeras niveau ${p.next.n} dans ${p.days} jour${p.days>1?'s':''}, le ${formatDateFr(p.date)}.`;
     } else {
-      realPhrase = `Aucune session cette semaine — ajoute du temps pour voir une estimation.`;
+      phrase = mode === '7d'
+        ? `Aucune session cette semaine — ajoute du temps pour voir une estimation.`
+        : `Ajoute des sessions pour voir une estimation.`;
     }
-    realBox.innerHTML = `${realBigHtml}<p class="proj-line">${realPhrase}</p>`;
+    contentBox.innerHTML = `${bigHtml}<p class="proj-line">${phrase}</p>`;
   }
 
   const MONTHS_FR_SHORT = ['janv','févr','mars','avr','mai','juin','juil','août','sept','oct','nov','déc'];
@@ -909,6 +934,8 @@
   function renderLevels(currentIdx){
     const container = document.getElementById('levelsScroll');
     container.innerHTML = '';
+    const rates = getRates();
+    const rate = rateForMode(data.paceMode, rates);
     LEVELS.forEach((lv, i) => {
       const card = document.createElement('div');
       let cls = 'level-card';
@@ -924,6 +951,12 @@
         ? `<svg class="lv-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`
         : '';
 
+      let dateHtml = '';
+      if(i > currentIdx){
+        const estDate = estimateDateForHours(lv.hours, rate);
+        dateHtml = `<div class="lv-date">≈ ${estDate ? formatDateShort(estDate) : '—'}</div>`;
+      }
+
       card.innerHTML = `
         <div class="lv-top">
           <span class="lv-hangul">${lv.hangul}</span>
@@ -931,6 +964,7 @@
         </div>
         <div class="lv-hours">Niveau ${lv.n} · ${lv.hours} h</div>
         <div class="lv-desc">${lv.desc}</div>
+        ${dateHtml}
       `;
       container.appendChild(card);
     });
@@ -1014,10 +1048,14 @@
   const confirmAddBtn = document.getElementById('confirmAddBtn');
   const customAmount = document.getElementById('customAmount');
   const addUnitSeg = document.getElementById('addUnitSeg');
+  const addDateInput = document.getElementById('addDateInput');
   let addUnit = 'min';
 
   function openAddModal(){
     customAmount.value = '';
+    const todayKey = todayISO();
+    addDateInput.value = todayKey;
+    addDateInput.max = todayKey;
     addOverlay.classList.add('open');
     setTimeout(() => customAmount.focus(), 250);
   }
@@ -1038,23 +1076,23 @@
   document.getElementById('quickChips').addEventListener('click', (e) => {
     const chip = e.target.closest('.chip');
     if(!chip) return;
-    addMinutes(Number(chip.dataset.min));
+    addMinutes(Number(chip.dataset.min), addDateInput.value || todayISO());
   });
 
   confirmAddBtn.addEventListener('click', () => {
     const raw = Number(customAmount.value);
     if(!raw || raw <= 0) return;
     const minutes = addUnit === 'h' ? raw * 60 : raw;
-    addMinutes(minutes);
+    addMinutes(minutes, addDateInput.value || todayISO());
   });
 
   customAmount.addEventListener('keydown', (e) => {
     if(e.key === 'Enter') confirmAddBtn.click();
   });
 
-  function addMinutes(minutes){
+  function addMinutes(minutes, dateKey){
     data.totalMinutes += minutes;
-    const key = todayISO();
+    const key = dateKey || todayISO();
     data.sessions[key] = (data.sessions[key] || 0) + minutes;
     saveData();
     render();
@@ -1092,12 +1130,13 @@
   settingsBtn.addEventListener('click', openSettingsModal);
   document.getElementById('editGoalBtn').addEventListener('click', openSettingsModal);
 
-  document.getElementById('realPaceSeg').addEventListener('click', (e) => {
+  document.getElementById('paceModeSeg').addEventListener('click', (e) => {
     const btn = e.target.closest('button');
     if(!btn) return;
-    data.realPaceMode = btn.dataset.mode === 'all' ? 'all' : '7d';
+    const validModes = ['7d','all','goal'];
+    data.paceMode = validModes.includes(btn.dataset.mode) ? btn.dataset.mode : '7d';
     saveData();
-    renderProjections();
+    render();
   });
   cancelGoalBtn.addEventListener('click', closeSettingsModal);
   settingsOverlay.addEventListener('click', (e) => { if(e.target === settingsOverlay) closeSettingsModal(); });
