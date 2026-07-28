@@ -208,6 +208,7 @@
   .mini-seg button.active{ background: var(--teal-dim); color: var(--teal); }
   .mini-seg button:focus-visible{ outline: 2px solid var(--teal); outline-offset: -2px; }
   .proj-line{ font-size: 13px; color: var(--text-muted); margin-bottom: 8px; line-height: 1.5; }
+  #projContent .proj-line{ min-height: 3em; margin-bottom: 0; }
   .proj-line:last-child{ margin-bottom: 0; }
   .proj-line .big{ color: var(--text); font-weight: 700; font-size: 14px; }
   .proj-empty{ font-size: 13px; color: var(--text-faint); line-height: 1.5; }
@@ -253,7 +254,7 @@
   .level-card .lv-check{ width:16px; height:16px; color: var(--teal); }
   .level-card .lv-hours{ font-size: 12px; color: var(--text-faint); font-weight: 700; margin-bottom: 6px;}
   .level-card .lv-desc{ font-size: 11.5px; color: var(--text-muted); line-height: 1.45; }
-  .level-card .lv-date{ font-size: 11px; color: var(--text-faint); font-weight: 700; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); }
+  .level-card .lv-date{ font-size: 10.5px; line-height: 1.35; color: var(--text-faint); font-weight: 700; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); }
   .level-card.current .lv-date{ color: var(--coral); }
   .level-card{ cursor: pointer; }
   .level-card:hover{ border-color: rgba(242,240,233,0.25); }
@@ -273,7 +274,11 @@
     padding: 10px 2px 11px;
     text-align: center;
     min-width: 0;
+    cursor: pointer;
+    transition: border-color .15s ease, transform .15s ease;
   }
+  .week-day:hover{ border-color: rgba(242,240,233,0.25); transform: translateY(-1px); }
+  .week-day:focus-visible{ outline: 2px solid var(--coral); outline-offset: 2px; }
   .week-day.today{ border-color: var(--coral); }
   .week-day .wd-date{ font-size: 10px; color: var(--text-faint); font-weight: 700; text-transform: uppercase; margin-bottom: 7px; letter-spacing: .01em; }
   .week-day.today .wd-date{ color: var(--coral); }
@@ -667,6 +672,23 @@
   </div>
 </div>
 
+<!-- Edit day modal -->
+<div class="overlay" id="editDayOverlay">
+  <div class="modal">
+    <h2 id="editDayTitle">Modifier ce jour</h2>
+    <span class="field-label">Temps total pour ce jour</span>
+    <div class="input-row">
+      <input type="number" id="editDayAmount" min="0" placeholder="0" inputmode="numeric">
+      <div class="seg" id="editDayUnitSeg">
+        <button type="button" class="active" data-unit="min">min</button>
+        <button type="button" data-unit="h">h</button>
+      </div>
+    </div>
+    <button class="btn-primary" id="saveEditDayBtn">Enregistrer</button>
+    <button class="btn-text" id="cancelEditDayBtn">Annuler</button>
+  </div>
+</div>
+
 <script>
 (function(){
   "use strict";
@@ -790,6 +812,12 @@
 
   function formatDateShort(date){
     return `${date.getDate()}/${date.getMonth()+1}/${String(date.getFullYear()).slice(-2)}`;
+  }
+  function formatDateFrCap(date){
+    const s = formatDateFr(date);
+    const parts = s.split(' ');
+    parts[1] = parts[1].charAt(0).toUpperCase() + parts[1].slice(1);
+    return parts.join(' ');
   }
 
   function computeProjections(){
@@ -923,6 +951,10 @@
       const isToday = key === todayKey;
       const cell = document.createElement('div');
       cell.className = 'week-day' + (isToday ? ' today' : '') + (minutes > 0 ? ' has-data' : '');
+      cell.dataset.date = key;
+      cell.tabIndex = 0;
+      cell.setAttribute('role', 'button');
+      cell.setAttribute('aria-label', `Modifier le temps du ${d.getDate()} ${MONTHS_FR_SHORT[d.getMonth()]}`);
       cell.innerHTML = `
         <div class="wd-date">${d.getDate()} ${MONTHS_FR_SHORT[d.getMonth()]}</div>
         <div class="wd-min">${minutes}</div>
@@ -954,7 +986,7 @@
       let dateHtml = '';
       if(i > currentIdx){
         const estDate = estimateDateForHours(lv.hours, rate);
-        dateHtml = `<div class="lv-date">≈ ${estDate ? formatDateShort(estDate) : '—'}</div>`;
+        dateHtml = `<div class="lv-date">≈ ${estDate ? formatDateFrCap(estDate) : '—'}</div>`;
       }
 
       card.innerHTML = `
@@ -1159,6 +1191,73 @@
 
   goalAmount.addEventListener('keydown', (e) => {
     if(e.key === 'Enter') saveGoalBtn.click();
+  });
+
+  /* ---------------- Edit day modal ---------------- */
+  const editDayOverlay = document.getElementById('editDayOverlay');
+  const editDayAmount = document.getElementById('editDayAmount');
+  const editDayUnitSeg = document.getElementById('editDayUnitSeg');
+  const saveEditDayBtn = document.getElementById('saveEditDayBtn');
+  const cancelEditDayBtn = document.getElementById('cancelEditDayBtn');
+  let editDayUnit = 'min';
+  let editDayKeyCurrent = null;
+
+  function openEditDayModal(dateKey, dateObj){
+    editDayKeyCurrent = dateKey;
+    const minutes = data.sessions[dateKey] || 0;
+    document.getElementById('editDayTitle').textContent = `Modifier le ${formatDateFr(dateObj)}`;
+    editDayUnit = 'min';
+    editDayUnitSeg.querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.unit === 'min'));
+    editDayAmount.value = minutes || '';
+    editDayOverlay.classList.add('open');
+    setTimeout(() => editDayAmount.focus(), 250);
+  }
+  function closeEditDayModal(){ editDayOverlay.classList.remove('open'); editDayKeyCurrent = null; }
+
+  document.getElementById('weekRow').addEventListener('click', (e) => {
+    const cell = e.target.closest('.week-day');
+    if(!cell) return;
+    const key = cell.dataset.date;
+    const [y,m,d] = key.split('-').map(Number);
+    openEditDayModal(key, new Date(y, m-1, d));
+  });
+  document.getElementById('weekRow').addEventListener('keydown', (e) => {
+    if(e.key !== 'Enter' && e.key !== ' ') return;
+    const cell = e.target.closest('.week-day');
+    if(!cell) return;
+    e.preventDefault();
+    const key = cell.dataset.date;
+    const [y,m,d] = key.split('-').map(Number);
+    openEditDayModal(key, new Date(y, m-1, d));
+  });
+
+  editDayUnitSeg.addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if(!btn) return;
+    editDayUnitSeg.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    editDayUnit = btn.dataset.unit;
+  });
+
+  cancelEditDayBtn.addEventListener('click', closeEditDayModal);
+  editDayOverlay.addEventListener('click', (e) => { if(e.target === editDayOverlay) closeEditDayModal(); });
+
+  saveEditDayBtn.addEventListener('click', () => {
+    if(editDayKeyCurrent === null) return;
+    const raw = Number(editDayAmount.value) || 0;
+    const newMinutes = Math.max(0, editDayUnit === 'h' ? raw * 60 : raw);
+    const oldMinutes = data.sessions[editDayKeyCurrent] || 0;
+    const diff = newMinutes - oldMinutes;
+    data.totalMinutes = Math.max(0, data.totalMinutes + diff);
+    if(newMinutes > 0) data.sessions[editDayKeyCurrent] = newMinutes;
+    else delete data.sessions[editDayKeyCurrent];
+    saveData();
+    render();
+    closeEditDayModal();
+  });
+
+  editDayAmount.addEventListener('keydown', (e) => {
+    if(e.key === 'Enter') saveEditDayBtn.click();
   });
 
   /* ---------------- Level notes screen ---------------- */
