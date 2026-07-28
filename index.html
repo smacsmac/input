@@ -260,6 +260,99 @@
   .level-card .lv-check{ width:16px; height:16px; color: var(--teal); }
   .level-card .lv-hours{ font-size: 12px; color: var(--text-faint); font-weight: 700; margin-bottom: 6px;}
   .level-card .lv-desc{ font-size: 11.5px; color: var(--text-muted); line-height: 1.45; }
+  .level-card{ cursor: pointer; }
+  .level-card:hover{ border-color: rgba(242,240,233,0.25); }
+  .level-card:focus-visible{ outline: 2px solid var(--coral); outline-offset: 2px; }
+
+  /* ---------- Week row ---------- */
+  .week-row{
+    display:flex;
+    gap: 8px;
+    animation: fadeSlideIn .6s .12s ease both;
+  }
+  .week-day{
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 10px 2px 11px;
+    text-align: center;
+    min-width: 0;
+  }
+  .week-day.today{ border-color: var(--coral); }
+  .week-day .wd-date{ font-size: 10px; color: var(--text-faint); font-weight: 700; text-transform: uppercase; margin-bottom: 7px; letter-spacing: .01em; }
+  .week-day.today .wd-date{ color: var(--coral); }
+  .week-day .wd-min{ font-family: var(--font-display); font-size: 16px; font-weight: 600; color: var(--text-faint); }
+  .week-day.has-data .wd-min{ color: var(--teal); }
+  @media (max-width: 420px){
+    .week-day .wd-date{ font-size: 9px; }
+    .week-day .wd-min{ font-size: 14px; }
+  }
+
+  /* ---------- Level notes screen ---------- */
+  .level-screen{
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse 120% 80% at 50% -10%, #201e38 0%, var(--bg) 55%);
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    padding: 20px 20px calc(20px + env(safe-area-inset-bottom, 0px));
+    transform: translateX(100%);
+    transition: transform .32s cubic-bezier(.16,1,.3,1);
+  }
+  .level-screen.open{ transform: translateX(0); }
+
+  .level-screen-header{
+    display:flex;
+    align-items:center;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-shrink: 0;
+  }
+  .level-screen-title{ flex:1; text-align:center; }
+  .level-screen-title .lst-hangul{ font-family: var(--font-display); font-style: italic; color: var(--coral); font-size: 18px; margin-right: 8px; }
+  .level-screen-title .lst-name{ font-family: var(--font-display); font-weight: 600; font-size: 18px; }
+  .level-screen-spacer{ width: 44px; flex-shrink: 0; }
+
+  .level-screen-desc{
+    color: var(--text-muted);
+    font-size: 13px;
+    line-height: 1.5;
+    margin: 0 0 16px;
+    flex-shrink: 0;
+  }
+
+  .paper-card{
+    flex: 1;
+    min-height: 0;
+    background: #f4ecd8;
+    border-radius: var(--radius-md);
+    box-shadow: 0 20px 50px -20px rgba(0,0,0,0.6);
+    display: flex;
+    overflow: hidden;
+  }
+
+  .lined-paper{
+    flex: 1;
+    width: 100%;
+    border: none;
+    outline: none;
+    resize: none;
+    background-color: transparent;
+    background-image: linear-gradient(rgba(90,70,45,0.22) 1px, transparent 1px);
+    background-size: 100% 2rem;
+    background-position-y: 1.95rem;
+    line-height: 2rem;
+    padding: 0 18px;
+    font-family: var(--font-body);
+    font-size: 15px;
+    color: #3a2e1a;
+    caret-color: #b5432f;
+  }
+  .lined-paper::placeholder{ color: rgba(58,46,26,0.4); }
+  .lined-paper::-webkit-scrollbar{ width: 8px; }
+  .lined-paper::-webkit-scrollbar-thumb{ background: rgba(90,70,45,0.2); border-radius: 8px; }
 
   /* ---------- FAB ---------- */
   .fab{
@@ -471,6 +564,9 @@
     </div>
   </div>
 
+  <h2 class="section-title">Cette semaine<span class="rule"></span></h2>
+  <div class="week-row" id="weekRow"></div>
+
   <h2 class="section-title">Estimations pour le prochain niveau<span class="rule"></span></h2>
   <div class="proj-grid">
     <div class="proj-card goal">
@@ -506,6 +602,22 @@
 <button class="fab" id="fabBtn" aria-label="Ajouter une session">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
 </button>
+
+<div class="level-screen" id="levelScreen">
+  <div class="level-screen-header">
+    <button class="icon-btn" id="levelBackBtn" aria-label="Retour à l'écran principal">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+    </button>
+    <div class="level-screen-title">
+      <span class="lst-hangul" id="lstHangul">일</span><span class="lst-name" id="lstName">Niveau 1</span>
+    </div>
+    <div class="level-screen-spacer"></div>
+  </div>
+  <p class="level-screen-desc" id="lstDesc"></p>
+  <div class="paper-card">
+    <textarea class="lined-paper" id="levelNotesArea" placeholder="Ressources, vidéos, chaînes utilisées à ce niveau..." spellcheck="false"></textarea>
+  </div>
+</div>
 
 <!-- Add session modal -->
 <div class="overlay" id="addOverlay">
@@ -557,17 +669,18 @@
   function loadData(){
     try{
       const raw = localStorage.getItem(STORAGE_KEY);
-      if(!raw) return { totalMinutes: 0, dailyGoalMinutes: 0, sessions: {}, realPaceMode: '7d' };
+      if(!raw) return { totalMinutes: 0, dailyGoalMinutes: 0, sessions: {}, realPaceMode: '7d', levelNotes: {} };
       const parsed = JSON.parse(raw);
       return {
         totalMinutes: parsed.totalMinutes || 0,
         dailyGoalMinutes: parsed.dailyGoalMinutes || 0,
         sessions: parsed.sessions || {},
-        realPaceMode: parsed.realPaceMode === 'all' ? 'all' : '7d'
+        realPaceMode: parsed.realPaceMode === 'all' ? 'all' : '7d',
+        levelNotes: parsed.levelNotes || {}
       };
     }catch(e){
       console.error('Erreur de lecture des données', e);
-      return { totalMinutes: 0, dailyGoalMinutes: 0, sessions: {}, realPaceMode: '7d' };
+      return { totalMinutes: 0, dailyGoalMinutes: 0, sessions: {}, realPaceMode: '7d', levelNotes: {} };
     }
   }
 
@@ -714,6 +827,7 @@
     document.getElementById('statGoal').textContent = data.dailyGoalMinutes > 0 ? formatHoursMin(data.dailyGoalMinutes) : '—';
 
     renderProjections();
+    renderWeekRow();
     renderLevels(idx);
     renderChart();
   }
@@ -770,6 +884,28 @@
     realBox.innerHTML = `${realBigHtml}<p class="proj-line">${realPhrase}</p>`;
   }
 
+  const MONTHS_FR_SHORT = ['janv','févr','mars','avr','mai','juin','juil','août','sept','oct','nov','déc'];
+
+  function renderWeekRow(){
+    const container = document.getElementById('weekRow');
+    container.innerHTML = '';
+    const today = new Date();
+    const todayKey = todayISO();
+    for(let i=6;i>=0;i--){
+      const d = addDays(today, -i);
+      const key = toISODate(d);
+      const minutes = Math.round(data.sessions[key] || 0);
+      const isToday = key === todayKey;
+      const cell = document.createElement('div');
+      cell.className = 'week-day' + (isToday ? ' today' : '') + (minutes > 0 ? ' has-data' : '');
+      cell.innerHTML = `
+        <div class="wd-date">${d.getDate()} ${MONTHS_FR_SHORT[d.getMonth()]}</div>
+        <div class="wd-min">${minutes}</div>
+      `;
+      container.appendChild(cell);
+    }
+  }
+
   function renderLevels(currentIdx){
     const container = document.getElementById('levelsScroll');
     container.innerHTML = '';
@@ -779,6 +915,10 @@
       if(i < currentIdx) cls += ' done';
       else if(i === currentIdx) cls += ' current';
       card.className = cls;
+      card.tabIndex = 0;
+      card.setAttribute('role', 'button');
+      card.setAttribute('aria-label', `Ouvrir les notes du niveau ${lv.n}`);
+      card.dataset.levelIndex = i;
 
       const checkSvg = i < currentIdx
         ? `<svg class="lv-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`
@@ -980,6 +1120,63 @@
 
   goalAmount.addEventListener('keydown', (e) => {
     if(e.key === 'Enter') saveGoalBtn.click();
+  });
+
+  /* ---------------- Level notes screen ---------------- */
+  const levelScreen = document.getElementById('levelScreen');
+  const levelsScroll = document.getElementById('levelsScroll');
+  const levelBackBtn = document.getElementById('levelBackBtn');
+  const levelNotesArea = document.getElementById('levelNotesArea');
+  let currentNotesLevel = null;
+  let notesSaveTimer = null;
+
+  function openLevelScreen(levelIdx){
+    const lv = LEVELS[levelIdx];
+    if(!lv) return;
+    currentNotesLevel = levelIdx;
+    document.getElementById('lstHangul').textContent = lv.hangul;
+    document.getElementById('lstName').textContent = `Niveau ${lv.n}`;
+    document.getElementById('lstDesc').textContent = lv.desc;
+    levelNotesArea.value = data.levelNotes[lv.n] || '';
+    levelScreen.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => levelNotesArea.focus({ preventScroll: true }), 320);
+  }
+
+  function closeLevelScreen(){
+    levelScreen.classList.remove('open');
+    document.body.style.overflow = '';
+    currentNotesLevel = null;
+  }
+
+  levelsScroll.addEventListener('click', (e) => {
+    const card = e.target.closest('.level-card');
+    if(!card) return;
+    openLevelScreen(Number(card.dataset.levelIndex));
+  });
+
+  levelsScroll.addEventListener('keydown', (e) => {
+    if(e.key !== 'Enter' && e.key !== ' ') return;
+    const card = e.target.closest('.level-card');
+    if(!card) return;
+    e.preventDefault();
+    openLevelScreen(Number(card.dataset.levelIndex));
+  });
+
+  levelBackBtn.addEventListener('click', closeLevelScreen);
+
+  document.addEventListener('keydown', (e) => {
+    if(e.key === 'Escape' && levelScreen.classList.contains('open')) closeLevelScreen();
+  });
+
+  levelNotesArea.addEventListener('input', () => {
+    if(currentNotesLevel === null) return;
+    const lv = LEVELS[currentNotesLevel];
+    clearTimeout(notesSaveTimer);
+    notesSaveTimer = setTimeout(() => {
+      data.levelNotes[lv.n] = levelNotesArea.value;
+      saveData();
+    }, 350);
   });
 
   /* ---------------- Init ---------------- */
