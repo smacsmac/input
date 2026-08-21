@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#14131f">
 <title>Suivi d'input · 한국어</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,25 +17,32 @@
     --text: #f2f0e9;
     --text-muted: #a19dc2;
     --text-faint: #6d6a8c;
+    /* --- Couleur d'accent : pilotée par le thème de chaque langue --- */
     --coral: #ff6f5e;
     --coral-soft: #ffb3a8;
     --coral-dim: rgba(255,111,94,0.14);
+    --coral-shadow: rgba(255,111,94,0.55);
+    --accent-glow: rgba(255,111,94,0.13);
     --teal: #52d6c9;
     --teal-dim: rgba(82,214,201,0.14);
     --gold: #f2c14e;
+    --danger: #ff8080;
     --shadow: 0 20px 50px -20px rgba(0,0,0,0.6);
     --radius-lg: 24px;
     --radius-md: 16px;
     --radius-sm: 10px;
     --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
     --font-body: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --page-bg:
+      radial-gradient(ellipse 120% 80% at 50% -10%, var(--accent-glow) 0%, transparent 62%),
+      radial-gradient(ellipse 120% 80% at 50% -10%, #201e38 0%, var(--bg) 55%);
   }
 
   *{ box-sizing: border-box; }
 
   html, body{
     margin:0; padding:0;
-    background: radial-gradient(ellipse 120% 80% at 50% -10%, #201e38 0%, var(--bg) 55%);
+    background: var(--page-bg);
     color: var(--text);
     font-family: var(--font-body);
     -webkit-font-smoothing: antialiased;
@@ -49,13 +57,19 @@
     max-width: 760px;
     margin: 0 auto;
   }
+  .wrap.page-in{ animation: pageIn .34s cubic-bezier(.16,1,.3,1) both; }
+  @keyframes pageIn{
+    from{ opacity:0; transform: translateX(var(--slide-from, 20px)); }
+    to{ opacity:1; transform: none; }
+  }
 
   /* ---------- Header ---------- */
   header{
     display:flex;
     align-items:flex-start;
     justify-content: space-between;
-    margin-bottom: 28px;
+    gap: 14px;
+    margin-bottom: 14px;
     animation: fadeSlideIn .6s ease both;
   }
 
@@ -74,9 +88,13 @@
     font-size: 34px;
     margin: 0;
     letter-spacing: -0.01em;
+    overflow-wrap: anywhere;
   }
 
   h1 .hangul{ color: var(--coral); font-style: italic; font-weight: 500;}
+
+  .head-titles{ min-width: 0; }
+  .head-actions{ display:flex; gap: 8px; flex-shrink: 0; }
 
   .icon-btn{
     background: var(--surface);
@@ -92,6 +110,40 @@
   .icon-btn:hover{ color: var(--text); border-color: rgba(242,240,233,0.2); transform: translateY(-1px); }
   .icon-btn:focus-visible{ outline: 2px solid var(--coral); outline-offset: 2px; }
   .icon-btn svg{ width: 20px; height: 20px; }
+  .icon-btn:disabled{ opacity: .3; cursor: default; }
+  .icon-btn:disabled:hover{ color: var(--text-muted); border-color: var(--border); transform:none; }
+  .icon-btn.is-add{ color: var(--coral); border-color: var(--coral-dim); background: var(--coral-dim); }
+
+  /* ---------- Points de navigation entre langues ---------- */
+  .lang-dots{
+    display:flex; align-items:center; gap: 7px;
+    margin: 0 0 22px;
+    flex-wrap: wrap;
+    animation: fadeSlideIn .6s .03s ease both;
+  }
+  .lang-dot{
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    background: rgba(242,240,233,0.16);
+    border: none; padding: 0;
+    cursor: pointer;
+    transition: all .2s cubic-bezier(.16,1,.3,1);
+  }
+  .lang-dot:hover{ background: rgba(242,240,233,0.36); }
+  .lang-dot:focus-visible{ outline: 2px solid var(--coral); outline-offset: 3px; }
+  .lang-dot.active{ width: 26px; border-radius: 99px; background: var(--coral); }
+  .lang-dot.add{
+    width: 18px; height: 18px;
+    background: transparent;
+    border: 1px dashed rgba(242,240,233,0.24);
+    color: var(--text-faint);
+    font-size: 12px; line-height: 1;
+    font-family: var(--font-body); font-weight: 700;
+    display:flex; align-items:center; justify-content:center;
+    border-radius: 50%;
+    margin-left: 3px;
+  }
+  .lang-dot.add:hover{ color: var(--coral); border-color: var(--coral); background: transparent; }
 
   /* ---------- Hero card ---------- */
   .hero{
@@ -110,6 +162,8 @@
   .ring-wrap svg{ width: 100%; height: 100%; transform: rotate(-90deg); }
   .ring-track{ fill:none; stroke: rgba(242,240,233,0.07); stroke-width: 10; }
   .ring-progress{ fill:none; stroke: url(#ringGradient); stroke-width: 10; stroke-linecap: round; transition: stroke-dashoffset .8s cubic-bezier(.16,1,.3,1); }
+  .grad-start{ stop-color: var(--coral); }
+  .grad-end{ stop-color: var(--coral-soft); }
   .ring-center{
     position:absolute; inset:0;
     display:flex; flex-direction:column; align-items:center; justify-content:center;
@@ -130,7 +184,7 @@
   /* ---------- Stats row ---------- */
   .stats-row{
     display:grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 12px;
     margin-top: 18px;
     animation: fadeSlideIn .6s .1s ease both;
@@ -140,10 +194,14 @@
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
     padding: 14px 16px;
+    min-width: 0;
   }
   .stat-chip .stat-label{ font-size: 11.5px; text-transform: uppercase; letter-spacing: .08em; color: var(--text-faint); font-weight: 700; margin-bottom: 5px;}
-  .stat-chip .stat-value{ font-family: var(--font-display); font-size: 21px; font-weight: 600; }
+  .stat-chip .stat-value{ font-family: var(--font-display); font-size: 21px; font-weight: 600; white-space: nowrap; }
   .stat-chip .stat-value.accent{ color: var(--coral); }
+  .stat-chip .stat-value.streak{ color: var(--gold); }
+  .stat-chip .stat-sub{ font-size: 10.5px; color: var(--text-faint); font-weight: 700; margin-top: 3px; }
+  .flame{ font-size: 15px; }
 
   /* ---------- Section titles ---------- */
   .section-title{
@@ -178,7 +236,7 @@
     flex-shrink: 0;
     transition: transform .15s ease, background .15s ease;
   }
-  .proj-edit-btn:hover{ background: rgba(255,111,94,0.24); transform: translateY(-1px); }
+  .proj-edit-btn:hover{ transform: translateY(-1px); filter: brightness(1.25); }
   .proj-edit-btn:focus-visible{ outline: 2px solid var(--coral); outline-offset: 2px; }
   .proj-edit-btn svg{ width: 14px; height: 14px; }
   .proj-big-row{ display:flex; align-items:baseline; gap: 8px; margin-bottom: 4px; }
@@ -226,6 +284,11 @@
   .chart-svg{ width: 100%; height: auto; display:block; }
   .chart-axis-label{ font-size: 10.5px; fill: var(--text-faint); font-family: var(--font-body); }
   .chart-max-label{ font-size: 10.5px; fill: var(--text-faint); font-family: var(--font-body); }
+  .chart-line{ fill:none; stroke: var(--coral); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+  .chart-area{ fill: url(#areaGradient); stroke: none; }
+  .chart-dot{ fill: var(--coral); stroke: var(--bg); stroke-width: 1.5; }
+  .area-start{ stop-color: var(--coral); stop-opacity: .35; }
+  .area-end{ stop-color: var(--coral); stop-opacity: 0; }
 
   /* ---------- Levels roadmap ---------- */
   .levels-scroll{
@@ -289,11 +352,11 @@
     .week-day .wd-min{ font-size: 14px; }
   }
 
-  /* ---------- Level notes screen ---------- */
-  .level-screen{
+  /* ---------- Écrans plein page (notes de niveau / nouvelle langue) ---------- */
+  .screen{
     position: fixed;
     inset: 0;
-    background: radial-gradient(ellipse 120% 80% at 50% -10%, #201e38 0%, var(--bg) 55%);
+    background: var(--page-bg);
     z-index: 50;
     display: flex;
     flex-direction: column;
@@ -301,19 +364,19 @@
     transform: translateX(100%);
     transition: transform .32s cubic-bezier(.16,1,.3,1);
   }
-  .level-screen.open{ transform: translateX(0); }
+  .screen.open{ transform: translateX(0); }
 
-  .level-screen-header{
+  .screen-header{
     display:flex;
     align-items:center;
     gap: 12px;
     margin-bottom: 16px;
     flex-shrink: 0;
   }
-  .level-screen-title{ flex:1; text-align:center; }
-  .level-screen-title .lst-hangul{ font-family: var(--font-display); font-style: italic; color: var(--coral); font-size: 18px; margin-right: 8px; }
-  .level-screen-title .lst-name{ font-family: var(--font-display); font-weight: 600; font-size: 18px; }
-  .level-screen-spacer{ width: 44px; flex-shrink: 0; }
+  .screen-title{ flex:1; text-align:center; min-width: 0; }
+  .screen-title .lst-hangul{ font-family: var(--font-display); font-style: italic; color: var(--coral); font-size: 18px; margin-right: 8px; }
+  .screen-title .lst-name{ font-family: var(--font-display); font-weight: 600; font-size: 18px; }
+  .screen-spacer{ width: 44px; flex-shrink: 0; }
 
   .level-screen-desc{
     color: var(--text-muted);
@@ -354,22 +417,37 @@
   .lined-paper::-webkit-scrollbar{ width: 8px; }
   .lined-paper::-webkit-scrollbar-thumb{ background: rgba(90,70,45,0.2); border-radius: 8px; }
 
+  /* ---------- Écran « nouvelle langue » ---------- */
+  .new-screen{ overflow-y: auto; }
+  .new-body{ width: 100%; max-width: 460px; margin: 0 auto; padding-bottom: 30px; }
+  .new-hero{ text-align:center; margin: 6px 0 22px; }
+  .new-hero .globe{ font-size: 42px; line-height: 1; }
+  .new-hero h2{ font-family: var(--font-display); font-weight: 600; font-size: 24px; margin: 12px 0 6px; }
+  .new-hero p{ color: var(--text-muted); font-size: 14px; line-height: 1.55; margin: 0; }
+  .new-card{
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 22px 20px;
+    box-shadow: var(--shadow);
+  }
+
   /* ---------- FAB ---------- */
   .fab{
     position: fixed;
     right: 26px; bottom: 26px;
     width: 62px; height: 62px;
     border-radius: 50%;
-    background: linear-gradient(155deg, var(--coral), #ff8a6f);
+    background: linear-gradient(155deg, var(--coral), var(--coral-soft));
     color: #1a1220;
     border: none;
-    box-shadow: 0 14px 30px -8px rgba(255,111,94,0.55);
+    box-shadow: 0 14px 30px -8px var(--coral-shadow);
     cursor: pointer;
     display:flex; align-items:center; justify-content:center;
-    transition: transform .18s ease, box-shadow .18s ease;
+    transition: transform .18s ease, box-shadow .18s ease, opacity .2s ease;
     z-index: 30;
   }
-  .fab:hover{ transform: translateY(-2px) scale(1.03); box-shadow: 0 18px 36px -8px rgba(255,111,94,0.65); }
+  .fab:hover{ transform: translateY(-2px) scale(1.03); }
   .fab:active{ transform: translateY(0) scale(0.97); }
   .fab:focus-visible{ outline: 2px solid var(--text); outline-offset: 3px; }
   .fab svg{ width: 26px; height: 26px; }
@@ -380,7 +458,7 @@
     background: rgba(10,9,16,0.6);
     backdrop-filter: blur(3px);
     display:flex; align-items:flex-end; justify-content:center;
-    z-index: 40;
+    z-index: 60;
     opacity:0; pointer-events:none;
     transition: opacity .2s ease;
   }
@@ -396,6 +474,8 @@
     padding: 26px 22px 30px;
     width: 100%;
     max-width: 420px;
+    max-height: 92vh;
+    overflow-y: auto;
     box-shadow: 0 -20px 60px rgba(0,0,0,0.5);
     transform: translateY(24px);
     transition: transform .25s cubic-bezier(.16,1,.3,1);
@@ -406,6 +486,15 @@
   }
 
   .modal h2{ font-family: var(--font-display); font-weight: 600; font-size: 20px; margin: 0 0 18px; }
+  .modal-lang{
+    font-family: var(--font-body);
+    font-size: 11px; font-weight: 800;
+    text-transform: uppercase; letter-spacing: .07em;
+    color: var(--coral); background: var(--coral-dim);
+    padding: 4px 10px; border-radius: 99px;
+    vertical-align: middle; margin-left: 8px;
+    white-space: nowrap;
+  }
 
   .chip-row{ display:flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
   .chip{
@@ -422,6 +511,7 @@
   }
   .chip:hover{ border-color: var(--coral); color: var(--coral); }
   .chip:focus-visible{ outline: 2px solid var(--coral); outline-offset: 1px; }
+  .chip.small{ padding: 7px 13px; font-size: 12.5px; }
 
   .divider-or{ display:flex; align-items:center; gap: 10px; color: var(--text-faint); font-size: 12px; margin: 6px 0 16px; }
   .divider-or::before, .divider-or::after{ content:''; flex:1; height:1px; background: var(--border); }
@@ -460,9 +550,43 @@
   .seg button.active{ background: var(--coral-dim); color: var(--coral); }
   .seg button:focus-visible{ outline: 2px solid var(--coral); outline-offset: -2px; }
 
+  .text-input{
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 15.5px;
+    font-weight: 600;
+    padding: 12px 14px;
+    border-radius: var(--radius-sm);
+    margin-bottom: 14px;
+  }
+  .text-input:focus-visible{ outline: 2px solid var(--coral); outline-offset: 1px; }
+  .text-input::placeholder{ color: var(--text-faint); font-weight: 500; }
+
+  /* ---------- Nuancier de thèmes ---------- */
+  .swatch-row{ display:flex; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
+  .swatch{
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    padding: 0;
+    cursor: pointer;
+    position: relative;
+    transition: transform .15s ease;
+  }
+  .swatch:hover{ transform: translateY(-2px); }
+  .swatch:focus-visible{ outline: 2px solid var(--text); outline-offset: 3px; }
+  .swatch.active{ border-color: var(--text); }
+  .swatch.active::after{
+    content:''; position:absolute; inset: -6px;
+    border-radius: 50%; border: 1px solid rgba(242,240,233,0.25);
+  }
+
   .btn-primary{
     width: 100%;
-    background: linear-gradient(155deg, var(--coral), #ff8a6f);
+    background: linear-gradient(155deg, var(--coral), var(--coral-soft));
     color: #1a1220;
     border: none;
     padding: 14px;
@@ -491,6 +615,8 @@
   .btn-text:hover{ color: var(--text-muted); }
 
   .field-label{ font-size: 12.5px; color: var(--text-muted); font-weight: 700; margin-bottom: 8px; display:block; }
+  .field-hint{ font-size: 12px; color: var(--text-faint); margin: -8px 0 16px; line-height: 1.45; }
+  .field-error{ font-size: 12.5px; color: var(--danger); font-weight: 700; margin: -6px 0 14px; }
 
   .date-input{
     width: 100%;
@@ -507,6 +633,29 @@
   }
   .date-input:focus-visible{ outline: 2px solid var(--coral); outline-offset: 1px; }
 
+  /* ---------- Zone de suppression ---------- */
+  .danger-zone{ margin-top: 22px; padding-top: 16px; border-top: 1px solid var(--border); }
+  .btn-danger{
+    width: 100%;
+    background: transparent;
+    border: 1px solid rgba(255,128,128,0.32);
+    color: var(--danger);
+    padding: 11px;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 13.5px;
+    cursor: pointer;
+    transition: background .15s ease;
+  }
+  .btn-danger:hover{ background: rgba(255,128,128,0.1); }
+  .btn-danger:focus-visible{ outline: 2px solid var(--danger); outline-offset: 2px; }
+  .btn-danger.solid{ background: #d94f4f; border-color: #d94f4f; color: #fff; }
+  .btn-danger.solid:hover{ background: #e35b5b; }
+  .danger-note{ font-size: 12px; color: var(--text-faint); text-align:center; line-height: 1.5; }
+  .confirm-del p{ font-size: 13px; color: var(--text-muted); line-height: 1.5; margin: 0 0 12px; }
+  [hidden]{ display: none !important; }
+
   @keyframes fadeSlideIn{
     from{ opacity: 0; transform: translateY(10px); }
     to{ opacity: 1; transform: translateY(0); }
@@ -516,12 +665,20 @@
     *{ animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
   }
 
+  @media (max-width: 620px){
+    .stats-row{ grid-template-columns: 1fr 1fr; }
+  }
   @media (max-width: 560px){
     .hero{ flex-direction: column; text-align:center; }
     .hero-info{ width: 100%; }
-    .stats-row{ grid-template-columns: 1fr 1fr; }
-    .stats-row .stat-chip:last-child{ grid-column: span 2; }
     h1{ font-size: 28px; }
+  }
+  @media (max-width: 480px){
+    body{ padding: 24px 16px 120px; }
+    .icon-btn{ width: 40px; height: 40px; }
+    .icon-btn svg{ width: 18px; height: 18px; }
+    .head-actions{ gap: 6px; }
+    h1{ font-size: 25px; }
   }
   @media (max-width: 400px){
     .mini-seg button{ padding: 6px 8px; font-size: 10px; }
@@ -532,22 +689,32 @@
 
 <div class="wrap">
   <header>
-    <div>
+    <div class="head-titles">
       <p class="eyebrow">Suivi d'input compréhensible</p>
-      <h1>Coréen <span class="hangul">한국어</span></h1>
+      <h1 id="pageTitle">Coréen <span class="hangul">한국어</span></h1>
     </div>
-    <button class="icon-btn" id="settingsBtn" aria-label="Régler l'objectif quotidien" title="Objectif quotidien">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-    </button>
+    <div class="head-actions">
+      <button class="icon-btn" id="prevLangBtn" aria-label="Langue précédente" title="Langue précédente">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+      </button>
+      <button class="icon-btn" id="nextLangBtn" aria-label="Langue suivante" title="Langue suivante">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+      </button>
+      <button class="icon-btn" id="settingsBtn" aria-label="Paramètres de la langue" title="Paramètres">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+      </button>
+    </div>
   </header>
+
+  <div class="lang-dots" id="langDots" role="tablist" aria-label="Langues suivies"></div>
 
   <section class="hero">
     <div class="ring-wrap">
       <svg viewBox="0 0 168 168">
         <defs>
           <linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#ff6f5e"/>
-            <stop offset="100%" stop-color="#ffb3a8"/>
+            <stop class="grad-start" offset="0%"/>
+            <stop class="grad-end" offset="100%"/>
           </linearGradient>
         </defs>
         <circle class="ring-track" cx="84" cy="84" r="74"></circle>
@@ -560,7 +727,7 @@
     </div>
     <div class="hero-info">
       <p class="hero-label" id="heroLabel">Niveau 1</p>
-      <p class="hero-desc" id="heroDesc">Tu démarres tout juste ton apprentissage du coréen.</p>
+      <p class="hero-desc" id="heroDesc"></p>
       <p class="hero-progress-line" id="heroProgressLine"></p>
       <div class="bar-track"><div class="bar-fill" id="heroBarFill" style="width:0%"></div></div>
     </div>
@@ -569,11 +736,16 @@
   <div class="stats-row">
     <div class="stat-chip">
       <div class="stat-label">Total</div>
-      <div class="stat-value" id="statTotal">0h</div>
+      <div class="stat-value" id="statTotal">0 min</div>
     </div>
     <div class="stat-chip">
       <div class="stat-label">Aujourd'hui</div>
       <div class="stat-value accent" id="statToday">0 min</div>
+    </div>
+    <div class="stat-chip" id="streakChip">
+      <div class="stat-label">Série</div>
+      <div class="stat-value streak" id="statStreak">—</div>
+      <div class="stat-sub" id="statStreakSub"></div>
     </div>
     <div class="stat-chip">
       <div class="stat-label">Objectif / jour</div>
@@ -614,15 +786,16 @@
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
 </button>
 
-<div class="level-screen" id="levelScreen">
-  <div class="level-screen-header">
+<!-- Écran des notes de niveau -->
+<div class="screen level-screen" id="levelScreen">
+  <div class="screen-header">
     <button class="icon-btn" id="levelBackBtn" aria-label="Retour à l'écran principal">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
     </button>
-    <div class="level-screen-title">
+    <div class="screen-title">
       <span class="lst-hangul" id="lstHangul">일</span><span class="lst-name" id="lstName">Niveau 1</span>
     </div>
-    <div class="level-screen-spacer"></div>
+    <div class="screen-spacer"></div>
   </div>
   <p class="level-screen-desc" id="lstDesc"></p>
   <div class="paper-card">
@@ -630,10 +803,59 @@
   </div>
 </div>
 
-<!-- Add session modal -->
+<!-- Écran « nouvelle langue » -->
+<div class="screen new-screen" id="newLangScreen">
+  <div class="screen-header">
+    <button class="icon-btn" id="newBackBtn" aria-label="Revenir à la langue précédente">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+    </button>
+    <div class="screen-title">
+      <span class="lst-name">Nouvelle langue</span>
+    </div>
+    <div class="screen-spacer"></div>
+  </div>
+
+  <div class="new-body">
+    <div class="new-hero">
+      <div class="globe">🌍</div>
+      <h2>Ajouter une langue</h2>
+      <p>Une nouvelle page, avec les mêmes 7 niveaux, ses propres heures et son propre objectif.</p>
+    </div>
+
+    <div class="new-card">
+      <span class="field-label">Quelle langue veux-tu suivre ?</span>
+      <input type="text" class="text-input" id="newLangName" placeholder="Ex. espagnol" autocomplete="off" spellcheck="false" maxlength="40">
+      <div class="chip-row" id="langSuggest">
+        <button class="chip small" type="button">espagnol</button>
+        <button class="chip small" type="button">japonais</button>
+        <button class="chip small" type="button">anglais</button>
+        <button class="chip small" type="button">italien</button>
+        <button class="chip small" type="button">allemand</button>
+        <button class="chip small" type="button">mandarin</button>
+      </div>
+      <p class="field-error" id="newLangError" hidden>Écris d'abord le nom de la langue.</p>
+
+      <span class="field-label">Couleur de la page</span>
+      <div class="swatch-row" id="newLangSwatches"></div>
+
+      <span class="field-label">Objectif quotidien (facultatif)</span>
+      <div class="input-row">
+        <input type="number" id="newLangGoal" min="0" placeholder="Ex. 30" inputmode="numeric">
+        <div class="seg" id="newGoalUnitSeg">
+          <button type="button" class="active" data-unit="min">min</button>
+          <button type="button" data-unit="h">h</button>
+        </div>
+      </div>
+
+      <button class="btn-primary" id="createLangBtn">Créer la page</button>
+    </div>
+  </div>
+</div>
+
+<!-- Ajouter une session -->
 <div class="overlay" id="addOverlay">
   <div class="modal">
-    <h2>Ajouter une session</h2>
+    <h2>Ajouter une session<span class="modal-lang" id="addModalLang"></span></h2>
     <span class="field-label">Date</span>
     <input type="date" class="date-input" id="addDateInput">
     <div class="chip-row" id="quickChips">
@@ -655,11 +877,15 @@
   </div>
 </div>
 
-<!-- Settings modal -->
+<!-- Paramètres de la langue -->
 <div class="overlay" id="settingsOverlay">
   <div class="modal">
-    <h2>Objectif quotidien</h2>
-    <span class="field-label">Combien de temps veux-tu écouter chaque jour ?</span>
+    <h2>Paramètres<span class="modal-lang" id="settingsModalLang"></span></h2>
+
+    <span class="field-label">Nom de la langue</span>
+    <input type="text" class="text-input" id="settingsName" autocomplete="off" spellcheck="false" maxlength="40">
+
+    <span class="field-label">Objectif quotidien</span>
     <div class="input-row">
       <input type="number" id="goalAmount" min="0" placeholder="Ex. 30" inputmode="numeric">
       <div class="seg" id="goalUnitSeg">
@@ -667,12 +893,31 @@
         <button type="button" data-unit="h">h</button>
       </div>
     </div>
-    <button class="btn-primary" id="saveGoalBtn">Enregistrer</button>
-    <button class="btn-text" id="cancelGoalBtn">Annuler</button>
+    <p class="field-hint">Laisse vide (ou 0) pour ne pas fixer d'objectif.</p>
+
+    <span class="field-label">Couleur de la page</span>
+    <div class="swatch-row" id="themeSwatches"></div>
+
+    <button class="btn-primary" id="saveSettingsBtn">Enregistrer</button>
+    <button class="btn-text" id="cancelSettingsBtn">Annuler</button>
+
+    <div class="danger-zone">
+      <div id="deleteBlock">
+        <button class="btn-danger" id="deleteLangBtn">Supprimer cette langue</button>
+      </div>
+      <div id="confirmDelBlock" hidden>
+        <div class="confirm-del">
+          <p id="confirmDelText">Supprimer cette langue et tout son historique ? C'est définitif.</p>
+          <button class="btn-danger solid" id="confirmDelBtn">Oui, tout supprimer</button>
+          <button class="btn-text" id="cancelDelBtn">Non, annuler</button>
+        </div>
+      </div>
+      <p class="danger-note" id="lastLangNote" hidden>C'est ta seule langue : ajoute-en une autre avant de pouvoir la supprimer.</p>
+    </div>
   </div>
 </div>
 
-<!-- Edit day modal -->
+<!-- Modifier un jour -->
 <div class="overlay" id="editDayOverlay">
   <div class="modal">
     <h2 id="editDayTitle">Modifier ce jour</h2>
@@ -693,46 +938,152 @@
 (function(){
   "use strict";
 
-  /* ---------------- Data layer ---------------- */
-  const STORAGE_KEY = 'krInputTrackerV1';
+  /* ---------------- Thèmes de couleur ---------------- */
+  const THEMES = [
+    { id:'coral',  name:'Corail',    accent:'#ff6f5e', soft:'#ffb3a8' },
+    { id:'ocean',  name:'Océan',     accent:'#5aa9ff', soft:'#a9d2ff' },
+    { id:'jade',   name:'Jade',      accent:'#3fd69a', soft:'#a5f0cd' },
+    { id:'violet', name:'Violet',    accent:'#a880ff', soft:'#d5bfff' },
+    { id:'ambre',  name:'Ambre',     accent:'#f2b13c', soft:'#ffd98a' },
+    { id:'rose',   name:'Rose',      accent:'#ff6faa', soft:'#ffb3d1' },
+    { id:'ciel',   name:'Ciel',      accent:'#4fd8e8', soft:'#a8f0f7' },
+    { id:'olive',  name:'Olive',     accent:'#b7d15c', soft:'#dcebA6' }
+  ];
+  const DEFAULT_THEME = 'coral';
+  function themeById(id){ return THEMES.find(t => t.id === id) || THEMES[0]; }
 
-  function loadData(){
+  function hexToRgba(hex, a){
+    const h = hex.replace('#','');
+    const r = parseInt(h.slice(0,2),16), g = parseInt(h.slice(2,4),16), b = parseInt(h.slice(4,6),16);
+    return 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')';
+  }
+
+  function applyThemeId(id){
+    const t = themeById(id);
+    const s = document.documentElement.style;
+    s.setProperty('--coral', t.accent);
+    s.setProperty('--coral-soft', t.soft);
+    s.setProperty('--coral-dim', hexToRgba(t.accent, 0.14));
+    s.setProperty('--coral-shadow', hexToRgba(t.accent, 0.55));
+    s.setProperty('--accent-glow', hexToRgba(t.accent, 0.13));
+  }
+
+  /* ---------------- Couche de données ---------------- */
+  const STORAGE_KEY = 'inputTrackerV2';
+  const LEGACY_KEY = 'krInputTrackerV1';
+  const VALID_MODES = ['7d','all','goal'];
+
+  function uid(){ return 'l' + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+
+  // Le coréen a droit à ses chiffres en hangul : on le reconnaît à son nom.
+  function isKoreanName(name){
+    const s = String(name || '').trim().toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    return s === 'coreen' || s === 'korean' || s === '\ud55c\uad6d\uc5b4';
+  }
+
+  function makeLang(o){
+    o = o || {};
+    const name = (typeof o.name === 'string' && o.name.trim()) ? o.name.trim().slice(0,40) : 'Langue';
+    return {
+      id: o.id || uid(),
+      name: name,
+      korean: isKoreanName(name),
+      theme: THEMES.some(t => t.id === o.theme) ? o.theme : DEFAULT_THEME,
+      totalMinutes: Number(o.totalMinutes) > 0 ? Number(o.totalMinutes) : 0,
+      dailyGoalMinutes: Number(o.dailyGoalMinutes) > 0 ? Number(o.dailyGoalMinutes) : 0,
+      sessions: (o.sessions && typeof o.sessions === 'object') ? o.sessions : {},
+      paceMode: VALID_MODES.includes(o.paceMode) ? o.paceMode : '7d',
+      levelNotes: (o.levelNotes && typeof o.levelNotes === 'object') ? o.levelNotes : {}
+    };
+  }
+
+  function makeKorean(extra){
+    return makeLang(Object.assign({ name:'coréen', korean:true, theme:'coral' }, extra || {}));
+  }
+
+  function loadState(){
     try{
       const raw = localStorage.getItem(STORAGE_KEY);
-      if(!raw) return { totalMinutes: 0, dailyGoalMinutes: 0, sessions: {}, paceMode: '7d', levelNotes: {} };
-      const parsed = JSON.parse(raw);
-      const validModes = ['7d','all','goal'];
-      let mode = parsed.paceMode || parsed.realPaceMode || '7d';
-      if(!validModes.includes(mode)) mode = '7d';
-      return {
-        totalMinutes: parsed.totalMinutes || 0,
-        dailyGoalMinutes: parsed.dailyGoalMinutes || 0,
-        sessions: parsed.sessions || {},
-        paceMode: mode,
-        levelNotes: parsed.levelNotes || {}
-      };
+      if(raw){
+        const p = JSON.parse(raw);
+        let langs = Array.isArray(p.languages) ? p.languages.map(makeLang) : [];
+        if(!langs.length) langs = [makeKorean()];
+        let idx = Number(p.activeIndex);
+        if(!Number.isInteger(idx) || idx < 0 || idx >= langs.length) idx = 0;
+        return { languages: langs, activeIndex: idx };
+      }
+      // Migration depuis l'ancienne version (coréen uniquement)
+      const legacy = localStorage.getItem(LEGACY_KEY);
+      if(legacy){
+        const old = JSON.parse(legacy);
+        return {
+          languages: [makeKorean({
+            totalMinutes: old.totalMinutes,
+            dailyGoalMinutes: old.dailyGoalMinutes,
+            sessions: old.sessions,
+            paceMode: old.paceMode || old.realPaceMode,
+            levelNotes: old.levelNotes
+          })],
+          activeIndex: 0
+        };
+      }
     }catch(e){
       console.error('Erreur de lecture des données', e);
-      return { totalMinutes: 0, dailyGoalMinutes: 0, sessions: {}, paceMode: '7d', levelNotes: {} };
+    }
+    return { languages: [makeKorean()], activeIndex: 0 };
+  }
+
+  let state = loadState();
+  let data = state.languages[state.activeIndex];
+  let onNewPage = false;
+
+  function saveData(){
+    try{
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }catch(e){
+      console.error('Erreur d\'enregistrement des données', e);
     }
   }
 
-  function saveData(){
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  /* ---------------- Aide au texte ---------------- */
+  function esc(str){
+    return String(str).replace(/[&<>"']/g, function(c){
+      return ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[c];
+    });
+  }
+  function langTitle(name){
+    const s = String(name || '').trim();
+    return s ? s.charAt(0).toUpperCase() + s.slice(1) : 'Langue';
+  }
+  function langLower(name){ return String(name || '').trim().toLowerCase(); }
+  // « du coréen », « de l'espagnol »
+  function deLang(lang){
+    const s = langLower(lang.name);
+    if(!s) return '';
+    return /^[aeiouyéèêëàâîïôöûüh]/.test(s) ? "de l'" + s : 'du ' + s;
   }
 
-  let data = loadData();
-
-  /* ---------------- Levels ---------------- */
+  /* ---------------- Niveaux ---------------- */
   const LEVELS = [
-    { n:1, hours:0,    hangul:'일', title:'Débutant', desc:"Tu démarres tout juste ton apprentissage du coréen." },
-    { n:2, hours:100,  hangul:'이', title:'Niveau 2', desc:"Tu commences à suivre des vidéos très simples." },
-    { n:3, hours:300,  hangul:'삼', title:'Niveau 3', desc:"Tu comprends des vidéos pour enfants et des contenus très guidés." },
-    { n:4, hours:600,  hangul:'사', title:'Niveau 4', desc:"Tu peux suivre des vidéos de niveau intermédiaire." },
-    { n:5, hours:1200, hangul:'오', title:'Niveau 5', desc:"Tu comprends une bonne partie de YouTube sans sous-titres, à condition que le sujet soit familier." },
-    { n:6, hours:2000, hangul:'육', title:'Niveau 6', desc:"Les dramas, les podcasts et les conversations deviennent nettement plus accessibles." },
-    { n:7, hours:3000, hangul:'칠', title:'Niveau 7', desc:"Compréhension très solide de la langue courante, avec encore des difficultés sur le vocabulaire spécialisé." }
+    { n:1, hours:0,    hangul:'일', roman:'I',
+      desc: l => 'Tu démarres tout juste ton apprentissage ' + deLang(l) + '.' },
+    { n:2, hours:100,  hangul:'이', roman:'II',
+      desc: () => 'Tu commences à suivre des vidéos très simples.' },
+    { n:3, hours:300,  hangul:'삼', roman:'III',
+      desc: () => 'Tu comprends des vidéos pour enfants et des contenus très guidés.' },
+    { n:4, hours:600,  hangul:'사', roman:'IV',
+      desc: () => 'Tu peux suivre des vidéos de niveau intermédiaire.' },
+    { n:5, hours:1200, hangul:'오', roman:'V',
+      desc: () => 'Tu comprends une bonne partie de YouTube sans sous-titres, à condition que le sujet soit familier.' },
+    { n:6, hours:2000, hangul:'육', roman:'VI',
+      desc: l => (l.korean ? 'Les dramas' : 'Les séries') + ', les podcasts et les conversations deviennent nettement plus accessibles.' },
+    { n:7, hours:3000, hangul:'칠', roman:'VII',
+      desc: () => 'Compréhension très solide de la langue courante, avec encore des difficultés sur le vocabulaire spécialisé.' }
   ];
+
+  function levelDesc(lv){ return lv.desc(data); }
+  function levelGlyph(lv){ return data.korean ? lv.hangul : lv.roman; }
 
   function getLevelIndex(totalHours){
     let idx = 0;
@@ -742,7 +1093,7 @@
     return idx;
   }
 
-  /* ---------------- Date helpers ---------------- */
+  /* ---------------- Dates ---------------- */
   function toISODate(d){
     const y = d.getFullYear();
     const m = String(d.getMonth()+1).padStart(2,'0');
@@ -782,6 +1133,35 @@
     return new Date(y, m-1, d);
   }
 
+  /* ---------------- Série (jours consécutifs) ---------------- */
+  function currentStreak(){
+    const today = new Date();
+    // Le jour en cours ne casse pas la série tant qu'il n'est pas fini.
+    let i = (data.sessions[toISODate(today)] > 0) ? 0 : 1;
+    let streak = 0;
+    while(true){
+      const key = toISODate(addDays(today, -i));
+      if(data.sessions[key] > 0){ streak++; i++; }
+      else break;
+      if(i > 10000) break;
+    }
+    return streak;
+  }
+  function bestStreak(){
+    const keys = Object.keys(data.sessions).filter(k => data.sessions[k] > 0).sort();
+    if(!keys.length) return 0;
+    let best = 1, run = 1;
+    for(let i=1;i<keys.length;i++){
+      const [y1,m1,d1] = keys[i-1].split('-').map(Number);
+      const [y2,m2,d2] = keys[i].split('-').map(Number);
+      const prev = new Date(y1, m1-1, d1);
+      const cur = new Date(y2, m2-1, d2);
+      run = (Math.round((cur - prev)/86400000) === 1) ? run + 1 : 1;
+      if(run > best) best = run;
+    }
+    return best;
+  }
+
   /* ---------------- Projections ---------------- */
   function getRates(){
     const goalHoursPerDay = data.dailyGoalMinutes/60;
@@ -810,9 +1190,6 @@
     return addDays(new Date(), days);
   }
 
-  function formatDateShort(date){
-    return `${date.getDate()}/${date.getMonth()+1}/${String(date.getFullYear()).slice(-2)}`;
-  }
   function formatDateFrCap(date){
     const s = formatDateFr(date);
     const parts = s.split(' ');
@@ -839,17 +1216,19 @@
     return { maxed:false, remainingHours, next, mode, rate, days, date, rates, hasHistory: rates.hasHistory };
   }
 
-  /* ---------------- Rendering ---------------- */
+  /* ---------------- Rendu ---------------- */
   const RING_R = 74;
   const RING_C = 2 * Math.PI * RING_R;
 
   function render(){
+    renderHeader();
+
     const totalHours = data.totalMinutes/60;
     const idx = getLevelIndex(totalHours);
     const level = LEVELS[idx];
     const next = LEVELS[idx+1];
 
-    // Ring + hero
+    // Anneau + hero
     let percent;
     if(!next){ percent = 100; }
     else{
@@ -861,9 +1240,9 @@
     ringEl.style.strokeDashoffset = RING_C - (percent/100)*RING_C;
 
     document.getElementById('ringLevelNum').textContent = level.n;
-    document.getElementById('ringHangul').textContent = level.hangul;
+    document.getElementById('ringHangul').textContent = levelGlyph(level);
     document.getElementById('heroLabel').textContent = `Niveau ${level.n}`;
-    document.getElementById('heroDesc').textContent = level.desc;
+    document.getElementById('heroDesc').textContent = levelDesc(level);
     document.getElementById('heroBarFill').style.width = percent + '%';
 
     if(next){
@@ -874,15 +1253,103 @@
         `<strong>${formatHoursMin(data.totalMinutes)}</strong> · niveau maximum atteint 🎉`;
     }
 
-    // Stats row
+    // Bandeau de statistiques
     document.getElementById('statTotal').textContent = formatHoursMin(data.totalMinutes);
     document.getElementById('statToday').textContent = formatHoursMin(data.sessions[todayISO()] || 0);
     document.getElementById('statGoal').textContent = data.dailyGoalMinutes > 0 ? formatHoursMin(data.dailyGoalMinutes) : '—';
+    renderStreak();
 
     renderProjections();
     renderWeekRow();
     renderLevels(idx);
     renderChart();
+  }
+
+  function renderHeader(){
+    const title = langTitle(data.name);
+    const h1 = document.getElementById('pageTitle');
+    if(data.korean && langLower(data.name) !== '한국어'){
+      h1.innerHTML = `${esc(title)} <span class="hangul">한국어</span>`;
+      document.title = "Suivi d'input · 한국어";
+    } else if(data.korean){
+      h1.textContent = title;
+      document.title = "Suivi d'input · 한국어";
+    } else {
+      h1.textContent = title;
+      document.title = "Suivi d'input · " + title;
+    }
+
+    const prevBtn = document.getElementById('prevLangBtn');
+    prevBtn.disabled = state.activeIndex === 0;
+    if(state.activeIndex > 0){
+      const prevName = langTitle(state.languages[state.activeIndex-1].name);
+      prevBtn.title = '← ' + prevName;
+      prevBtn.setAttribute('aria-label', 'Langue précédente : ' + prevName);
+    } else {
+      prevBtn.title = 'Langue précédente';
+      prevBtn.setAttribute('aria-label', 'Langue précédente');
+    }
+
+    const nextBtn = document.getElementById('nextLangBtn');
+    const isLast = state.activeIndex === state.languages.length - 1;
+    nextBtn.classList.toggle('is-add', isLast);
+    if(isLast){
+      nextBtn.title = 'Ajouter une langue';
+      nextBtn.setAttribute('aria-label', 'Ajouter une langue');
+    } else {
+      const nextName = langTitle(state.languages[state.activeIndex+1].name);
+      nextBtn.title = nextName + ' →';
+      nextBtn.setAttribute('aria-label', 'Langue suivante : ' + nextName);
+    }
+
+    document.getElementById('addModalLang').textContent = title;
+    renderDots();
+  }
+
+  function renderDots(){
+    const box = document.getElementById('langDots');
+    box.innerHTML = '';
+    state.languages.forEach((l, i) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'lang-dot' + ((!onNewPage && i === state.activeIndex) ? ' active' : '');
+      b.dataset.index = String(i);
+      b.title = langTitle(l.name);
+      b.setAttribute('aria-label', 'Aller à ' + langTitle(l.name));
+      box.appendChild(b);
+    });
+    const add = document.createElement('button');
+    add.type = 'button';
+    add.className = 'lang-dot add';
+    add.dataset.index = 'new';
+    add.textContent = '+';
+    add.title = 'Ajouter une langue';
+    add.setAttribute('aria-label', 'Ajouter une langue');
+    box.appendChild(add);
+  }
+
+  function renderStreak(){
+    const cur = currentStreak();
+    const best = bestStreak();
+    const valueEl = document.getElementById('statStreak');
+    const subEl = document.getElementById('statStreakSub');
+    const chip = document.getElementById('streakChip');
+
+    if(cur > 0){
+      valueEl.innerHTML = `<span class="flame">🔥</span> ${cur} j`;
+    } else {
+      valueEl.textContent = '—';
+    }
+
+    if(best > 0){
+      subEl.textContent = `Record : ${best} j`;
+      chip.title = cur > 0
+        ? `${cur} jour${cur>1?'s':''} d'affilée · record : ${best}`
+        : `Série interrompue · record : ${best} jour${best>1?'s':''}`;
+    } else {
+      subEl.textContent = 'Commence aujourd’hui !';
+      chip.title = 'Aucune session pour le moment';
+    }
   }
 
   function renderProjections(){
@@ -919,7 +1386,7 @@
       return;
     }
 
-    // 7d or all
+    // 7d ou depuis le début
     const bigHtml = p.hasHistory
       ? `<div class="proj-big-row"><span class="proj-big-num">${formatHoursMin(p.rate*60)}</span><span class="proj-big-unit">par jour</span></div>`
       : `<div class="proj-big-row"><span class="proj-big-num">—</span></div>`;
@@ -991,11 +1458,11 @@
 
       card.innerHTML = `
         <div class="lv-top">
-          <span class="lv-hangul">${lv.hangul}</span>
+          <span class="lv-hangul">${esc(levelGlyph(lv))}</span>
           ${checkSvg}
         </div>
         <div class="lv-hours">Niveau ${lv.n} · ${lv.hours} h</div>
-        <div class="lv-desc">${lv.desc}</div>
+        <div class="lv-desc">${esc(levelDesc(lv))}</div>
         ${dateHtml}
       `;
       container.appendChild(card);
@@ -1011,7 +1478,7 @@
       return;
     }
 
-    // Build cumulative points
+    // Points cumulés
     let running = 0;
     const points = keys.map(k => {
       running += data.sessions[k];
@@ -1019,7 +1486,7 @@
       return { date: new Date(y, m-1, d), hours: running/60 };
     });
 
-    // extend to today if last entry isn't today
+    // prolonge jusqu'à aujourd'hui si la dernière entrée est antérieure
     const todayKey = todayISO();
     if(keys[keys.length-1] !== todayKey){
       const [y,m,d] = todayKey.split('-').map(Number);
@@ -1038,32 +1505,31 @@
     function yFor(pt){ return padT + innerH - (pt.hours / maxHours) * innerH; }
 
     let linePath = '';
-    let areaPath = '';
     points.forEach((pt, i) => {
       const x = xFor(pt).toFixed(1), y = yFor(pt).toFixed(1);
       linePath += (i===0 ? `M ${x} ${y}` : ` L ${x} ${y}`);
     });
     const lastX = xFor(points[points.length-1]).toFixed(1);
     const firstX = xFor(points[0]).toFixed(1);
-    areaPath = `${linePath} L ${lastX} ${(padT+innerH).toFixed(1)} L ${firstX} ${(padT+innerH).toFixed(1)} Z`;
+    const areaPath = `${linePath} L ${lastX} ${(padT+innerH).toFixed(1)} L ${firstX} ${(padT+innerH).toFixed(1)} Z`;
 
     let dots = '';
     points.forEach(pt => {
       const x = xFor(pt).toFixed(1), y = yFor(pt).toFixed(1);
-      dots += `<circle cx="${x}" cy="${y}" r="3.2" fill="#ff6f5e" stroke="#14131f" stroke-width="1.5"><title>${formatDateFr(pt.date)} — ${pt.hours.toFixed(1)} h</title></circle>`;
+      dots += `<circle class="chart-dot" cx="${x}" cy="${y}" r="3.2"><title>${formatDateFr(pt.date)} — ${pt.hours.toFixed(1)} h</title></circle>`;
     });
 
     const svg = `
       <svg class="chart-svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
         <defs>
           <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#ff6f5e" stop-opacity="0.35"/>
-            <stop offset="100%" stop-color="#ff6f5e" stop-opacity="0"/>
+            <stop class="area-start" offset="0%"/>
+            <stop class="area-end" offset="100%"/>
           </linearGradient>
         </defs>
         <line x1="${padL}" y1="${padT+innerH}" x2="${W-padR}" y2="${padT+innerH}" stroke="rgba(242,240,233,0.09)" stroke-width="1"/>
-        <path d="${areaPath}" fill="url(#areaGradient)" stroke="none"/>
-        <path d="${linePath}" fill="none" stroke="#ff6f5e" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+        <path class="chart-area" d="${areaPath}"/>
+        <path class="chart-line" d="${linePath}"/>
         ${dots}
         <text x="${padL}" y="14" class="chart-max-label">${maxHours.toFixed(0)} h</text>
         <text x="${padL}" y="${H-6}" class="chart-axis-label">${formatDateFr(points[0].date)}</text>
@@ -1073,7 +1539,163 @@
     chartCard.innerHTML = svg;
   }
 
-  /* ---------------- Add session modal ---------------- */
+  /* ---------------- Navigation entre les langues ---------------- */
+  const wrapEl = document.querySelector('.wrap');
+  const newLangScreen = document.getElementById('newLangScreen');
+
+  function animatePage(dir){
+    wrapEl.style.setProperty('--slide-from', (dir < 0 ? '-24px' : '24px'));
+    wrapEl.classList.remove('page-in');
+    void wrapEl.offsetWidth;
+    wrapEl.classList.add('page-in');
+  }
+
+  function goToLang(i, dir){
+    if(i < 0 || i >= state.languages.length) return;
+    closeNewScreen(true);
+    const changed = i !== state.activeIndex;
+    state.activeIndex = i;
+    data = state.languages[i];
+    applyThemeId(data.theme);
+    render();
+    if(changed || dir) animatePage(dir || 1);
+    saveData();
+  }
+
+  function goNext(){
+    if(onNewPage) return;
+    if(state.activeIndex < state.languages.length - 1) goToLang(state.activeIndex + 1, 1);
+    else openNewScreen();
+  }
+
+  function goPrev(){
+    if(onNewPage){ closeNewScreen(); return; }
+    if(state.activeIndex > 0) goToLang(state.activeIndex - 1, -1);
+  }
+
+  document.getElementById('prevLangBtn').addEventListener('click', goPrev);
+  document.getElementById('nextLangBtn').addEventListener('click', goNext);
+
+  document.getElementById('langDots').addEventListener('click', (e) => {
+    const dot = e.target.closest('.lang-dot');
+    if(!dot) return;
+    if(dot.dataset.index === 'new'){ openNewScreen(); return; }
+    const i = Number(dot.dataset.index);
+    if(i === state.activeIndex) return;
+    goToLang(i, i > state.activeIndex ? 1 : -1);
+  });
+
+  /* ---------------- Nuancier ---------------- */
+  function renderSwatches(container, activeId){
+    container.innerHTML = '';
+    THEMES.forEach(t => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'swatch' + (t.id === activeId ? ' active' : '');
+      b.style.background = `linear-gradient(155deg, ${t.accent}, ${t.soft})`;
+      b.dataset.theme = t.id;
+      b.title = t.name;
+      b.setAttribute('aria-label', 'Couleur ' + t.name);
+      container.appendChild(b);
+    });
+  }
+
+  function suggestTheme(){
+    const used = state.languages.map(l => l.theme);
+    const free = THEMES.find(t => used.indexOf(t.id) === -1);
+    return free ? free.id : THEMES[state.languages.length % THEMES.length].id;
+  }
+
+  /* ---------------- Écran « nouvelle langue » ---------------- */
+  const newLangName = document.getElementById('newLangName');
+  const newLangGoal = document.getElementById('newLangGoal');
+  const newLangError = document.getElementById('newLangError');
+  const newSwatchRow = document.getElementById('newLangSwatches');
+  const newGoalUnitSeg = document.getElementById('newGoalUnitSeg');
+  let newGoalUnit = 'min';
+  let pendingNewTheme = DEFAULT_THEME;
+
+  function openNewScreen(){
+    if(onNewPage) return;
+    onNewPage = true;
+    newLangName.value = '';
+    newLangGoal.value = '';
+    newLangError.hidden = true;
+    newGoalUnit = 'min';
+    newGoalUnitSeg.querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.unit === 'min'));
+    pendingNewTheme = suggestTheme();
+    renderSwatches(newSwatchRow, pendingNewTheme);
+    applyThemeId(pendingNewTheme);
+    newLangScreen.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    renderDots();
+    setTimeout(() => newLangName.focus({ preventScroll: true }), 330);
+  }
+
+  function closeNewScreen(keepTheme){
+    if(!onNewPage) return;
+    onNewPage = false;
+    newLangName.blur();
+    newLangGoal.blur();
+    newLangScreen.classList.remove('open');
+    document.body.style.overflow = '';
+    if(!keepTheme) applyThemeId(data.theme);
+    renderDots();
+  }
+
+  document.getElementById('newBackBtn').addEventListener('click', () => closeNewScreen());
+
+  newSwatchRow.addEventListener('click', (e) => {
+    const sw = e.target.closest('.swatch');
+    if(!sw) return;
+    pendingNewTheme = sw.dataset.theme;
+    renderSwatches(newSwatchRow, pendingNewTheme);
+    applyThemeId(pendingNewTheme); // aperçu en direct
+  });
+
+  newGoalUnitSeg.addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if(!btn) return;
+    newGoalUnitSeg.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    newGoalUnit = btn.dataset.unit;
+  });
+
+  document.getElementById('langSuggest').addEventListener('click', (e) => {
+    const chip = e.target.closest('.chip');
+    if(!chip) return;
+    newLangName.value = chip.textContent.trim();
+    newLangError.hidden = true;
+    newLangName.focus();
+  });
+
+  function createLanguage(){
+    const name = newLangName.value.trim();
+    if(!name){
+      newLangError.hidden = false;
+      newLangName.focus();
+      return;
+    }
+    const rawGoal = Number(newLangGoal.value);
+    const goalMinutes = rawGoal > 0 ? (newGoalUnit === 'h' ? rawGoal * 60 : rawGoal) : 0;
+
+    const lang = makeLang({ name: name, theme: pendingNewTheme, dailyGoalMinutes: goalMinutes });
+    state.languages.push(lang);
+    state.activeIndex = state.languages.length - 1;
+    data = lang;
+    closeNewScreen(true);
+    applyThemeId(data.theme);
+    render();
+    animatePage(1);
+    saveData();
+  }
+
+  document.getElementById('createLangBtn').addEventListener('click', createLanguage);
+  newLangName.addEventListener('keydown', (e) => { if(e.key === 'Enter') createLanguage(); });
+  newLangName.addEventListener('input', () => { if(newLangName.value.trim()) newLangError.hidden = true; });
+  newLangGoal.addEventListener('keydown', (e) => { if(e.key === 'Enter') createLanguage(); });
+
+  /* ---------------- Ajouter une session ---------------- */
   const addOverlay = document.getElementById('addOverlay');
   const fabBtn = document.getElementById('fabBtn');
   const cancelAddBtn = document.getElementById('cancelAddBtn');
@@ -1131,16 +1753,25 @@
     closeAddModal();
   }
 
-  /* ---------------- Settings modal ---------------- */
+  /* ---------------- Paramètres de la langue ---------------- */
   const settingsOverlay = document.getElementById('settingsOverlay');
   const settingsBtn = document.getElementById('settingsBtn');
-  const cancelGoalBtn = document.getElementById('cancelGoalBtn');
-  const saveGoalBtn = document.getElementById('saveGoalBtn');
+  const settingsName = document.getElementById('settingsName');
   const goalAmount = document.getElementById('goalAmount');
   const goalUnitSeg = document.getElementById('goalUnitSeg');
+  const themeSwatches = document.getElementById('themeSwatches');
+  const deleteBlock = document.getElementById('deleteBlock');
+  const confirmDelBlock = document.getElementById('confirmDelBlock');
+  const lastLangNote = document.getElementById('lastLangNote');
   let goalUnit = 'min';
+  let pendingTheme = DEFAULT_THEME;
 
-  function openSettingsModal(){
+  function openSettingsModal(focusGoal){
+    if(onNewPage) return;
+    pendingTheme = data.theme;
+    settingsName.value = data.name;
+    document.getElementById('settingsModalLang').textContent = langTitle(data.name);
+
     if(data.dailyGoalMinutes > 0){
       if(data.dailyGoalMinutes % 60 === 0){
         goalUnit = 'h';
@@ -1154,24 +1785,34 @@
       goalAmount.value = '';
     }
     goalUnitSeg.querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.unit === goalUnit));
+
+    renderSwatches(themeSwatches, pendingTheme);
+
+    const multiple = state.languages.length > 1;
+    deleteBlock.hidden = !multiple;
+    lastLangNote.hidden = multiple;
+    confirmDelBlock.hidden = true;
+
     settingsOverlay.classList.add('open');
-    setTimeout(() => goalAmount.focus(), 250);
+    setTimeout(() => (focusGoal === true ? goalAmount : settingsName).focus(), 250);
   }
-  function closeSettingsModal(){ settingsOverlay.classList.remove('open'); }
+  function closeSettingsModal(){
+    settingsOverlay.classList.remove('open');
+    applyThemeId(data.theme); // annule l'aperçu de couleur
+  }
 
-  settingsBtn.addEventListener('click', openSettingsModal);
-  document.getElementById('editGoalBtn').addEventListener('click', openSettingsModal);
-
-  document.getElementById('paceModeSeg').addEventListener('click', (e) => {
-    const btn = e.target.closest('button');
-    if(!btn) return;
-    const validModes = ['7d','all','goal'];
-    data.paceMode = validModes.includes(btn.dataset.mode) ? btn.dataset.mode : '7d';
-    saveData();
-    render();
-  });
-  cancelGoalBtn.addEventListener('click', closeSettingsModal);
+  settingsBtn.addEventListener('click', () => openSettingsModal(false));
+  document.getElementById('editGoalBtn').addEventListener('click', () => openSettingsModal(true));
+  document.getElementById('cancelSettingsBtn').addEventListener('click', closeSettingsModal);
   settingsOverlay.addEventListener('click', (e) => { if(e.target === settingsOverlay) closeSettingsModal(); });
+
+  themeSwatches.addEventListener('click', (e) => {
+    const sw = e.target.closest('.swatch');
+    if(!sw) return;
+    pendingTheme = sw.dataset.theme;
+    renderSwatches(themeSwatches, pendingTheme);
+    applyThemeId(pendingTheme); // aperçu en direct
+  });
 
   goalUnitSeg.addEventListener('click', (e) => {
     const btn = e.target.closest('button');
@@ -1181,19 +1822,61 @@
     goalUnit = btn.dataset.unit;
   });
 
-  saveGoalBtn.addEventListener('click', () => {
+  document.getElementById('saveSettingsBtn').addEventListener('click', () => {
+    const newName = settingsName.value.trim();
+    if(newName){
+      data.name = newName.slice(0,40);
+      data.korean = isKoreanName(data.name);
+    }
     const raw = Number(goalAmount.value);
     data.dailyGoalMinutes = raw > 0 ? (goalUnit === 'h' ? raw*60 : raw) : 0;
+    data.theme = pendingTheme;
+    saveData();
+    applyThemeId(data.theme);
+    render();
+    settingsOverlay.classList.remove('open');
+  });
+
+  settingsName.addEventListener('keydown', (e) => {
+    if(e.key === 'Enter') document.getElementById('saveSettingsBtn').click();
+  });
+  goalAmount.addEventListener('keydown', (e) => {
+    if(e.key === 'Enter') document.getElementById('saveSettingsBtn').click();
+  });
+
+  document.getElementById('deleteLangBtn').addEventListener('click', () => {
+    document.getElementById('confirmDelText').textContent =
+      `Supprimer « ${langTitle(data.name)} » et tout son historique (heures, notes, objectif) ? C'est définitif.`;
+    deleteBlock.hidden = true;
+    confirmDelBlock.hidden = false;
+  });
+  document.getElementById('cancelDelBtn').addEventListener('click', () => {
+    confirmDelBlock.hidden = true;
+    deleteBlock.hidden = false;
+  });
+  document.getElementById('confirmDelBtn').addEventListener('click', () => {
+    if(state.languages.length <= 1) return;
+    const i = state.activeIndex;
+    state.languages.splice(i, 1);
+    state.activeIndex = Math.max(0, Math.min(i, state.languages.length - 1));
+    data = state.languages[state.activeIndex];
+    settingsOverlay.classList.remove('open');
+    saveData();
+    applyThemeId(data.theme);
+    render();
+    animatePage(-1);
+  });
+
+  /* ---------------- Rythme (segments) ---------------- */
+  document.getElementById('paceModeSeg').addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if(!btn) return;
+    data.paceMode = VALID_MODES.includes(btn.dataset.mode) ? btn.dataset.mode : '7d';
     saveData();
     render();
-    closeSettingsModal();
   });
 
-  goalAmount.addEventListener('keydown', (e) => {
-    if(e.key === 'Enter') saveGoalBtn.click();
-  });
-
-  /* ---------------- Edit day modal ---------------- */
+  /* ---------------- Modifier un jour ---------------- */
   const editDayOverlay = document.getElementById('editDayOverlay');
   const editDayAmount = document.getElementById('editDayAmount');
   const editDayUnitSeg = document.getElementById('editDayUnitSeg');
@@ -1260,7 +1943,7 @@
     if(e.key === 'Enter') saveEditDayBtn.click();
   });
 
-  /* ---------------- Level notes screen ---------------- */
+  /* ---------------- Notes de niveau ---------------- */
   const levelScreen = document.getElementById('levelScreen');
   const levelsScroll = document.getElementById('levelsScroll');
   const levelBackBtn = document.getElementById('levelBackBtn');
@@ -1272,9 +1955,9 @@
     const lv = LEVELS[levelIdx];
     if(!lv) return;
     currentNotesLevel = levelIdx;
-    document.getElementById('lstHangul').textContent = lv.hangul;
-    document.getElementById('lstName').textContent = `Niveau ${lv.n}`;
-    document.getElementById('lstDesc').textContent = lv.desc;
+    document.getElementById('lstHangul').textContent = levelGlyph(lv);
+    document.getElementById('lstName').textContent = `Niveau ${lv.n} · ${langTitle(data.name)}`;
+    document.getElementById('lstDesc').textContent = levelDesc(lv);
     levelNotesArea.value = data.levelNotes[lv.n] || '';
     levelScreen.classList.add('open');
     document.body.style.overflow = 'hidden';
@@ -1282,9 +1965,20 @@
   }
 
   function closeLevelScreen(){
+    flushNotes();
+    levelNotesArea.blur();
     levelScreen.classList.remove('open');
     document.body.style.overflow = '';
     currentNotesLevel = null;
+  }
+
+  function flushNotes(){
+    if(currentNotesLevel === null) return;
+    clearTimeout(notesSaveTimer);
+    const lv = LEVELS[currentNotesLevel];
+    if(!lv) return;
+    data.levelNotes[lv.n] = levelNotesArea.value;
+    saveData();
   }
 
   levelsScroll.addEventListener('click', (e) => {
@@ -1303,10 +1997,6 @@
 
   levelBackBtn.addEventListener('click', closeLevelScreen);
 
-  document.addEventListener('keydown', (e) => {
-    if(e.key === 'Escape' && levelScreen.classList.contains('open')) closeLevelScreen();
-  });
-
   levelNotesArea.addEventListener('input', () => {
     if(currentNotesLevel === null) return;
     const lv = LEVELS[currentNotesLevel];
@@ -1317,7 +2007,38 @@
     }, 350);
   });
 
-  /* ---------------- Init ---------------- */
+  window.addEventListener('beforeunload', flushNotes);
+
+  /* ---------------- Clavier ---------------- */
+  function anyOverlayOpen(){
+    return !!document.querySelector('.overlay.open');
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if(e.key === 'Escape'){
+      if(anyOverlayOpen()){
+        closeAddModal();
+        closeSettingsModal();
+        closeEditDayModal();
+        return;
+      }
+      if(levelScreen.classList.contains('open')){ closeLevelScreen(); return; }
+      if(onNewPage){ closeNewScreen(); return; }
+      return;
+    }
+
+    if(e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+    if(e.metaKey || e.ctrlKey || e.altKey) return;
+    if(anyOverlayOpen() || levelScreen.classList.contains('open') || onNewPage) return;
+    const t = e.target;
+    if(t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+    e.preventDefault();
+    if(e.key === 'ArrowLeft') goPrev();
+    else goNext();
+  });
+
+  /* ---------------- Démarrage ---------------- */
+  applyThemeId(data.theme);
   render();
 })();
 </script>
