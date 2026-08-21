@@ -2,12 +2,15 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#14131f">
 <title>Suivi d'input · 한국어</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<!-- Police chargée sans bloquer l'affichage : sur une connexion lente, la page
+     s'affiche tout de suite avec les polices de repli puis bascule. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" media="print" onload="this.media='all';this.onload=null">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap"></noscript>
 <style>
   :root{
     --bg: #14131f;
@@ -17,7 +20,8 @@
     --text: #f2f0e9;
     --text-muted: #a19dc2;
     --text-faint: #6d6a8c;
-    /* --- Couleur d'accent : pilotée par le thème de chaque langue --- */
+    /* Accent : redéfini sur chaque page (chaque langue a sa couleur) et sur
+       :root pour les fenêtres et les écrans, qui suivent la langue active. */
     --coral: #ff6f5e;
     --coral-soft: #ffb3a8;
     --coral-dim: rgba(255,111,94,0.14);
@@ -42,30 +46,52 @@
 
   html, body{
     margin:0; padding:0;
-    background: var(--page-bg);
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;              /* c'est chaque page qui défile */
+    background: var(--bg);
     color: var(--text);
     font-family: var(--font-body);
     -webkit-font-smoothing: antialiased;
   }
 
-  body{
-    min-height: 100vh;
+  /* ---------- Carrousel ---------- */
+  /* Toutes les langues sont montées en même temps, côte à côte. Changer de
+     page ne déplace qu'un rail : aucun rendu pendant le geste. */
+  .viewport{
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+  }
+  .track{
+    display: flex;
+    height: 100%;
+    width: 100%;
+    will-change: transform;
+    transform: translate3d(0,0,0);
+  }
+  .page{
+    flex: 0 0 100%;
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
     padding: 32px 20px 120px;
+    padding-top: max(32px, env(safe-area-inset-top, 0px));
+    background: var(--page-bg);
+    /* l'horizontale est au carrousel, la verticale reste native */
+    touch-action: pan-y;
+    scrollbar-width: thin;
+  }
+  @supports (touch-action: pan-y pinch-zoom){
+    .page{ touch-action: pan-y pinch-zoom; }
   }
 
   .wrap{
     max-width: 760px;
     margin: 0 auto;
-    /* Le navigateur sait d'avance que l'horizontale est à nous : il n'a pas à
-       attendre notre code pour décider, et le défilement vertical reste natif. */
-    touch-action: pan-y;
   }
-  @supports (touch-action: pan-y pinch-zoom){
-    .wrap{ touch-action: pan-y pinch-zoom; }
-  }
-  /* Pendant le geste seulement : la page devient une couche à part, préparée
-     une seule fois au lieu d'être redessinée à chaque image. */
-  .wrap.is-dragging, .wrap.is-animating{ will-change: transform, opacity; }
 
   /* ---------- Header ---------- */
   header{
@@ -118,7 +144,7 @@
   .icon-btn:disabled:hover{ color: var(--text-muted); border-color: var(--border); transform:none; }
   .icon-btn.is-add{ color: var(--coral); border-color: var(--coral-dim); background: var(--coral-dim); }
 
-  /* ---------- Points de navigation entre langues ---------- */
+  /* ---------- Points de navigation ---------- */
   .lang-dots{
     display:flex; align-items:center; gap: 7px;
     margin: 0 0 22px;
@@ -149,7 +175,7 @@
   }
   .lang-dot.add:hover{ color: var(--coral); border-color: var(--coral); background: transparent; }
 
-  /* ---------- Hero card ---------- */
+  /* ---------- Hero ---------- */
   .hero{
     background: linear-gradient(165deg, var(--surface) 0%, var(--surface-2) 100%);
     border: 1px solid var(--border);
@@ -165,7 +191,7 @@
   .ring-wrap{ position: relative; flex-shrink: 0; width: 168px; height: 168px; }
   .ring-wrap svg{ width: 100%; height: 100%; transform: rotate(-90deg); }
   .ring-track{ fill:none; stroke: rgba(242,240,233,0.07); stroke-width: 10; }
-  .ring-progress{ fill:none; stroke: url(#ringGradient); stroke-width: 10; stroke-linecap: round; transition: stroke-dashoffset .8s cubic-bezier(.16,1,.3,1); }
+  .ring-progress{ fill:none; stroke-width: 10; stroke-linecap: round; transition: stroke-dashoffset .8s cubic-bezier(.16,1,.3,1); }
   .grad-start{ stop-color: var(--coral); }
   .grad-end{ stop-color: var(--coral-soft); }
   .ring-center{
@@ -185,7 +211,7 @@
   .bar-track{ height: 7px; border-radius: 99px; background: rgba(242,240,233,0.07); overflow:hidden; }
   .bar-fill{ height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--coral), var(--coral-soft)); transition: width .8s cubic-bezier(.16,1,.3,1); }
 
-  /* ---------- Stats row ---------- */
+  /* ---------- Statistiques ---------- */
   .stats-row{
     display:grid;
     grid-template-columns: repeat(4, 1fr);
@@ -207,7 +233,7 @@
   .stat-chip .stat-sub{ font-size: 10.5px; color: var(--text-faint); font-weight: 700; margin-top: 3px; }
   .flame{ font-size: 15px; }
 
-  /* ---------- Section titles ---------- */
+  /* ---------- Titres de section ---------- */
   .section-title{
     font-family: var(--font-display);
     font-size: 19px;
@@ -219,7 +245,7 @@
   }
   .section-title .rule{ flex:1; height:1px; background: var(--border); }
 
-  /* ---------- Projection card ---------- */
+  /* ---------- Estimations ---------- */
   .proj-card{
     background: var(--surface);
     border: 1px solid var(--border);
@@ -238,7 +264,7 @@
     display:flex; align-items:center; justify-content:center;
     cursor:pointer;
     flex-shrink: 0;
-    transition: transform .15s ease, background .15s ease;
+    transition: transform .15s ease, filter .15s ease;
   }
   .proj-edit-btn:hover{ transform: translateY(-1px); filter: brightness(1.25); }
   .proj-edit-btn:focus-visible{ outline: 2px solid var(--coral); outline-offset: 2px; }
@@ -270,13 +296,10 @@
   .mini-seg button.active{ background: var(--teal-dim); color: var(--teal); }
   .mini-seg button:focus-visible{ outline: 2px solid var(--teal); outline-offset: -2px; }
   .proj-line{ font-size: 13px; color: var(--text-muted); margin-bottom: 8px; line-height: 1.5; }
-  #projContent .proj-line{ min-height: 3em; margin-bottom: 0; }
+  .proj-content .proj-line{ min-height: 3em; margin-bottom: 0; }
   .proj-line:last-child{ margin-bottom: 0; }
-  .proj-line .big{ color: var(--text); font-weight: 700; font-size: 14px; }
-  .proj-empty{ font-size: 13px; color: var(--text-faint); line-height: 1.5; }
-  .proj-empty a{ color: var(--coral); cursor:pointer; text-decoration: underline; }
 
-  /* ---------- Chart ---------- */
+  /* ---------- Graphique ---------- */
   .chart-card{
     background: var(--surface);
     border: 1px solid var(--border);
@@ -289,12 +312,11 @@
   .chart-axis-label{ font-size: 10.5px; fill: var(--text-faint); font-family: var(--font-body); }
   .chart-max-label{ font-size: 10.5px; fill: var(--text-faint); font-family: var(--font-body); }
   .chart-line{ fill:none; stroke: var(--coral); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
-  .chart-area{ fill: url(#areaGradient); stroke: none; }
   .chart-dot{ fill: var(--coral); stroke: var(--bg); stroke-width: 1.5; }
   .area-start{ stop-color: var(--coral); stop-opacity: .35; }
   .area-end{ stop-color: var(--coral); stop-opacity: 0; }
 
-  /* ---------- Levels roadmap ---------- */
+  /* ---------- Les 7 niveaux ---------- */
   .levels-scroll{
     display:flex;
     gap: 12px;
@@ -312,6 +334,7 @@
     padding: 16px 14px;
     position: relative;
     transition: border-color .2s ease;
+    cursor: pointer;
   }
   .level-card.done{ border-color: rgba(82,214,201,0.35); }
   .level-card.current{ border-color: var(--coral); background: linear-gradient(165deg, var(--surface-2), var(--surface)); }
@@ -324,11 +347,10 @@
   .level-card .lv-desc{ font-size: 11.5px; color: var(--text-muted); line-height: 1.45; }
   .level-card .lv-date{ font-size: 10.5px; line-height: 1.35; color: var(--text-faint); font-weight: 700; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); }
   .level-card.current .lv-date{ color: var(--coral); }
-  .level-card{ cursor: pointer; }
   .level-card:hover{ border-color: rgba(242,240,233,0.25); }
   .level-card:focus-visible{ outline: 2px solid var(--coral); outline-offset: 2px; }
 
-  /* ---------- Week row ---------- */
+  /* ---------- Semaine ---------- */
   .week-row{
     display:flex;
     gap: 8px;
@@ -357,15 +379,17 @@
     .week-day .wd-min{ font-size: 14px; }
   }
 
-  /* ---------- Écrans plein page (notes de niveau / nouvelle langue) ---------- */
+  /* ---------- Écrans plein page ---------- */
   .screen{
     position: fixed;
     inset: 0;
     background: var(--page-bg);
+    background-color: var(--bg);
     z-index: 50;
     display: flex;
     flex-direction: column;
     padding: 20px 20px calc(20px + env(safe-area-inset-bottom, 0px));
+    padding-top: max(20px, env(safe-area-inset-top, 0px));
     transform: translateX(100%);
     transition: transform .32s cubic-bezier(.16,1,.3,1);
   }
@@ -419,10 +443,7 @@
     caret-color: #b5432f;
   }
   .lined-paper::placeholder{ color: rgba(58,46,26,0.4); }
-  .lined-paper::-webkit-scrollbar{ width: 8px; }
-  .lined-paper::-webkit-scrollbar-thumb{ background: rgba(90,70,45,0.2); border-radius: 8px; }
 
-  /* ---------- Écran « nouvelle langue » ---------- */
   .new-screen{ overflow-y: auto; }
   .new-body{ width: 100%; max-width: 460px; margin: 0 auto; padding-bottom: 30px; }
   .new-hero{ text-align:center; margin: 6px 0 22px; }
@@ -437,10 +458,11 @@
     box-shadow: var(--shadow);
   }
 
-  /* ---------- FAB ---------- */
+  /* ---------- Bouton flottant ---------- */
   .fab{
     position: fixed;
     right: 26px; bottom: 26px;
+    bottom: calc(26px + env(safe-area-inset-bottom, 0px));
     width: 62px; height: 62px;
     border-radius: 50%;
     background: linear-gradient(155deg, var(--coral), var(--coral-soft));
@@ -449,7 +471,7 @@
     box-shadow: 0 14px 30px -8px var(--coral-shadow);
     cursor: pointer;
     display:flex; align-items:center; justify-content:center;
-    transition: transform .18s ease, box-shadow .18s ease, opacity .2s ease;
+    transition: transform .18s ease, box-shadow .18s ease;
     z-index: 30;
   }
   .fab:hover{ transform: translateY(-2px) scale(1.03); }
@@ -457,7 +479,7 @@
   .fab:focus-visible{ outline: 2px solid var(--text); outline-offset: 3px; }
   .fab svg{ width: 26px; height: 26px; }
 
-  /* ---------- Modal ---------- */
+  /* ---------- Fenêtres ---------- */
   .overlay{
     position: fixed; inset:0;
     background: rgba(10,9,16,0.6);
@@ -477,9 +499,11 @@
     border: 1px solid var(--border);
     border-radius: 22px 22px 0 0;
     padding: 26px 22px 30px;
+    padding-bottom: calc(30px + env(safe-area-inset-bottom, 0px));
     width: 100%;
     max-width: 420px;
     max-height: 92vh;
+    max-height: 92dvh;
     overflow-y: auto;
     box-shadow: 0 -20px 60px rgba(0,0,0,0.5);
     transform: translateY(24px);
@@ -555,6 +579,17 @@
   .seg button.active{ background: var(--coral-dim); color: var(--coral); }
   .seg button:focus-visible{ outline: 2px solid var(--coral); outline-offset: -2px; }
 
+  /* Bascule de l'échelle des niveaux */
+  .seg-scale{ width: 100%; margin-bottom: 10px; }
+  .seg-scale button{ flex: 1; padding: 11px 8px; line-height: 1.25; }
+  .seg-scale .sc-h{ display:block; font-family: var(--font-display); font-size: 16px; font-weight: 600; }
+  .seg-scale .sc-t{ display:block; font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; opacity: .75; margin-top: 2px; }
+  .scale-steps{
+    font-size: 11.5px; color: var(--text-faint); font-weight: 700;
+    margin: 0 0 18px; line-height: 1.5;
+    font-variant-numeric: tabular-nums;
+  }
+
   .text-input{
     width: 100%;
     background: var(--surface);
@@ -570,7 +605,6 @@
   .text-input:focus-visible{ outline: 2px solid var(--coral); outline-offset: 1px; }
   .text-input::placeholder{ color: var(--text-faint); font-weight: 500; }
 
-  /* ---------- Nuancier de thèmes ---------- */
   .swatch-row{ display:flex; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
   .swatch{
     width: 34px; height: 34px;
@@ -638,7 +672,6 @@
   }
   .date-input:focus-visible{ outline: 2px solid var(--coral); outline-offset: 1px; }
 
-  /* ---------- Zone de suppression ---------- */
   .danger-zone{ margin-top: 22px; padding-top: 16px; border-top: 1px solid var(--border); }
   .btn-danger{
     width: 100%;
@@ -656,7 +689,6 @@
   .btn-danger:hover{ background: rgba(255,128,128,0.1); }
   .btn-danger:focus-visible{ outline: 2px solid var(--danger); outline-offset: 2px; }
   .btn-danger.solid{ background: #d94f4f; border-color: #d94f4f; color: #fff; }
-  .btn-danger.solid:hover{ background: #e35b5b; }
   .danger-note{ font-size: 12px; color: var(--text-faint); text-align:center; line-height: 1.5; }
   .confirm-del p{ font-size: 13px; color: var(--text-muted); line-height: 1.5; margin: 0 0 12px; }
   [hidden]{ display: none !important; }
@@ -679,7 +711,7 @@
     h1{ font-size: 28px; }
   }
   @media (max-width: 480px){
-    body{ padding: 24px 16px 120px; }
+    .page{ padding: 24px 16px 120px; }
     .icon-btn{ width: 40px; height: 40px; }
     .icon-btn svg{ width: 18px; height: 18px; }
     .head-actions{ gap: 6px; }
@@ -692,100 +724,106 @@
 </head>
 <body>
 
-<div class="wrap">
-  <header>
-    <div class="head-titles">
-      <p class="eyebrow">Suivi d'input compréhensible</p>
-      <h1 id="pageTitle">Coréen <span class="hangul">한국어</span></h1>
-    </div>
-    <div class="head-actions">
-      <button class="icon-btn" id="prevLangBtn" aria-label="Langue précédente" title="Langue précédente">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-      </button>
-      <button class="icon-btn" id="nextLangBtn" aria-label="Langue suivante" title="Langue suivante">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-      </button>
-      <button class="icon-btn" id="settingsBtn" aria-label="Paramètres de la langue" title="Paramètres">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-      </button>
-    </div>
-  </header>
+<!-- Gabarit d'une page de langue : cloné une fois par langue au chargement -->
+<template id="pageTpl">
+  <div class="page">
+    <div class="wrap">
+      <header>
+        <div class="head-titles">
+          <p class="eyebrow">Suivi d'input compréhensible</p>
+          <h1 data-el="title">Coréen</h1>
+        </div>
+        <div class="head-actions">
+          <button class="icon-btn" data-el="prev" aria-label="Langue précédente" title="Langue précédente">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+          </button>
+          <button class="icon-btn" data-el="next" aria-label="Langue suivante" title="Langue suivante">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+          </button>
+          <button class="icon-btn" data-el="settings" aria-label="Paramètres de la langue" title="Paramètres">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+          </button>
+        </div>
+      </header>
 
-  <div class="lang-dots" id="langDots" role="tablist" aria-label="Langues suivies"></div>
+      <div class="lang-dots" data-el="dots" aria-label="Langues suivies"></div>
 
-  <section class="hero">
-    <div class="ring-wrap">
-      <svg viewBox="0 0 168 168">
-        <defs>
-          <linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop class="grad-start" offset="0%"/>
-            <stop class="grad-end" offset="100%"/>
-          </linearGradient>
-        </defs>
-        <circle class="ring-track" cx="84" cy="84" r="74"></circle>
-        <circle class="ring-progress" id="ringProgress" cx="84" cy="84" r="74"></circle>
-      </svg>
-      <div class="ring-center">
-        <div class="ring-level-num" id="ringLevelNum">1</div>
-        <div class="ring-hangul" id="ringHangul">일</div>
+      <section class="hero">
+        <div class="ring-wrap">
+          <svg viewBox="0 0 168 168">
+            <defs>
+              <linearGradient data-el="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop class="grad-start" offset="0%"/>
+                <stop class="grad-end" offset="100%"/>
+              </linearGradient>
+            </defs>
+            <circle class="ring-track" cx="84" cy="84" r="74"></circle>
+            <circle class="ring-progress" data-el="ring" cx="84" cy="84" r="74"></circle>
+          </svg>
+          <div class="ring-center">
+            <div class="ring-level-num" data-el="ringNum">1</div>
+            <div class="ring-hangul" data-el="ringGlyph">일</div>
+          </div>
+        </div>
+        <div class="hero-info">
+          <p class="hero-label" data-el="heroLabel">Niveau 1</p>
+          <p class="hero-desc" data-el="heroDesc"></p>
+          <p class="hero-progress-line" data-el="heroProgress"></p>
+          <div class="bar-track"><div class="bar-fill" data-el="heroBar" style="width:0%"></div></div>
+        </div>
+      </section>
+
+      <div class="stats-row">
+        <div class="stat-chip" data-el="totalChip">
+          <div class="stat-label">Total</div>
+          <div class="stat-value" data-el="statTotal">0 min</div>
+          <div class="stat-sub" data-el="statTotalSub"></div>
+        </div>
+        <div class="stat-chip">
+          <div class="stat-label">Aujourd'hui</div>
+          <div class="stat-value accent" data-el="statToday">0 min</div>
+        </div>
+        <div class="stat-chip" data-el="streakChip">
+          <div class="stat-label">Série</div>
+          <div class="stat-value streak" data-el="statStreak">—</div>
+          <div class="stat-sub" data-el="statStreakSub"></div>
+        </div>
+        <div class="stat-chip">
+          <div class="stat-label">Objectif / jour</div>
+          <div class="stat-value" data-el="statGoal">—</div>
+        </div>
       </div>
-    </div>
-    <div class="hero-info">
-      <p class="hero-label" id="heroLabel">Niveau 1</p>
-      <p class="hero-desc" id="heroDesc"></p>
-      <p class="hero-progress-line" id="heroProgressLine"></p>
-      <div class="bar-track"><div class="bar-fill" id="heroBarFill" style="width:0%"></div></div>
-    </div>
-  </section>
 
-  <div class="stats-row">
-    <div class="stat-chip" id="totalChip">
-      <div class="stat-label">Total</div>
-      <div class="stat-value" id="statTotal">0 min</div>
-      <div class="stat-sub" id="statTotalSub"></div>
-    </div>
-    <div class="stat-chip">
-      <div class="stat-label">Aujourd'hui</div>
-      <div class="stat-value accent" id="statToday">0 min</div>
-    </div>
-    <div class="stat-chip" id="streakChip">
-      <div class="stat-label">Série</div>
-      <div class="stat-value streak" id="statStreak">—</div>
-      <div class="stat-sub" id="statStreakSub"></div>
-    </div>
-    <div class="stat-chip">
-      <div class="stat-label">Objectif / jour</div>
-      <div class="stat-value" id="statGoal">—</div>
-    </div>
-  </div>
+      <h2 class="section-title">Cette semaine<span class="rule"></span></h2>
+      <div class="week-row" data-el="weekRow"></div>
 
-  <h2 class="section-title">Cette semaine<span class="rule"></span></h2>
-  <div class="week-row" id="weekRow"></div>
-
-  <h2 class="section-title">Estimations pour le prochain niveau<span class="rule"></span></h2>
-  <div class="proj-card single">
-    <div class="proj-card-head">
-      <div class="mini-seg" id="paceModeSeg">
-        <button type="button" data-mode="7d" class="active">7 j</button>
-        <button type="button" data-mode="all">Depuis le début</button>
-        <button type="button" data-mode="goal">Obj</button>
+      <h2 class="section-title">Estimations pour le prochain niveau<span class="rule"></span></h2>
+      <div class="proj-card">
+        <div class="proj-card-head">
+          <div class="mini-seg" data-el="paceSeg">
+            <button type="button" data-mode="7d" class="active">7 j</button>
+            <button type="button" data-mode="all">Depuis le début</button>
+            <button type="button" data-mode="goal">Obj</button>
+          </div>
+          <button class="proj-edit-btn" data-el="editGoal" aria-label="Modifier l'objectif quotidien" title="Modifier l'objectif">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path></svg>
+          </button>
+        </div>
+        <h3 data-el="projLabel">Selon ton rythme réel (7 derniers jours)</h3>
+        <div class="proj-content" data-el="projContent"></div>
       </div>
-      <button class="proj-edit-btn" id="editGoalBtn" aria-label="Modifier l'objectif quotidien" title="Modifier l'objectif">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path></svg>
-      </button>
+
+      <h2 class="section-title">Progression cumulée<span class="rule"></span></h2>
+      <div class="chart-card" data-el="chartCard"></div>
+
+      <h2 class="section-title">Les 7 niveaux<span class="rule"></span></h2>
+      <div class="levels-scroll" data-el="levels"></div>
     </div>
-    <h3 id="projModeLabel">Selon ton rythme réel (7 derniers jours)</h3>
-    <div id="projContent"></div>
   </div>
+</template>
 
-
-  <h2 class="section-title">Progression cumulée<span class="rule"></span></h2>
-  <div class="chart-card" id="chartCard">
-    <div class="chart-empty">Ajoute ta première session pour voir ta progression ici.</div>
-  </div>
-
-  <h2 class="section-title">Les 7 niveaux<span class="rule"></span></h2>
-  <div class="levels-scroll" id="levelsScroll"></div>
+<div class="viewport" id="viewport">
+  <div class="track" id="track"></div>
 </div>
 
 <button class="fab" id="fabBtn" aria-label="Ajouter une session">
@@ -815,9 +853,7 @@
     <button class="icon-btn" id="newBackBtn" aria-label="Revenir à la langue précédente">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
     </button>
-    <div class="screen-title">
-      <span class="lst-name">Nouvelle langue</span>
-    </div>
+    <div class="screen-title"><span class="lst-name">Nouvelle langue</span></div>
     <div class="screen-spacer"></div>
   </div>
 
@@ -825,7 +861,7 @@
     <div class="new-hero">
       <div class="globe">🌍</div>
       <h2>Ajouter une langue</h2>
-      <p>Une nouvelle page, avec les mêmes 7 niveaux, ses propres heures et son propre objectif.</p>
+      <p>Une nouvelle page, avec ses propres heures, son objectif et son échelle de niveaux.</p>
     </div>
 
     <div class="new-card">
@@ -840,6 +876,13 @@
         <button class="chip small" type="button">mandarin</button>
       </div>
       <p class="field-error" id="newLangError" hidden>Écris d'abord le nom de la langue.</p>
+
+      <span class="field-label">Heures pour atteindre le niveau 7</span>
+      <div class="seg seg-scale" id="newScaleSeg">
+        <button type="button" data-scale="ds"><span class="sc-h">1 500 h</span><span class="sc-t">Langue proche</span></button>
+        <button type="button" data-scale="kr"><span class="sc-h">3 000 h</span><span class="sc-t">Langue lointaine</span></button>
+      </div>
+      <p class="scale-steps" id="newScaleSteps"></p>
 
       <span class="field-label">Couleur de la page</span>
       <div class="swatch-row" id="newLangSwatches"></div>
@@ -901,6 +944,13 @@
     <span class="field-label">Nom de la langue</span>
     <input type="text" class="text-input" id="settingsName" autocomplete="off" spellcheck="false" maxlength="40">
 
+    <span class="field-label">Heures pour atteindre le niveau 7</span>
+    <div class="seg seg-scale" id="scaleSeg">
+      <button type="button" data-scale="ds"><span class="sc-h">1 500 h</span><span class="sc-t">Langue proche</span></button>
+      <button type="button" data-scale="kr"><span class="sc-h">3 000 h</span><span class="sc-t">Langue lointaine</span></button>
+    </div>
+    <p class="scale-steps" id="scaleSteps"></p>
+
     <span class="field-label">Objectif quotidien</span>
     <div class="input-row">
       <input type="number" id="goalAmount" min="0" placeholder="Ex. 30" inputmode="numeric">
@@ -933,7 +983,7 @@
       </div>
       <div id="confirmDelBlock" hidden>
         <div class="confirm-del">
-          <p id="confirmDelText">Supprimer cette langue et tout son historique ? C'est définitif.</p>
+          <p id="confirmDelText"></p>
           <button class="btn-danger solid" id="confirmDelBtn">Oui, tout supprimer</button>
           <button class="btn-text" id="cancelDelBtn">Non, annuler</button>
         </div>
@@ -964,29 +1014,30 @@
 (function(){
   "use strict";
 
-  /* ---------------- Thèmes de couleur ---------------- */
+  /* ================= Thèmes ================= */
   const THEMES = [
-    { id:'coral',  name:'Corail',    accent:'#ff6f5e', soft:'#ffb3a8' },
-    { id:'ocean',  name:'Océan',     accent:'#5aa9ff', soft:'#a9d2ff' },
-    { id:'jade',   name:'Jade',      accent:'#3fd69a', soft:'#a5f0cd' },
-    { id:'violet', name:'Violet',    accent:'#a880ff', soft:'#d5bfff' },
-    { id:'ambre',  name:'Ambre',     accent:'#f2b13c', soft:'#ffd98a' },
-    { id:'rose',   name:'Rose',      accent:'#ff6faa', soft:'#ffb3d1' },
-    { id:'ciel',   name:'Ciel',      accent:'#4fd8e8', soft:'#a8f0f7' },
-    { id:'olive',  name:'Olive',     accent:'#b7d15c', soft:'#dcebA6' }
+    { id:'coral',  name:'Corail', accent:'#ff6f5e', soft:'#ffb3a8' },
+    { id:'ocean',  name:'Océan',  accent:'#5aa9ff', soft:'#a9d2ff' },
+    { id:'jade',   name:'Jade',   accent:'#3fd69a', soft:'#a5f0cd' },
+    { id:'violet', name:'Violet', accent:'#a880ff', soft:'#d5bfff' },
+    { id:'ambre',  name:'Ambre',  accent:'#f2b13c', soft:'#ffd98a' },
+    { id:'rose',   name:'Rose',   accent:'#ff6faa', soft:'#ffb3d1' },
+    { id:'ciel',   name:'Ciel',   accent:'#4fd8e8', soft:'#a8f0f7' },
+    { id:'olive',  name:'Olive',  accent:'#b7d15c', soft:'#dceba6' }
   ];
   const DEFAULT_THEME = 'coral';
   function themeById(id){ return THEMES.find(t => t.id === id) || THEMES[0]; }
 
   function hexToRgba(hex, a){
     const h = hex.replace('#','');
-    const r = parseInt(h.slice(0,2),16), g = parseInt(h.slice(2,4),16), b = parseInt(h.slice(4,6),16);
-    return 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')';
+    return 'rgba(' + parseInt(h.slice(0,2),16) + ',' + parseInt(h.slice(2,4),16) + ',' + parseInt(h.slice(4,6),16) + ',' + a + ')';
   }
 
-  function applyThemeId(id){
+  // Chaque page porte sa propre couleur ; :root suit la langue active pour les
+  // fenêtres et les écrans.
+  function applyThemeTo(el, id){
     const t = themeById(id);
-    const s = document.documentElement.style;
+    const s = el.style;
     s.setProperty('--coral', t.accent);
     s.setProperty('--coral-soft', t.soft);
     s.setProperty('--coral-dim', hexToRgba(t.accent, 0.14));
@@ -994,19 +1045,37 @@
     s.setProperty('--accent-glow', hexToRgba(t.accent, 0.13));
   }
 
-  /* ---------------- Couche de données ---------------- */
+  /* ================= Échelles de niveaux ================= */
+  const SCALES = {
+    ds: { id:'ds', hours:[0, 50, 150, 300, 600, 1000, 1500] },
+    kr: { id:'kr', hours:[0, 100, 300, 600, 1200, 2000, 3000] }
+  };
+  function scaleOf(lang){ return SCALES[lang.scale] || SCALES.ds; }
+  function levelHours(lang, i){ return scaleOf(lang).hours[i]; }
+
+  // Langues « lointaines » pour un francophone : 3 000 h par défaut.
+  const DISTANT = ['coreen','korean','japonais','japanese','chinois','chinese','mandarin','cantonais',
+    'cantonese','arabe','arabic','russe','russian','hindi','thai','thailandais','vietnamien','hebreu',
+    'hebrew','turc','turkish','polonais','hongrois','finnois','grec','persan','farsi','ourdou','georgien',
+    'islandais','coréen','japonais'];
+
+  function normalize(s){
+    return String(s || '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  }
+  function isKoreanName(name){
+    const s = normalize(name);
+    return s === 'coreen' || s === 'korean' || s === '한국어';
+  }
+  function defaultScaleFor(name){
+    return DISTANT.indexOf(normalize(name)) !== -1 ? 'kr' : 'ds';
+  }
+
+  /* ================= Données ================= */
   const STORAGE_KEY = 'inputTrackerV2';
   const LEGACY_KEY = 'krInputTrackerV1';
   const VALID_MODES = ['7d','all','goal'];
 
   function uid(){ return 'l' + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
-
-  // Le coréen a droit à ses chiffres en hangul : on le reconnaît à son nom.
-  function isKoreanName(name){
-    const s = String(name || '').trim().toLowerCase()
-      .normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-    return s === 'coreen' || s === 'korean' || s === '\ud55c\uad6d\uc5b4';
-  }
 
   function makeLang(o){
     o = o || {};
@@ -1015,6 +1084,7 @@
       id: o.id || uid(),
       name: name,
       korean: isKoreanName(name),
+      scale: SCALES[o.scale] ? o.scale : defaultScaleFor(name),
       theme: THEMES.some(t => t.id === o.theme) ? o.theme : DEFAULT_THEME,
       totalMinutes: Number(o.totalMinutes) > 0 ? Number(o.totalMinutes) : 0,
       baseMinutes: Number(o.baseMinutes) > 0 ? Number(o.baseMinutes) : 0,
@@ -1026,7 +1096,7 @@
   }
 
   function makeKorean(extra){
-    return makeLang(Object.assign({ name:'coréen', korean:true, theme:'coral' }, extra || {}));
+    return makeLang(Object.assign({ name:'coréen', scale:'kr', theme:'coral' }, extra || {}));
   }
 
   function loadState(){
@@ -1040,20 +1110,16 @@
         if(!Number.isInteger(idx) || idx < 0 || idx >= langs.length) idx = 0;
         return { languages: langs, activeIndex: idx };
       }
-      // Migration depuis l'ancienne version (coréen uniquement)
       const legacy = localStorage.getItem(LEGACY_KEY);
       if(legacy){
         const old = JSON.parse(legacy);
-        return {
-          languages: [makeKorean({
-            totalMinutes: old.totalMinutes,
-            dailyGoalMinutes: old.dailyGoalMinutes,
-            sessions: old.sessions,
-            paceMode: old.paceMode || old.realPaceMode,
-            levelNotes: old.levelNotes
-          })],
-          activeIndex: 0
-        };
+        return { languages: [makeKorean({
+          totalMinutes: old.totalMinutes,
+          dailyGoalMinutes: old.dailyGoalMinutes,
+          sessions: old.sessions,
+          paceMode: old.paceMode || old.realPaceMode,
+          levelNotes: old.levelNotes
+        })], activeIndex: 0 };
       }
     }catch(e){
       console.error('Erreur de lecture des données', e);
@@ -1062,70 +1128,59 @@
   }
 
   let state = loadState();
-  let data = state.languages[state.activeIndex];
-  let onNewPage = false;
+  let activeIndex = state.activeIndex;
+  function activeLang(){ return state.languages[activeIndex]; }
 
   function saveData(){
     try{
+      state.activeIndex = activeIndex;
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     }catch(e){
-      console.error('Erreur d\'enregistrement des données', e);
+      console.error("Erreur d'enregistrement des données", e);
     }
   }
 
-  /* ---------------- Aide au texte ---------------- */
+  /* ================= Texte ================= */
   function esc(str){
-    return String(str).replace(/[&<>"']/g, function(c){
-      return ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[c];
-    });
+    return String(str).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[c]);
   }
   function langTitle(name){
     const s = String(name || '').trim();
     return s ? s.charAt(0).toUpperCase() + s.slice(1) : 'Langue';
   }
   function langLower(name){ return String(name || '').trim().toLowerCase(); }
-  // « du coréen », « de l'espagnol »
   function deLang(lang){
     const s = langLower(lang.name);
     if(!s) return '';
     return /^[aeiouyéèêëàâîïôöûüh]/.test(s) ? "de l'" + s : 'du ' + s;
   }
+  function fmtInt(n){
+    return Math.round(n).toLocaleString('fr-FR').replace(/[\u202f\u00a0]/g, ' ');
+  }
 
-  /* ---------------- Niveaux ---------------- */
+  /* ================= Niveaux ================= */
   const LEVELS = [
-    { n:1, hours:0,    hangul:'일', roman:'I',
-      desc: l => 'Tu démarres tout juste ton apprentissage ' + deLang(l) + '.' },
-    { n:2, hours:100,  hangul:'이', roman:'II',
-      desc: () => 'Tu commences à suivre des vidéos très simples.' },
-    { n:3, hours:300,  hangul:'삼', roman:'III',
-      desc: () => 'Tu comprends des vidéos pour enfants et des contenus très guidés.' },
-    { n:4, hours:600,  hangul:'사', roman:'IV',
-      desc: () => 'Tu peux suivre des vidéos de niveau intermédiaire.' },
-    { n:5, hours:1200, hangul:'오', roman:'V',
-      desc: () => 'Tu comprends une bonne partie de YouTube sans sous-titres, à condition que le sujet soit familier.' },
-    { n:6, hours:2000, hangul:'육', roman:'VI',
-      desc: l => (l.korean ? 'Les dramas' : 'Les séries') + ', les podcasts et les conversations deviennent nettement plus accessibles.' },
-    { n:7, hours:3000, hangul:'칠', roman:'VII',
-      desc: () => 'Compréhension très solide de la langue courante, avec encore des difficultés sur le vocabulaire spécialisé.' }
+    { n:1, hangul:'일', roman:'I',   desc: l => 'Tu démarres tout juste ton apprentissage ' + deLang(l) + '.' },
+    { n:2, hangul:'이', roman:'II',  desc: () => 'Tu commences à suivre des vidéos très simples.' },
+    { n:3, hangul:'삼', roman:'III', desc: () => 'Tu comprends des vidéos pour enfants et des contenus très guidés.' },
+    { n:4, hangul:'사', roman:'IV',  desc: () => 'Tu peux suivre des vidéos de niveau intermédiaire.' },
+    { n:5, hangul:'오', roman:'V',   desc: () => 'Tu comprends une bonne partie de YouTube sans sous-titres, à condition que le sujet soit familier.' },
+    { n:6, hangul:'육', roman:'VI',  desc: l => (l.korean ? 'Les dramas' : 'Les séries') + ', les podcasts et les conversations deviennent nettement plus accessibles.' },
+    { n:7, hangul:'칠', roman:'VII', desc: () => 'Compréhension très solide de la langue courante, avec encore des difficultés sur le vocabulaire spécialisé.' }
   ];
+  function levelDesc(lang, lv){ return lv.desc(lang); }
+  function levelGlyph(lang, lv){ return lang.korean ? lv.hangul : lv.roman; }
 
-  function levelDesc(lv){ return lv.desc(data); }
-  function levelGlyph(lv){ return data.korean ? lv.hangul : lv.roman; }
-
-  function getLevelIndex(totalHours){
+  function getLevelIndex(lang, totalHours){
+    const hours = scaleOf(lang).hours;
     let idx = 0;
-    for(let i=0;i<LEVELS.length;i++){
-      if(totalHours >= LEVELS[i].hours) idx = i;
-    }
+    for(let i=0;i<hours.length;i++){ if(totalHours >= hours[i]) idx = i; }
     return idx;
   }
 
-  /* ---------------- Dates ---------------- */
+  /* ================= Dates ================= */
   function toISODate(d){
-    const y = d.getFullYear();
-    const m = String(d.getMonth()+1).padStart(2,'0');
-    const day = String(d.getDate()).padStart(2,'0');
-    return `${y}-${m}-${day}`;
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
   }
   function todayISO(){ return toISODate(new Date()); }
   function addDays(date, n){ return new Date(date.getTime() + n*86400000); }
@@ -1137,396 +1192,309 @@
   function formatDateFr(date){
     return new Intl.DateTimeFormat('fr-FR', { day:'numeric', month:'long', year:'numeric' }).format(date);
   }
+  function formatDateFrCap(date){
+    const parts = formatDateFr(date).split(' ');
+    parts[1] = parts[1].charAt(0).toUpperCase() + parts[1].slice(1);
+    return parts.join(' ');
+  }
   function formatHoursMin(totalMinutes){
     const h = Math.floor(totalMinutes/60);
     const m = Math.round(totalMinutes%60);
     if(h<=0) return `${m} min`;
-    if(m===0) return `${h} h`;
-    return `${h} h ${String(m).padStart(2,'0')}`;
+    if(m===0) return `${fmtInt(h)} h`;
+    return `${fmtInt(h)} h ${String(m).padStart(2,'0')}`;
   }
-  // Heures de base : comptées dans le total et le niveau, jamais dans les rythmes.
-  function grandTotalMinutes(){ return data.baseMinutes + data.totalMinutes; }
 
-  function sumMinutesInWindow(nDays){
+  /* ================= Calculs (par langue) ================= */
+  // Heures de base : dans le total et le niveau, jamais dans les rythmes.
+  function grandTotal(lang){ return lang.baseMinutes + lang.totalMinutes; }
+
+  function sumMinutesInWindow(lang, nDays){
     let sum = 0;
     const today = new Date();
-    for(let i=0;i<nDays;i++){
-      const key = toISODate(addDays(today, -i));
-      sum += data.sessions[key] || 0;
-    }
+    for(let i=0;i<nDays;i++) sum += lang.sessions[toISODate(addDays(today, -i))] || 0;
     return sum;
   }
-  function getFirstSessionDate(){
-    const keys = Object.keys(data.sessions).filter(k => data.sessions[k] > 0).sort();
-    if(keys.length === 0) return null;
+  function firstSessionDate(lang){
+    const keys = Object.keys(lang.sessions).filter(k => lang.sessions[k] > 0).sort();
+    if(!keys.length) return null;
     const [y,m,d] = keys[0].split('-').map(Number);
     return new Date(y, m-1, d);
   }
-
-  /* ---------------- Série (jours consécutifs) ---------------- */
-  function currentStreak(){
+  function currentStreak(lang){
     const today = new Date();
-    // Le jour en cours ne casse pas la série tant qu'il n'est pas fini.
-    let i = (data.sessions[toISODate(today)] > 0) ? 0 : 1;
+    let i = (lang.sessions[toISODate(today)] > 0) ? 0 : 1;
     let streak = 0;
-    while(true){
-      const key = toISODate(addDays(today, -i));
-      if(data.sessions[key] > 0){ streak++; i++; }
+    while(i <= 10000){
+      if(lang.sessions[toISODate(addDays(today, -i))] > 0){ streak++; i++; }
       else break;
-      if(i > 10000) break;
     }
     return streak;
   }
-  function bestStreak(){
-    const keys = Object.keys(data.sessions).filter(k => data.sessions[k] > 0).sort();
+  function bestStreak(lang){
+    const keys = Object.keys(lang.sessions).filter(k => lang.sessions[k] > 0).sort();
     if(!keys.length) return 0;
     let best = 1, run = 1;
     for(let i=1;i<keys.length;i++){
       const [y1,m1,d1] = keys[i-1].split('-').map(Number);
       const [y2,m2,d2] = keys[i].split('-').map(Number);
-      const prev = new Date(y1, m1-1, d1);
-      const cur = new Date(y2, m2-1, d2);
-      run = (Math.round((cur - prev)/86400000) === 1) ? run + 1 : 1;
+      run = (Math.round((new Date(y2,m2-1,d2) - new Date(y1,m1-1,d1))/86400000) === 1) ? run + 1 : 1;
       if(run > best) best = run;
     }
     return best;
   }
 
-  /* ---------------- Projections ---------------- */
-  function getRates(){
-    const goalHoursPerDay = data.dailyGoalMinutes/60;
-    const avg7 = sumMinutesInWindow(7)/60/7;
-    const firstDate = getFirstSessionDate();
+  function getRates(lang){
+    const goalHoursPerDay = lang.dailyGoalMinutes/60;
+    const avg7 = sumMinutesInWindow(lang, 7)/60/7;
+    const first = firstSessionDate(lang);
     let avgAll = 0;
-    if(firstDate){
-      const daysSinceFirst = Math.max(1, diffDaysInclusive(firstDate, new Date()));
-      avgAll = (data.totalMinutes/60) / daysSinceFirst;
-    }
-    return { goalHoursPerDay, avg7, avgAll, hasHistory: !!firstDate };
+    if(first) avgAll = (lang.totalMinutes/60) / Math.max(1, diffDaysInclusive(first, new Date()));
+    return { goalHoursPerDay, avg7, avgAll, hasHistory: !!first };
   }
-
   function rateForMode(mode, rates){
     if(mode === 'goal') return rates.goalHoursPerDay;
     if(mode === 'all') return rates.avgAll;
     return rates.avg7;
   }
-
-  function estimateDateForHours(targetHours, rate){
-    const totalHours = grandTotalMinutes()/60;
+  function estimateDateForHours(lang, targetHours, rate){
+    const totalHours = grandTotal(lang)/60;
     if(totalHours >= targetHours) return null;
     if(!rate || rate <= 0) return null;
-    const remaining = targetHours - totalHours;
-    const days = Math.ceil(remaining/rate);
-    return addDays(new Date(), days);
+    return addDays(new Date(), Math.ceil((targetHours - totalHours)/rate));
   }
-
-  function formatDateFrCap(date){
-    const s = formatDateFr(date);
-    const parts = s.split(' ');
-    parts[1] = parts[1].charAt(0).toUpperCase() + parts[1].slice(1);
-    return parts.join(' ');
-  }
-
-  function computeProjections(){
-    const totalHours = grandTotalMinutes()/60;
-    const idx = getLevelIndex(totalHours);
+  function computeProjections(lang){
+    const totalHours = grandTotal(lang)/60;
+    const idx = getLevelIndex(lang, totalHours);
     const next = LEVELS[idx+1];
-    const rates = getRates();
+    const rates = getRates(lang);
     if(!next) return { maxed:true, rates };
-
-    const remainingHours = Math.max(0, next.hours - totalHours);
-    const mode = data.paceMode;
-    const rate = rateForMode(mode, rates);
+    const remainingHours = Math.max(0, levelHours(lang, idx+1) - totalHours);
+    const rate = rateForMode(lang.paceMode, rates);
     let days = null, date = null;
     if(rate > 0){
       days = Math.ceil(remainingHours / rate);
       date = addDays(new Date(), days);
     }
-
-    return { maxed:false, remainingHours, next, mode, rate, days, date, rates, hasHistory: rates.hasHistory };
+    return { maxed:false, remainingHours, next, nextHours: levelHours(lang, idx+1), rate, days, date, rates, hasHistory: rates.hasHistory };
   }
 
-  /* ---------------- Rendu ---------------- */
-  const RING_R = 74;
-  const RING_C = 2 * Math.PI * RING_R;
+  /* ================= Construction des pages ================= */
+  const track = document.getElementById('track');
+  const viewport = document.getElementById('viewport');
+  const tpl = document.getElementById('pageTpl');
+  let pages = [];   // { el, els, lang }
 
-  function render(){
-    renderHeader();
-
-    const totalMinutes = grandTotalMinutes();
-    const totalHours = totalMinutes/60;
-    const idx = getLevelIndex(totalHours);
-    const level = LEVELS[idx];
-    const next = LEVELS[idx+1];
-
-    // Anneau + hero
-    let percent;
-    if(!next){ percent = 100; }
-    else{
-      percent = ((totalHours - level.hours) / (next.hours - level.hours)) * 100;
-      percent = Math.max(0, Math.min(100, percent));
-    }
-    const ringEl = document.getElementById('ringProgress');
-    ringEl.style.strokeDasharray = RING_C;
-    ringEl.style.strokeDashoffset = RING_C - (percent/100)*RING_C;
-
-    document.getElementById('ringLevelNum').textContent = level.n;
-    document.getElementById('ringHangul').textContent = levelGlyph(level);
-    document.getElementById('heroLabel').textContent = `Niveau ${level.n}`;
-    document.getElementById('heroDesc').textContent = levelDesc(level);
-    document.getElementById('heroBarFill').style.width = percent + '%';
-
-    if(next){
-      document.getElementById('heroProgressLine').innerHTML =
-        `<strong>${formatHoursMin(totalMinutes)}</strong> vers le niveau ${next.n} · il te reste <strong>${formatHoursMin(Math.max(0,(next.hours*60)-totalMinutes))}</strong> (seuil : ${next.hours} h)`;
-    } else {
-      document.getElementById('heroProgressLine').innerHTML =
-        `<strong>${formatHoursMin(totalMinutes)}</strong> · niveau maximum atteint 🎉`;
-    }
-
-    // Bandeau de statistiques
-    document.getElementById('statTotal').textContent = formatHoursMin(totalMinutes);
-    const totalSub = document.getElementById('statTotalSub');
-    const totalChip = document.getElementById('totalChip');
-    if(data.baseMinutes > 0){
-      totalSub.textContent = `dont ${formatHoursMin(data.baseMinutes)} de base`;
-      totalChip.title = `${formatHoursMin(data.baseMinutes)} faites avant le suivi + ${formatHoursMin(data.totalMinutes)} suivies ici`;
-    } else {
-      totalSub.textContent = '';
-      totalChip.removeAttribute('title');
-    }
-    document.getElementById('statToday').textContent = formatHoursMin(data.sessions[todayISO()] || 0);
-    document.getElementById('statGoal').textContent = data.dailyGoalMinutes > 0 ? formatHoursMin(data.dailyGoalMinutes) : '—';
-    renderStreak();
-
-    renderProjections();
-    renderWeekRow();
-    renderLevels(idx);
-    renderChart();
+  function buildPage(i){
+    const el = tpl.content.firstElementChild.cloneNode(true);
+    el.dataset.index = String(i);
+    const els = {};
+    el.querySelectorAll('[data-el]').forEach(n => { els[n.dataset.el] = n; });
+    // Un dégradé par page : sinon toutes les pages piocheraient la couleur de la première.
+    els.ringGrad.id = 'ringGrad-' + i;
+    els.ring.style.stroke = `url(#ringGrad-${i})`;
+    return { el, els, lang: state.languages[i] };
   }
 
-  function renderHeader(){
-    const title = langTitle(data.name);
-    const h1 = document.getElementById('pageTitle');
-    if(data.korean && langLower(data.name) !== '한국어'){
-      h1.innerHTML = `${esc(title)} <span class="hangul">한국어</span>`;
-      document.title = "Suivi d'input · 한국어";
-    } else if(data.korean){
-      h1.textContent = title;
-      document.title = "Suivi d'input · 한국어";
-    } else {
-      h1.textContent = title;
-      document.title = "Suivi d'input · " + title;
-    }
-
-    const prevBtn = document.getElementById('prevLangBtn');
-    prevBtn.disabled = state.activeIndex === 0;
-    if(state.activeIndex > 0){
-      const prevName = langTitle(state.languages[state.activeIndex-1].name);
-      prevBtn.title = '← ' + prevName;
-      prevBtn.setAttribute('aria-label', 'Langue précédente : ' + prevName);
-    } else {
-      prevBtn.title = 'Langue précédente';
-      prevBtn.setAttribute('aria-label', 'Langue précédente');
-    }
-
-    const nextBtn = document.getElementById('nextLangBtn');
-    const isLast = state.activeIndex === state.languages.length - 1;
-    nextBtn.classList.toggle('is-add', isLast);
-    if(isLast){
-      nextBtn.title = 'Ajouter une langue';
-      nextBtn.setAttribute('aria-label', 'Ajouter une langue');
-    } else {
-      const nextName = langTitle(state.languages[state.activeIndex+1].name);
-      nextBtn.title = nextName + ' →';
-      nextBtn.setAttribute('aria-label', 'Langue suivante : ' + nextName);
-    }
-
-    document.getElementById('addModalLang').textContent = title;
-    renderDots();
-  }
-
-  function renderDots(){
-    const box = document.getElementById('langDots');
-    box.innerHTML = '';
-    state.languages.forEach((l, i) => {
-      const b = document.createElement('button');
-      b.type = 'button';
-      b.className = 'lang-dot' + ((!onNewPage && i === state.activeIndex) ? ' active' : '');
-      b.dataset.index = String(i);
-      b.title = langTitle(l.name);
-      b.setAttribute('aria-label', 'Aller à ' + langTitle(l.name));
-      box.appendChild(b);
+  function buildAllPages(){
+    track.innerHTML = '';
+    pages = state.languages.map((lang, i) => {
+      const p = buildPage(i);
+      track.appendChild(p.el);
+      return p;
     });
-    const add = document.createElement('button');
-    add.type = 'button';
-    add.className = 'lang-dot add';
-    add.dataset.index = 'new';
-    add.textContent = '+';
-    add.title = 'Ajouter une langue';
-    add.setAttribute('aria-label', 'Ajouter une langue');
-    box.appendChild(add);
-  }
-
-  function renderStreak(){
-    const cur = currentStreak();
-    const best = bestStreak();
-    const valueEl = document.getElementById('statStreak');
-    const subEl = document.getElementById('statStreakSub');
-    const chip = document.getElementById('streakChip');
-
-    if(cur > 0){
-      valueEl.innerHTML = `<span class="flame">🔥</span> ${cur} j`;
-    } else {
-      valueEl.textContent = '—';
-    }
-
-    if(best > 0){
-      subEl.textContent = `Record : ${best} j`;
-      chip.title = cur > 0
-        ? `${cur} jour${cur>1?'s':''} d'affilée · record : ${best}`
-        : `Série interrompue · record : ${best} jour${best>1?'s':''}`;
-    } else {
-      subEl.textContent = 'Commence aujourd’hui !';
-      chip.title = 'Aucune session pour le moment';
-    }
-  }
-
-  function renderProjections(){
-    const p = computeProjections();
-    const contentBox = document.getElementById('projContent');
-    const modeLabel = document.getElementById('projModeLabel');
-
-    document.querySelectorAll('#paceModeSeg button').forEach(b => {
-      b.classList.toggle('active', b.dataset.mode === data.paceMode);
-    });
-
-    const labels = {
-      '7d': 'Selon ton rythme réel (7 derniers jours)',
-      'all': 'Selon ton rythme réel (depuis le début)',
-      'goal': 'Selon ton objectif quotidien'
-    };
-    modeLabel.textContent = labels[data.paceMode] || labels['7d'];
-
-    if(p.maxed){
-      contentBox.innerHTML = `<div class="proj-big-row"><span class="proj-big-num">🎉</span></div><p class="proj-line">Niveau maximum atteint. Continue à pratiquer pour consolider ce niveau !</p>`;
-      return;
-    }
-
-    const mode = data.paceMode;
-
-    if(mode === 'goal'){
-      const bigHtml = data.dailyGoalMinutes > 0
-        ? `<div class="proj-big-row"><span class="proj-big-num">${formatHoursMin(data.dailyGoalMinutes)}</span><span class="proj-big-unit">par jour</span></div>`
-        : `<div class="proj-big-row"><span class="proj-big-num">—</span></div>`;
-      const phrase = data.dailyGoalMinutes > 0
-        ? `Tu passeras niveau ${p.next.n} dans ${p.days} jour${p.days>1?'s':''}, le ${formatDateFr(p.date)}.`
-        : `Définis un objectif pour voir une estimation.`;
-      contentBox.innerHTML = `${bigHtml}<p class="proj-line">${phrase}</p>`;
-      return;
-    }
-
-    // 7d ou depuis le début
-    const bigHtml = p.hasHistory
-      ? `<div class="proj-big-row"><span class="proj-big-num">${formatHoursMin(p.rate*60)}</span><span class="proj-big-unit">par jour</span></div>`
-      : `<div class="proj-big-row"><span class="proj-big-num">—</span></div>`;
-
-    let phrase;
-    if(!p.hasHistory){
-      phrase = `Ajoute des sessions pour calculer ton rythme réel.`;
-    } else if(p.days !== null){
-      phrase = `À ce rythme, tu passeras niveau ${p.next.n} dans ${p.days} jour${p.days>1?'s':''}, le ${formatDateFr(p.date)}.`;
-    } else {
-      phrase = mode === '7d'
-        ? `Aucune session cette semaine — ajoute du temps pour voir une estimation.`
-        : `Ajoute des sessions pour voir une estimation.`;
-    }
-    contentBox.innerHTML = `${bigHtml}<p class="proj-line">${phrase}</p>`;
+    pages.forEach((p, i) => renderPage(i));
+    updateDots();
+    syncInert();
+    setTrackInstant(-activeIndex * pageWidth());
   }
 
   const MONTHS_FR_SHORT = ['janv','févr','mars','avr','mai','juin','juil','août','sept','oct','nov','déc'];
+  const RING_C = 2 * Math.PI * 74;
 
-  function renderWeekRow(){
-    const container = document.getElementById('weekRow');
+  function renderPage(i){
+    const p = pages[i];
+    if(!p) return;
+    const lang = state.languages[i];
+    p.lang = lang;
+    const els = p.els;
+
+    applyThemeTo(p.el, lang.theme);
+
+    // En-tête
+    const title = langTitle(lang.name);
+    if(lang.korean && langLower(lang.name) !== '한국어'){
+      els.title.innerHTML = `${esc(title)} <span class="hangul">한국어</span>`;
+    } else {
+      els.title.textContent = title;
+    }
+
+    els.prev.disabled = (i === 0);
+    if(i > 0){
+      const prevName = langTitle(state.languages[i-1].name);
+      els.prev.title = '← ' + prevName;
+      els.prev.setAttribute('aria-label', 'Langue précédente : ' + prevName);
+    }
+    const isLast = (i === state.languages.length - 1);
+    els.next.classList.toggle('is-add', isLast);
+    els.next.title = isLast ? 'Ajouter une langue' : langTitle(state.languages[i+1].name) + ' →';
+    els.next.setAttribute('aria-label', isLast ? 'Ajouter une langue' : 'Langue suivante : ' + langTitle(state.languages[i+1].name));
+
+    // Anneau et hero
+    const totalMinutes = grandTotal(lang);
+    const totalHours = totalMinutes/60;
+    const idx = getLevelIndex(lang, totalHours);
+    const level = LEVELS[idx];
+    const next = LEVELS[idx+1];
+    const hoursNow = levelHours(lang, idx);
+    const hoursNext = next ? levelHours(lang, idx+1) : null;
+
+    let percent = 100;
+    if(next) percent = Math.max(0, Math.min(100, ((totalHours - hoursNow) / (hoursNext - hoursNow)) * 100));
+    els.ring.style.strokeDasharray = RING_C;
+    els.ring.style.strokeDashoffset = RING_C - (percent/100)*RING_C;
+
+    els.ringNum.textContent = level.n;
+    els.ringGlyph.textContent = levelGlyph(lang, level);
+    els.heroLabel.textContent = `Niveau ${level.n}`;
+    els.heroDesc.textContent = levelDesc(lang, level);
+    els.heroBar.style.width = percent + '%';
+
+    if(next){
+      els.heroProgress.innerHTML =
+        `<strong>${formatHoursMin(totalMinutes)}</strong> vers le niveau ${next.n} · il te reste <strong>${formatHoursMin(Math.max(0,(hoursNext*60)-totalMinutes))}</strong> (seuil : ${fmtInt(hoursNext)} h)`;
+    } else {
+      els.heroProgress.innerHTML = `<strong>${formatHoursMin(totalMinutes)}</strong> · niveau maximum atteint 🎉`;
+    }
+
+    // Statistiques
+    els.statTotal.textContent = formatHoursMin(totalMinutes);
+    els.statToday.textContent = formatHoursMin(lang.sessions[todayISO()] || 0);
+    els.statGoal.textContent = lang.dailyGoalMinutes > 0 ? formatHoursMin(lang.dailyGoalMinutes) : '—';
+    if(lang.baseMinutes > 0){
+      els.statTotalSub.textContent = `dont ${formatHoursMin(lang.baseMinutes)} de base`;
+      els.totalChip.title = `${formatHoursMin(lang.baseMinutes)} faites avant le suivi + ${formatHoursMin(lang.totalMinutes)} suivies ici`;
+    } else {
+      els.statTotalSub.textContent = '';
+      els.totalChip.removeAttribute('title');
+    }
+
+    const cur = currentStreak(lang), best = bestStreak(lang);
+    if(cur > 0) els.statStreak.innerHTML = `<span class="flame">🔥</span> ${cur} j`;
+    else els.statStreak.textContent = '—';
+    if(best > 0){
+      els.statStreakSub.textContent = `Record : ${best} j`;
+      els.streakChip.title = cur > 0 ? `${cur} jour${cur>1?'s':''} d'affilée · record : ${best}` : `Série interrompue · record : ${best} j`;
+    } else {
+      els.statStreakSub.textContent = 'Commence aujourd’hui !';
+      els.streakChip.title = 'Aucune session pour le moment';
+    }
+
+    renderWeek(lang, els.weekRow);
+    renderProjections(lang, els);
+    renderLevels(lang, els.levels, idx);
+    renderChart(lang, els.chartCard, i);
+  }
+
+  function renderWeek(lang, container){
     container.innerHTML = '';
     const today = new Date();
     const todayKey = todayISO();
     for(let i=6;i>=0;i--){
       const d = addDays(today, -i);
       const key = toISODate(d);
-      const minutes = Math.round(data.sessions[key] || 0);
-      const isToday = key === todayKey;
+      const minutes = Math.round(lang.sessions[key] || 0);
       const cell = document.createElement('div');
-      cell.className = 'week-day' + (isToday ? ' today' : '') + (minutes > 0 ? ' has-data' : '');
+      cell.className = 'week-day' + (key === todayKey ? ' today' : '') + (minutes > 0 ? ' has-data' : '');
       cell.dataset.date = key;
       cell.tabIndex = 0;
       cell.setAttribute('role', 'button');
       cell.setAttribute('aria-label', `Modifier le temps du ${d.getDate()} ${MONTHS_FR_SHORT[d.getMonth()]}`);
-      cell.innerHTML = `
-        <div class="wd-date">${d.getDate()} ${MONTHS_FR_SHORT[d.getMonth()]}</div>
-        <div class="wd-min">${minutes}</div>
-      `;
+      cell.innerHTML = `<div class="wd-date">${d.getDate()} ${MONTHS_FR_SHORT[d.getMonth()]}</div><div class="wd-min">${minutes}</div>`;
       container.appendChild(cell);
     }
   }
 
-  function renderLevels(currentIdx){
-    const container = document.getElementById('levelsScroll');
+  function renderProjections(lang, els){
+    const p = computeProjections(lang);
+    els.paceSeg.querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.mode === lang.paceMode));
+
+    const labels = {
+      '7d': 'Selon ton rythme réel (7 derniers jours)',
+      'all': 'Selon ton rythme réel (depuis le début)',
+      'goal': 'Selon ton objectif quotidien'
+    };
+    els.projLabel.textContent = labels[lang.paceMode] || labels['7d'];
+
+    if(p.maxed){
+      els.projContent.innerHTML = `<div class="proj-big-row"><span class="proj-big-num">🎉</span></div><p class="proj-line">Niveau maximum atteint. Continue à pratiquer pour consolider ce niveau !</p>`;
+      return;
+    }
+
+    if(lang.paceMode === 'goal'){
+      const big = lang.dailyGoalMinutes > 0
+        ? `<div class="proj-big-row"><span class="proj-big-num">${formatHoursMin(lang.dailyGoalMinutes)}</span><span class="proj-big-unit">par jour</span></div>`
+        : `<div class="proj-big-row"><span class="proj-big-num">—</span></div>`;
+      const phrase = lang.dailyGoalMinutes > 0
+        ? `Tu passeras niveau ${p.next.n} dans ${fmtInt(p.days)} jour${p.days>1?'s':''}, le ${formatDateFr(p.date)}.`
+        : `Définis un objectif pour voir une estimation.`;
+      els.projContent.innerHTML = `${big}<p class="proj-line">${phrase}</p>`;
+      return;
+    }
+
+    const big = p.hasHistory
+      ? `<div class="proj-big-row"><span class="proj-big-num">${formatHoursMin(p.rate*60)}</span><span class="proj-big-unit">par jour</span></div>`
+      : `<div class="proj-big-row"><span class="proj-big-num">—</span></div>`;
+    let phrase;
+    if(!p.hasHistory) phrase = `Ajoute des sessions pour calculer ton rythme réel.`;
+    else if(p.days !== null) phrase = `À ce rythme, tu passeras niveau ${p.next.n} dans ${fmtInt(p.days)} jour${p.days>1?'s':''}, le ${formatDateFr(p.date)}.`;
+    else phrase = lang.paceMode === '7d'
+      ? `Aucune session cette semaine — ajoute du temps pour voir une estimation.`
+      : `Ajoute des sessions pour voir une estimation.`;
+    els.projContent.innerHTML = `${big}<p class="proj-line">${phrase}</p>`;
+  }
+
+  function renderLevels(lang, container, currentIdx){
     container.innerHTML = '';
-    const rates = getRates();
-    const rate = rateForMode(data.paceMode, rates);
+    const rate = rateForMode(lang.paceMode, getRates(lang));
     LEVELS.forEach((lv, i) => {
+      const hours = levelHours(lang, i);
       const card = document.createElement('div');
-      let cls = 'level-card';
-      if(i < currentIdx) cls += ' done';
-      else if(i === currentIdx) cls += ' current';
-      card.className = cls;
+      card.className = 'level-card' + (i < currentIdx ? ' done' : (i === currentIdx ? ' current' : ''));
       card.tabIndex = 0;
       card.setAttribute('role', 'button');
       card.setAttribute('aria-label', `Ouvrir les notes du niveau ${lv.n}`);
       card.dataset.levelIndex = i;
 
-      const checkSvg = i < currentIdx
+      const check = i < currentIdx
         ? `<svg class="lv-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`
         : '';
-
       let dateHtml = '';
       if(i > currentIdx){
-        const estDate = estimateDateForHours(lv.hours, rate);
-        dateHtml = `<div class="lv-date">≈ ${estDate ? formatDateFrCap(estDate) : '—'}</div>`;
+        const est = estimateDateForHours(lang, hours, rate);
+        dateHtml = `<div class="lv-date">≈ ${est ? formatDateFrCap(est) : '—'}</div>`;
       }
-
       card.innerHTML = `
-        <div class="lv-top">
-          <span class="lv-hangul">${esc(levelGlyph(lv))}</span>
-          ${checkSvg}
-        </div>
-        <div class="lv-hours">Niveau ${lv.n} · ${lv.hours} h</div>
-        <div class="lv-desc">${esc(levelDesc(lv))}</div>
-        ${dateHtml}
-      `;
+        <div class="lv-top"><span class="lv-hangul">${esc(levelGlyph(lang, lv))}</span>${check}</div>
+        <div class="lv-hours">Niveau ${lv.n} · ${fmtInt(hours)} h</div>
+        <div class="lv-desc">${esc(levelDesc(lang, lv))}</div>
+        ${dateHtml}`;
       container.appendChild(card);
     });
   }
 
-  function renderChart(){
-    const chartCard = document.getElementById('chartCard');
-    const keys = Object.keys(data.sessions).filter(k => data.sessions[k] > 0).sort();
-
-    if(keys.length === 0){
-      chartCard.innerHTML = `<div class="chart-empty">Ajoute ta première session pour voir ta progression ici.</div>`;
+  function renderChart(lang, card, pageIndex){
+    const keys = Object.keys(lang.sessions).filter(k => lang.sessions[k] > 0).sort();
+    if(!keys.length){
+      card.innerHTML = `<div class="chart-empty">Ajoute ta première session pour voir ta progression ici.</div>`;
       return;
     }
-
-    // Points cumulés
     let running = 0;
     const points = keys.map(k => {
-      running += data.sessions[k];
+      running += lang.sessions[k];
       const [y,m,d] = k.split('-').map(Number);
       return { date: new Date(y, m-1, d), hours: running/60 };
     });
-
-    // prolonge jusqu'à aujourd'hui si la dernière entrée est antérieure
     const todayKey = todayISO();
     if(keys[keys.length-1] !== todayKey){
       const [y,m,d] = todayKey.split('-').map(Number);
@@ -1535,148 +1503,327 @@
 
     const W = 640, H = 220, padL = 8, padR = 8, padT = 18, padB = 26;
     const innerW = W - padL - padR, innerH = H - padT - padB;
-
     const t0 = points[0].date.getTime();
-    const t1 = points[points.length-1].date.getTime();
-    const tSpan = Math.max(1, t1 - t0);
+    const tSpan = Math.max(1, points[points.length-1].date.getTime() - t0);
     const maxHours = Math.max(...points.map(p => p.hours)) * 1.15 || 1;
+    const xFor = pt => padL + ((pt.date.getTime() - t0) / tSpan) * innerW;
+    const yFor = pt => padT + innerH - (pt.hours / maxHours) * innerH;
 
-    function xFor(pt){ return padL + ((pt.date.getTime() - t0) / tSpan) * innerW; }
-    function yFor(pt){ return padT + innerH - (pt.hours / maxHours) * innerH; }
-
-    let linePath = '';
+    let line = '', dots = '';
     points.forEach((pt, i) => {
       const x = xFor(pt).toFixed(1), y = yFor(pt).toFixed(1);
-      linePath += (i===0 ? `M ${x} ${y}` : ` L ${x} ${y}`);
-    });
-    const lastX = xFor(points[points.length-1]).toFixed(1);
-    const firstX = xFor(points[0]).toFixed(1);
-    const areaPath = `${linePath} L ${lastX} ${(padT+innerH).toFixed(1)} L ${firstX} ${(padT+innerH).toFixed(1)} Z`;
-
-    let dots = '';
-    points.forEach(pt => {
-      const x = xFor(pt).toFixed(1), y = yFor(pt).toFixed(1);
+      line += (i===0 ? `M ${x} ${y}` : ` L ${x} ${y}`);
       dots += `<circle class="chart-dot" cx="${x}" cy="${y}" r="3.2"><title>${formatDateFr(pt.date)} — ${pt.hours.toFixed(1)} h</title></circle>`;
     });
+    const area = `${line} L ${xFor(points[points.length-1]).toFixed(1)} ${(padT+innerH).toFixed(1)} L ${xFor(points[0]).toFixed(1)} ${(padT+innerH).toFixed(1)} Z`;
+    const gid = 'areaGrad-' + pageIndex;
 
-    const svg = `
+    card.innerHTML = `
       <svg class="chart-svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
         <defs>
-          <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
+          <linearGradient id="${gid}" x1="0" y1="0" x2="0" y2="1">
             <stop class="area-start" offset="0%"/>
             <stop class="area-end" offset="100%"/>
           </linearGradient>
         </defs>
         <line x1="${padL}" y1="${padT+innerH}" x2="${W-padR}" y2="${padT+innerH}" stroke="rgba(242,240,233,0.09)" stroke-width="1"/>
-        <path class="chart-area" d="${areaPath}"/>
-        <path class="chart-line" d="${linePath}"/>
+        <path d="${area}" fill="url(#${gid})" stroke="none"/>
+        <path class="chart-line" d="${line}"/>
         ${dots}
-        <text x="${padL}" y="14" class="chart-max-label">${maxHours.toFixed(0)} h</text>
+        <text x="${padL}" y="14" class="chart-max-label">${fmtInt(maxHours)} h</text>
         <text x="${padL}" y="${H-6}" class="chart-axis-label">${formatDateFr(points[0].date)}</text>
         <text x="${W-padR}" y="${H-6}" class="chart-axis-label" text-anchor="end">${formatDateFr(points[points.length-1].date)}</text>
-      </svg>
-    `;
-    chartCard.innerHTML = svg;
+      </svg>`;
   }
 
-  /* ---------------- Navigation entre les langues ---------------- */
-  const wrapEl = document.querySelector('.wrap');
-  const newLangScreen = document.getElementById('newLangScreen');
+  function updateDots(){
+    pages.forEach((p, pi) => {
+      const box = p.els.dots;
+      box.innerHTML = '';
+      state.languages.forEach((l, i) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'lang-dot' + (i === activeIndex ? ' active' : '');
+        b.dataset.index = String(i);
+        b.title = langTitle(l.name);
+        b.setAttribute('aria-label', 'Aller à ' + langTitle(l.name));
+        box.appendChild(b);
+      });
+      const add = document.createElement('button');
+      add.type = 'button';
+      add.className = 'lang-dot add';
+      add.dataset.index = 'new';
+      add.textContent = '+';
+      add.title = 'Ajouter une langue';
+      add.setAttribute('aria-label', 'Ajouter une langue');
+      box.appendChild(add);
+    });
+  }
 
+  function updateActiveDot(){
+    pages.forEach(p => {
+      p.els.dots.querySelectorAll('.lang-dot').forEach(d => {
+        if(d.dataset.index === 'new') return;
+        d.classList.toggle('active', Number(d.dataset.index) === activeIndex);
+      });
+    });
+  }
+
+  /* ================= Carrousel ================= */
   const MOTION_OK = !(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-  const OUT_MS = 140;   // la page sort
-  const IN_MS = 240;    // la nouvelle page entre
-  let animTimer = null;
+  const SLIDE_MS = 320;
+  let W = 0, trackX = 0, slideTimer = null, wrappedPage = null;
+  let onNewPage = false;
 
-  function slideDistance(){
-    return Math.round(Math.min(window.innerWidth, 560) * 0.26);
+  function pageWidth(){ return W; }
+  function measure(){ W = viewport.clientWidth || window.innerWidth; }
+
+  function setTrackInstant(x){
+    trackX = x;
+    track.style.transition = 'none';
+    track.style.transform = `translate3d(${x}px,0,0)`;
+  }
+  function animateTrack(x, done){
+    trackX = x;
+    track.style.transition = `transform ${SLIDE_MS}ms cubic-bezier(.22,1,.36,1)`;
+    track.style.transform = `translate3d(${x}px,0,0)`;
+    clearTimeout(slideTimer);
+    slideTimer = setTimeout(() => {
+      track.style.transition = 'none';
+      if(done) done();
+    }, SLIDE_MS + 20);
   }
 
-  function clearWrapAnim(){
-    clearTimeout(animTimer);
-    animTimer = null;
-    wrapEl.style.transition = '';
-    wrapEl.style.transform = '';
-    wrapEl.style.opacity = '';
-    wrapEl.classList.remove('is-animating', 'is-dragging');
+  // Boucle : la page d'en face est décalée d'un tour pour venir se placer
+  // juste à côté, le rail glisse d'une page, puis tout est remis d'aplomb.
+  function setWrapOffset(el, px){
+    if(wrappedPage && wrappedPage !== el) wrappedPage.style.transform = '';
+    wrappedPage = el;
+    el.style.transform = `translate3d(${px}px,0,0)`;
+  }
+  function clearWrapOffset(){
+    if(wrappedPage){ wrappedPage.style.transform = ''; wrappedPage = null; }
+  }
+  function prepareWrap(dx){
+    const n = state.languages.length;
+    if(n < 2){ clearWrapOffset(); return; }
+    if(dx < 0 && activeIndex === n-1) setWrapOffset(pages[0].el, n*W);
+    else if(dx > 0 && activeIndex === 0) setWrapOffset(pages[n-1].el, -n*W);
+    else clearWrapOffset();
   }
 
-  function applyLang(i){
-    state.activeIndex = i;
-    data = state.languages[i];
-    applyThemeId(data.theme);
-    render();
+  function syncInert(){
+    pages.forEach((p, i) => { p.el.inert = (i !== activeIndex); });
+  }
+
+  function setActive(i){
+    activeIndex = i;
+    syncInert();
+    const lang = state.languages[i];
+    applyThemeTo(document.documentElement, lang.theme);
+    document.title = lang.korean ? "Suivi d'input · 한국어" : "Suivi d'input · " + langTitle(lang.name);
+    updateActiveDot();
     saveData();
   }
 
-  // Entrée seule : le contenu est déjà en place, on le fait glisser depuis le bord.
-  function animateIn(dir){
-    if(!MOTION_OK){ clearWrapAnim(); return; }
-    const dist = slideDistance();
-    clearTimeout(animTimer);
-    wrapEl.classList.add('is-animating');
-    wrapEl.style.transition = 'none';
-    wrapEl.style.transform = `translate3d(${dir < 0 ? -dist : dist}px,0,0)`;
-    wrapEl.style.opacity = '0';
-    // Deux images d'attente : la nouvelle page est peinte avant que l'animation démarre,
-    // sinon les premières images de l'animation tombent pendant le rendu.
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-      wrapEl.style.transition = `transform ${IN_MS}ms cubic-bezier(.16,1,.3,1), opacity ${Math.round(IN_MS*0.6)}ms ease-out`;
-      wrapEl.style.transform = 'translate3d(0,0,0)';
-      wrapEl.style.opacity = '1';
-      animTimer = setTimeout(clearWrapAnim, IN_MS + 30);
-    }));
-  }
-
-  function goToLang(i, dir){
-    if(i < 0 || i >= state.languages.length) return;
+  function goTo(target, dir, animate){
+    const n = state.languages.length;
+    if(target < 0 || target >= n) return;
     closeNewScreen(true);
-    const changed = i !== state.activeIndex;
 
-    if(!changed || !dir || !MOTION_OK){
-      applyLang(i);
-      clearWrapAnim();
+    const isWrap = wrappedPage && pages[target] && wrappedPage === pages[target].el;
+    const destX = isWrap ? -(activeIndex + dir) * W : -target * W;
+    const same = (target === activeIndex);
+
+    if(target !== activeIndex) setActive(target);
+
+    if(!animate || !MOTION_OK || (same && !isWrap)){
+      clearWrapOffset();
+      setTrackInstant(-target * W);
       return;
     }
-
-    // Sortie -> échange du contenu pendant que la page est invisible -> entrée.
-    // Le rendu (graphique, cartes, semaine) ne tombe plus au milieu de l'animation.
-    const dist = slideDistance();
-    clearTimeout(animTimer);
-    wrapEl.classList.add('is-animating');
-    wrapEl.style.transition = `transform ${OUT_MS}ms cubic-bezier(.4,0,.9,1), opacity ${OUT_MS}ms linear`;
-    wrapEl.style.transform = `translate3d(${dir > 0 ? -dist : dist}px,0,0)`;
-    wrapEl.style.opacity = '0';
-    animTimer = setTimeout(() => {
-      applyLang(i);
-      animateIn(dir);
-    }, OUT_MS);
+    animateTrack(destX, () => {
+      if(isWrap){
+        clearWrapOffset();
+        setTrackInstant(-target * W);
+      }
+    });
   }
 
   function goNext(){
     if(onNewPage) return;
-    if(state.activeIndex < state.languages.length - 1) goToLang(state.activeIndex + 1, 1);
+    if(activeIndex < state.languages.length - 1) goTo(activeIndex + 1, 1, true);
     else openNewScreen();
   }
-
   function goPrev(){
     if(onNewPage){ closeNewScreen(); return; }
-    if(state.activeIndex > 0) goToLang(state.activeIndex - 1, -1);
+    if(activeIndex > 0) goTo(activeIndex - 1, -1, true);
+  }
+  function step(dir){
+    const n = state.languages.length;
+    if(n < 2) return;
+    goTo((activeIndex + dir + n) % n, dir, true);
   }
 
-  document.getElementById('prevLangBtn').addEventListener('click', goPrev);
-  document.getElementById('nextLangBtn').addEventListener('click', goNext);
-
-  document.getElementById('langDots').addEventListener('click', (e) => {
-    const dot = e.target.closest('.lang-dot');
-    if(!dot) return;
-    if(dot.dataset.index === 'new'){ openNewScreen(); return; }
-    const i = Number(dot.dataset.index);
-    if(i === state.activeIndex) return;
-    goToLang(i, i > state.activeIndex ? 1 : -1);
+  // Un focus programmé peut pousser un conteneur à défiler même en overflow:hidden.
+  viewport.addEventListener('scroll', () => {
+    if(viewport.scrollLeft !== 0) viewport.scrollLeft = 0;
+    if(viewport.scrollTop !== 0) viewport.scrollTop = 0;
   });
 
-  /* ---------------- Nuancier ---------------- */
+  window.addEventListener('resize', () => {
+    measure();
+    clearWrapOffset();
+    setTrackInstant(-activeIndex * W);
+  });
+
+  /* ================= Balayage ================= */
+  const SWIPE_RATIO = 1.3, SWIPE_SLOP = 8;
+  let swipeX = 0, swipeY = 0, swipeDX = 0, lastX = 0, lastT = 0, velocity = 0;
+  let tracking = false, locked = false, suppressClick = false;
+  let dragRaf = 0;
+
+  function anyOverlayOpen(){ return !!document.querySelector('.overlay.open'); }
+
+  function swipeBlocked(target){
+    if(anyOverlayOpen()) return true;
+    if(levelScreen.classList.contains('open')) return true;
+    if(!target || !target.closest) return false;
+    if(target.closest('.levels-scroll')) return true;
+    if(target.closest('input, textarea, select')) return true;
+    return false;
+  }
+
+  function dragFrame(){
+    dragRaf = 0;
+    track.style.transform = `translate3d(${trackX.toFixed(1)}px,0,0)`;
+  }
+
+  document.addEventListener('touchstart', (e) => {
+    tracking = false; locked = false; swipeDX = 0; velocity = 0;
+    if(e.touches.length !== 1) return;
+    if(swipeBlocked(e.target)) return;
+    if(!onNewPage && state.languages.length < 2) return;
+    tracking = true;
+    swipeX = lastX = e.touches[0].clientX;
+    swipeY = e.touches[0].clientY;
+    lastT = e.timeStamp || Date.now();
+  }, { passive: true });
+
+  document.addEventListener('touchmove', (e) => {
+    if(!tracking || e.touches.length !== 1) return;
+    const x = e.touches[0].clientX;
+    const dx = x - swipeX;
+    const dy = e.touches[0].clientY - swipeY;
+    if(!locked){
+      if(Math.abs(dx) < SWIPE_SLOP && Math.abs(dy) < SWIPE_SLOP) return;
+      if(Math.abs(dx) < Math.abs(dy) * SWIPE_RATIO){ tracking = false; return; }
+      locked = true;
+      clearTimeout(slideTimer);
+      track.style.transition = 'none';
+    }
+    const t = e.timeStamp || Date.now();
+    if(t > lastT){ velocity = (x - lastX) / (t - lastT); lastT = t; lastX = x; }
+    swipeDX = dx;
+    e.preventDefault();
+    if(!onNewPage){
+      prepareWrap(dx);
+      trackX = -activeIndex * W + dx;          // suivi exact du doigt
+      if(!dragRaf) dragRaf = requestAnimationFrame(dragFrame);
+    }
+  }, { passive: false });
+
+  document.addEventListener('touchend', () => {
+    if(!tracking || !locked){ tracking = false; return; }
+    const dx = swipeDX;
+    tracking = false; locked = false;
+    if(dragRaf){ cancelAnimationFrame(dragRaf); dragRaf = 0; }
+
+    const far = Math.abs(dx) > Math.max(50, W * 0.18);
+    const flick = Math.abs(velocity) > 0.45 && Math.abs(dx) > 25;
+
+    if(!far && !flick){
+      clearWrapOffset();
+      if(MOTION_OK) animateTrack(-activeIndex * W);
+      else setTrackInstant(-activeIndex * W);
+      return;
+    }
+
+    suppressClick = true;
+    setTimeout(() => { suppressClick = false; }, 350);
+
+    const dir = dx < 0 ? 1 : -1;
+    if(onNewPage){
+      if(dir === -1) closeNewScreen();
+      return;
+    }
+    step(dir);
+  }, { passive: true });
+
+  document.addEventListener('touchcancel', () => {
+    if(locked){
+      if(dragRaf){ cancelAnimationFrame(dragRaf); dragRaf = 0; }
+      clearWrapOffset();
+      animateTrack(-activeIndex * W);
+    }
+    tracking = false; locked = false;
+  }, { passive: true });
+
+  document.addEventListener('click', (e) => {
+    if(!suppressClick) return;
+    e.preventDefault();
+    e.stopPropagation();
+  }, true);
+
+  /* ================= Interactions dans les pages ================= */
+  track.addEventListener('click', (e) => {
+    const pageEl = e.target.closest('.page');
+    if(!pageEl) return;
+    const i = Number(pageEl.dataset.index);
+    if(i !== activeIndex) return;          // seule la page affichée est interactive
+    const lang = state.languages[i];
+
+    const dot = e.target.closest('.lang-dot');
+    if(dot){
+      if(dot.dataset.index === 'new'){ openNewScreen(); return; }
+      const t = Number(dot.dataset.index);
+      if(t !== activeIndex) goTo(t, t > activeIndex ? 1 : -1, true);
+      return;
+    }
+
+    const named = e.target.closest('[data-el]');
+    const name = named ? named.dataset.el : '';
+    if(name === 'prev'){ goPrev(); return; }
+    if(name === 'next'){ goNext(); return; }
+    if(name === 'settings'){ openSettingsModal(false); return; }
+    if(name === 'editGoal'){ openSettingsModal(true); return; }
+
+    const paceBtn = e.target.closest('.mini-seg button');
+    if(paceBtn){
+      lang.paceMode = VALID_MODES.includes(paceBtn.dataset.mode) ? paceBtn.dataset.mode : '7d';
+      saveData();
+      renderPage(i);
+      return;
+    }
+
+    const day = e.target.closest('.week-day');
+    if(day){ openEditDayModal(day.dataset.date); return; }
+
+    const card = e.target.closest('.level-card');
+    if(card){ openLevelScreen(Number(card.dataset.levelIndex)); return; }
+  });
+
+  track.addEventListener('keydown', (e) => {
+    if(e.key !== 'Enter' && e.key !== ' ') return;
+    const day = e.target.closest && e.target.closest('.week-day');
+    const card = e.target.closest && e.target.closest('.level-card');
+    if(!day && !card) return;
+    e.preventDefault();
+    if(day) openEditDayModal(day.dataset.date);
+    else openLevelScreen(Number(card.dataset.levelIndex));
+  });
+
+  /* ================= Nuancier et échelle ================= */
   function renderSwatches(container, activeId){
     container.innerHTML = '';
     THEMES.forEach(t => {
@@ -1690,14 +1837,21 @@
       container.appendChild(b);
     });
   }
-
   function suggestTheme(){
     const used = state.languages.map(l => l.theme);
     const free = THEMES.find(t => used.indexOf(t.id) === -1);
     return free ? free.id : THEMES[state.languages.length % THEMES.length].id;
   }
+  function scaleStepsText(id){
+    return 'Paliers : ' + SCALES[id].hours.map(h => fmtInt(h)).join(' · ') + ' h';
+  }
+  function paintScaleSeg(seg, stepsEl, id){
+    seg.querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.scale === id));
+    stepsEl.textContent = scaleStepsText(id);
+  }
 
-  /* ---------------- Écran « nouvelle langue » ---------------- */
+  /* ================= Écran « nouvelle langue » ================= */
+  const newLangScreen = document.getElementById('newLangScreen');
   const newLangName = document.getElementById('newLangName');
   const newLangGoal = document.getElementById('newLangGoal');
   const newLangBase = document.getElementById('newLangBase');
@@ -1705,9 +1859,10 @@
   const newSwatchRow = document.getElementById('newLangSwatches');
   const newGoalUnitSeg = document.getElementById('newGoalUnitSeg');
   const newBaseUnitSeg = document.getElementById('newBaseUnitSeg');
-  let newGoalUnit = 'min';
-  let newBaseUnit = 'h';
-  let pendingNewTheme = DEFAULT_THEME;
+  const newScaleSeg = document.getElementById('newScaleSeg');
+  const newScaleSteps = document.getElementById('newScaleSteps');
+  let newGoalUnit = 'min', newBaseUnit = 'h';
+  let pendingNewTheme = DEFAULT_THEME, newScale = 'ds', newScaleTouched = false;
 
   function openNewScreen(){
     if(onNewPage) return;
@@ -1716,29 +1871,24 @@
     newLangGoal.value = '';
     newLangBase.value = '';
     newLangError.hidden = true;
-    newGoalUnit = 'min';
+    newGoalUnit = 'min'; newBaseUnit = 'h';
     newGoalUnitSeg.querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.unit === 'min'));
-    newBaseUnit = 'h';
     newBaseUnitSeg.querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.unit === 'h'));
+    newScale = 'ds'; newScaleTouched = false;
+    paintScaleSeg(newScaleSeg, newScaleSteps, newScale);
     pendingNewTheme = suggestTheme();
     renderSwatches(newSwatchRow, pendingNewTheme);
-    applyThemeId(pendingNewTheme);
+    applyThemeTo(document.documentElement, pendingNewTheme);
     newLangScreen.classList.add('open');
-    document.body.style.overflow = 'hidden';
-    renderDots();
     setTimeout(() => newLangName.focus({ preventScroll: true }), 330);
   }
 
   function closeNewScreen(keepTheme){
     if(!onNewPage) return;
     onNewPage = false;
-    newLangName.blur();
-    newLangGoal.blur();
-    newLangBase.blur();
+    newLangName.blur(); newLangGoal.blur(); newLangBase.blur();
     newLangScreen.classList.remove('open');
-    document.body.style.overflow = '';
-    if(!keepTheme) applyThemeId(data.theme);
-    renderDots();
+    if(!keepTheme) applyThemeTo(document.documentElement, activeLang().theme);
   }
 
   document.getElementById('newBackBtn').addEventListener('click', () => closeNewScreen());
@@ -1748,167 +1898,164 @@
     if(!sw) return;
     pendingNewTheme = sw.dataset.theme;
     renderSwatches(newSwatchRow, pendingNewTheme);
-    applyThemeId(pendingNewTheme); // aperçu en direct
+    applyThemeTo(document.documentElement, pendingNewTheme);
   });
 
-  newGoalUnitSeg.addEventListener('click', (e) => {
-    const btn = e.target.closest('button');
-    if(!btn) return;
-    newGoalUnitSeg.querySelectorAll('button').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    newGoalUnit = btn.dataset.unit;
+  newScaleSeg.addEventListener('click', (e) => {
+    const b = e.target.closest('button');
+    if(!b) return;
+    newScale = b.dataset.scale;
+    newScaleTouched = true;
+    paintScaleSeg(newScaleSeg, newScaleSteps, newScale);
   });
 
-  newBaseUnitSeg.addEventListener('click', (e) => {
-    const btn = e.target.closest('button');
-    if(!btn) return;
-    newBaseUnitSeg.querySelectorAll('button').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    newBaseUnit = btn.dataset.unit;
-  });
+  function unitSegHandler(seg, set){
+    seg.addEventListener('click', (e) => {
+      const btn = e.target.closest('button');
+      if(!btn) return;
+      seg.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      set(btn.dataset.unit);
+    });
+  }
+  unitSegHandler(newGoalUnitSeg, u => { newGoalUnit = u; });
+  unitSegHandler(newBaseUnitSeg, u => { newBaseUnit = u; });
+
+  function suggestScaleFromName(){
+    if(newScaleTouched) return;
+    const s = defaultScaleFor(newLangName.value);
+    if(s !== newScale){ newScale = s; paintScaleSeg(newScaleSeg, newScaleSteps, newScale); }
+  }
 
   document.getElementById('langSuggest').addEventListener('click', (e) => {
     const chip = e.target.closest('.chip');
     if(!chip) return;
     newLangName.value = chip.textContent.trim();
     newLangError.hidden = true;
+    suggestScaleFromName();
     newLangName.focus();
+  });
+  newLangName.addEventListener('input', () => {
+    if(newLangName.value.trim()) newLangError.hidden = true;
+    suggestScaleFromName();
   });
 
   function createLanguage(){
     const name = newLangName.value.trim();
-    if(!name){
-      newLangError.hidden = false;
-      newLangName.focus();
-      return;
-    }
+    if(!name){ newLangError.hidden = false; newLangName.focus(); return; }
     const rawGoal = Number(newLangGoal.value);
-    const goalMinutes = rawGoal > 0 ? (newGoalUnit === 'h' ? rawGoal * 60 : rawGoal) : 0;
     const rawBase = Number(newLangBase.value);
-    const baseMinutes = rawBase > 0 ? (newBaseUnit === 'h' ? rawBase * 60 : rawBase) : 0;
-
-    const lang = makeLang({ name: name, theme: pendingNewTheme, dailyGoalMinutes: goalMinutes, baseMinutes: baseMinutes });
+    const lang = makeLang({
+      name: name,
+      scale: newScale,
+      theme: pendingNewTheme,
+      dailyGoalMinutes: rawGoal > 0 ? (newGoalUnit === 'h' ? rawGoal*60 : rawGoal) : 0,
+      baseMinutes: rawBase > 0 ? (newBaseUnit === 'h' ? rawBase*60 : rawBase) : 0
+    });
     state.languages.push(lang);
-    state.activeIndex = state.languages.length - 1;
-    data = lang;
     closeNewScreen(true);
-    applyThemeId(data.theme);
-    render();
-    saveData();
-    animateIn(1);
+    activeIndex = state.languages.length - 1;
+    rebuildAll();
+    setActive(activeIndex);
+  }
+  document.getElementById('createLangBtn').addEventListener('click', createLanguage);
+  [newLangName, newLangGoal, newLangBase].forEach(inp => {
+    inp.addEventListener('keydown', (e) => { if(e.key === 'Enter') createLanguage(); });
+  });
+
+  function rebuildAll(){
+    measure();
+    buildAllPages();
   }
 
-  document.getElementById('createLangBtn').addEventListener('click', createLanguage);
-  newLangName.addEventListener('keydown', (e) => { if(e.key === 'Enter') createLanguage(); });
-  newLangName.addEventListener('input', () => { if(newLangName.value.trim()) newLangError.hidden = true; });
-  newLangGoal.addEventListener('keydown', (e) => { if(e.key === 'Enter') createLanguage(); });
-  newLangBase.addEventListener('keydown', (e) => { if(e.key === 'Enter') createLanguage(); });
-
-  /* ---------------- Ajouter une session ---------------- */
+  /* ================= Ajouter une session ================= */
   const addOverlay = document.getElementById('addOverlay');
-  const fabBtn = document.getElementById('fabBtn');
-  const cancelAddBtn = document.getElementById('cancelAddBtn');
-  const confirmAddBtn = document.getElementById('confirmAddBtn');
   const customAmount = document.getElementById('customAmount');
-  const addUnitSeg = document.getElementById('addUnitSeg');
   const addDateInput = document.getElementById('addDateInput');
+  const confirmAddBtn = document.getElementById('confirmAddBtn');
   let addUnit = 'min';
 
   function openAddModal(){
     customAmount.value = '';
-    const todayKey = todayISO();
-    addDateInput.value = todayKey;
-    addDateInput.max = todayKey;
+    const t = todayISO();
+    addDateInput.value = t;
+    addDateInput.max = t;
+    document.getElementById('addModalLang').textContent = langTitle(activeLang().name);
     addOverlay.classList.add('open');
     setTimeout(() => customAmount.focus(), 250);
   }
   function closeAddModal(){ addOverlay.classList.remove('open'); }
 
-  fabBtn.addEventListener('click', openAddModal);
-  cancelAddBtn.addEventListener('click', closeAddModal);
+  document.getElementById('fabBtn').addEventListener('click', openAddModal);
+  document.getElementById('cancelAddBtn').addEventListener('click', closeAddModal);
   addOverlay.addEventListener('click', (e) => { if(e.target === addOverlay) closeAddModal(); });
-
-  addUnitSeg.addEventListener('click', (e) => {
-    const btn = e.target.closest('button');
-    if(!btn) return;
-    addUnitSeg.querySelectorAll('button').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    addUnit = btn.dataset.unit;
-  });
+  unitSegHandler(document.getElementById('addUnitSeg'), u => { addUnit = u; });
 
   document.getElementById('quickChips').addEventListener('click', (e) => {
     const chip = e.target.closest('.chip');
     if(!chip) return;
     addMinutes(Number(chip.dataset.min), addDateInput.value || todayISO());
   });
-
   confirmAddBtn.addEventListener('click', () => {
     const raw = Number(customAmount.value);
     if(!raw || raw <= 0) return;
-    const minutes = addUnit === 'h' ? raw * 60 : raw;
-    addMinutes(minutes, addDateInput.value || todayISO());
+    addMinutes(addUnit === 'h' ? raw*60 : raw, addDateInput.value || todayISO());
   });
-
-  customAmount.addEventListener('keydown', (e) => {
-    if(e.key === 'Enter') confirmAddBtn.click();
-  });
+  customAmount.addEventListener('keydown', (e) => { if(e.key === 'Enter') confirmAddBtn.click(); });
 
   function addMinutes(minutes, dateKey){
-    data.totalMinutes += minutes;
+    const lang = activeLang();
+    lang.totalMinutes += minutes;
     const key = dateKey || todayISO();
-    data.sessions[key] = (data.sessions[key] || 0) + minutes;
+    lang.sessions[key] = (lang.sessions[key] || 0) + minutes;
     saveData();
-    render();
+    renderPage(activeIndex);
     closeAddModal();
   }
 
-  /* ---------------- Paramètres de la langue ---------------- */
+  /* ================= Paramètres ================= */
   const settingsOverlay = document.getElementById('settingsOverlay');
-  const settingsBtn = document.getElementById('settingsBtn');
   const settingsName = document.getElementById('settingsName');
   const goalAmount = document.getElementById('goalAmount');
-  const goalUnitSeg = document.getElementById('goalUnitSeg');
   const baseAmount = document.getElementById('baseAmount');
+  const goalUnitSeg = document.getElementById('goalUnitSeg');
   const baseUnitSeg = document.getElementById('baseUnitSeg');
   const themeSwatches = document.getElementById('themeSwatches');
+  const scaleSeg = document.getElementById('scaleSeg');
+  const scaleSteps = document.getElementById('scaleSteps');
   const deleteBlock = document.getElementById('deleteBlock');
   const confirmDelBlock = document.getElementById('confirmDelBlock');
   const lastLangNote = document.getElementById('lastLangNote');
-  let goalUnit = 'min';
-  let baseUnit = 'h';
-  let pendingTheme = DEFAULT_THEME;
+  let goalUnit = 'min', baseUnit = 'h';
+  let pendingTheme = DEFAULT_THEME, pendingScale = 'ds';
+
+  unitSegHandler(goalUnitSeg, u => { goalUnit = u; });
+  unitSegHandler(baseUnitSeg, u => { baseUnit = u; });
 
   function openSettingsModal(focusGoal){
     if(onNewPage) return;
-    pendingTheme = data.theme;
-    settingsName.value = data.name;
-    document.getElementById('settingsModalLang').textContent = langTitle(data.name);
+    const lang = activeLang();
+    pendingTheme = lang.theme;
+    pendingScale = lang.scale;
+    settingsName.value = lang.name;
+    document.getElementById('settingsModalLang').textContent = langTitle(lang.name);
+    paintScaleSeg(scaleSeg, scaleSteps, pendingScale);
 
-    if(data.dailyGoalMinutes > 0){
-      if(data.dailyGoalMinutes % 60 === 0){
-        goalUnit = 'h';
-        goalAmount.value = data.dailyGoalMinutes/60;
-      } else {
-        goalUnit = 'min';
-        goalAmount.value = data.dailyGoalMinutes;
-      }
+    if(lang.dailyGoalMinutes > 0 && lang.dailyGoalMinutes % 60 === 0){
+      goalUnit = 'h'; goalAmount.value = lang.dailyGoalMinutes/60;
     } else {
-      goalUnit = 'min';
-      goalAmount.value = '';
+      goalUnit = 'min'; goalAmount.value = lang.dailyGoalMinutes > 0 ? lang.dailyGoalMinutes : '';
     }
     goalUnitSeg.querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.unit === goalUnit));
 
-    if(data.baseMinutes > 0 && data.baseMinutes % 60 !== 0){
-      baseUnit = 'min';
-      baseAmount.value = data.baseMinutes;
+    if(lang.baseMinutes > 0 && lang.baseMinutes % 60 !== 0){
+      baseUnit = 'min'; baseAmount.value = lang.baseMinutes;
     } else {
-      baseUnit = 'h';
-      baseAmount.value = data.baseMinutes > 0 ? data.baseMinutes/60 : '';
+      baseUnit = 'h'; baseAmount.value = lang.baseMinutes > 0 ? lang.baseMinutes/60 : '';
     }
     baseUnitSeg.querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.unit === baseUnit));
 
     renderSwatches(themeSwatches, pendingTheme);
-
     const multiple = state.languages.length > 1;
     deleteBlock.hidden = !multiple;
     lastLangNote.hidden = multiple;
@@ -1919,11 +2066,10 @@
   }
   function closeSettingsModal(){
     settingsOverlay.classList.remove('open');
-    applyThemeId(data.theme); // annule l'aperçu de couleur
+    applyThemeTo(document.documentElement, activeLang().theme);
+    applyThemeTo(pages[activeIndex].el, activeLang().theme);
   }
 
-  settingsBtn.addEventListener('click', () => openSettingsModal(false));
-  document.getElementById('editGoalBtn').addEventListener('click', () => openSettingsModal(true));
   document.getElementById('cancelSettingsBtn').addEventListener('click', closeSettingsModal);
   settingsOverlay.addEventListener('click', (e) => { if(e.target === settingsOverlay) closeSettingsModal(); });
 
@@ -1932,55 +2078,44 @@
     if(!sw) return;
     pendingTheme = sw.dataset.theme;
     renderSwatches(themeSwatches, pendingTheme);
-    applyThemeId(pendingTheme); // aperçu en direct
+    applyThemeTo(document.documentElement, pendingTheme);   // aperçu en direct
+    applyThemeTo(pages[activeIndex].el, pendingTheme);
   });
 
-  goalUnitSeg.addEventListener('click', (e) => {
-    const btn = e.target.closest('button');
-    if(!btn) return;
-    goalUnitSeg.querySelectorAll('button').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    goalUnit = btn.dataset.unit;
-  });
-
-  baseUnitSeg.addEventListener('click', (e) => {
-    const btn = e.target.closest('button');
-    if(!btn) return;
-    baseUnitSeg.querySelectorAll('button').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    baseUnit = btn.dataset.unit;
+  scaleSeg.addEventListener('click', (e) => {
+    const b = e.target.closest('button');
+    if(!b) return;
+    pendingScale = b.dataset.scale;
+    paintScaleSeg(scaleSeg, scaleSteps, pendingScale);
   });
 
   document.getElementById('saveSettingsBtn').addEventListener('click', () => {
+    const lang = activeLang();
     const newName = settingsName.value.trim();
     if(newName){
-      data.name = newName.slice(0,40);
-      data.korean = isKoreanName(data.name);
+      lang.name = newName.slice(0,40);
+      lang.korean = isKoreanName(lang.name);
     }
     const raw = Number(goalAmount.value);
-    data.dailyGoalMinutes = raw > 0 ? (goalUnit === 'h' ? raw*60 : raw) : 0;
+    lang.dailyGoalMinutes = raw > 0 ? (goalUnit === 'h' ? raw*60 : raw) : 0;
     const rawBase = Number(baseAmount.value);
-    data.baseMinutes = rawBase > 0 ? (baseUnit === 'h' ? rawBase*60 : rawBase) : 0;
-    data.theme = pendingTheme;
+    lang.baseMinutes = rawBase > 0 ? (baseUnit === 'h' ? rawBase*60 : rawBase) : 0;
+    lang.theme = pendingTheme;
+    lang.scale = pendingScale;
     saveData();
-    applyThemeId(data.theme);
-    render();
     settingsOverlay.classList.remove('open');
+    pages.forEach((p, i) => renderPage(i));   // les voisines affichent son nom
+    updateDots();
+    setActive(activeIndex);
   });
 
-  settingsName.addEventListener('keydown', (e) => {
-    if(e.key === 'Enter') document.getElementById('saveSettingsBtn').click();
-  });
-  goalAmount.addEventListener('keydown', (e) => {
-    if(e.key === 'Enter') document.getElementById('saveSettingsBtn').click();
-  });
-  baseAmount.addEventListener('keydown', (e) => {
-    if(e.key === 'Enter') document.getElementById('saveSettingsBtn').click();
-  });
+  settingsName.addEventListener('keydown', (e) => { if(e.key === 'Enter') document.getElementById('saveSettingsBtn').click(); });
+  goalAmount.addEventListener('keydown', (e) => { if(e.key === 'Enter') document.getElementById('saveSettingsBtn').click(); });
+  baseAmount.addEventListener('keydown', (e) => { if(e.key === 'Enter') document.getElementById('saveSettingsBtn').click(); });
 
   document.getElementById('deleteLangBtn').addEventListener('click', () => {
     document.getElementById('confirmDelText').textContent =
-      `Supprimer « ${langTitle(data.name)} » et tout son historique (heures, notes, objectif) ? C'est définitif.`;
+      `Supprimer « ${langTitle(activeLang().name)} » et tout son historique (heures, notes, objectif) ? C'est définitif.`;
     deleteBlock.hidden = true;
     confirmDelBlock.hidden = false;
   });
@@ -1990,301 +2125,99 @@
   });
   document.getElementById('confirmDelBtn').addEventListener('click', () => {
     if(state.languages.length <= 1) return;
-    const i = state.activeIndex;
-    state.languages.splice(i, 1);
-    state.activeIndex = Math.max(0, Math.min(i, state.languages.length - 1));
-    data = state.languages[state.activeIndex];
+    state.languages.splice(activeIndex, 1);
+    activeIndex = Math.max(0, Math.min(activeIndex, state.languages.length - 1));
     settingsOverlay.classList.remove('open');
-    saveData();
-    applyThemeId(data.theme);
-    render();
-    animateIn(-1);
+    rebuildAll();
+    setActive(activeIndex);
   });
 
-  /* ---------------- Rythme (segments) ---------------- */
-  document.getElementById('paceModeSeg').addEventListener('click', (e) => {
-    const btn = e.target.closest('button');
-    if(!btn) return;
-    data.paceMode = VALID_MODES.includes(btn.dataset.mode) ? btn.dataset.mode : '7d';
-    saveData();
-    render();
-  });
-
-  /* ---------------- Modifier un jour ---------------- */
+  /* ================= Modifier un jour ================= */
   const editDayOverlay = document.getElementById('editDayOverlay');
   const editDayAmount = document.getElementById('editDayAmount');
-  const editDayUnitSeg = document.getElementById('editDayUnitSeg');
   const saveEditDayBtn = document.getElementById('saveEditDayBtn');
-  const cancelEditDayBtn = document.getElementById('cancelEditDayBtn');
-  let editDayUnit = 'min';
-  let editDayKeyCurrent = null;
+  let editDayUnit = 'min', editDayKey = null;
 
-  function openEditDayModal(dateKey, dateObj){
-    editDayKeyCurrent = dateKey;
-    const minutes = data.sessions[dateKey] || 0;
-    document.getElementById('editDayTitle').textContent = `Modifier le ${formatDateFr(dateObj)}`;
+  unitSegHandler(document.getElementById('editDayUnitSeg'), u => { editDayUnit = u; });
+
+  function openEditDayModal(dateKey){
+    const lang = activeLang();
+    const [y,m,d] = dateKey.split('-').map(Number);
+    editDayKey = dateKey;
+    document.getElementById('editDayTitle').textContent = `Modifier le ${formatDateFr(new Date(y, m-1, d))}`;
     editDayUnit = 'min';
-    editDayUnitSeg.querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.unit === 'min'));
-    editDayAmount.value = minutes || '';
+    document.querySelectorAll('#editDayUnitSeg button').forEach(b => b.classList.toggle('active', b.dataset.unit === 'min'));
+    editDayAmount.value = lang.sessions[dateKey] || '';
     editDayOverlay.classList.add('open');
     setTimeout(() => editDayAmount.focus(), 250);
   }
-  function closeEditDayModal(){ editDayOverlay.classList.remove('open'); editDayKeyCurrent = null; }
+  function closeEditDayModal(){ editDayOverlay.classList.remove('open'); editDayKey = null; }
 
-  document.getElementById('weekRow').addEventListener('click', (e) => {
-    const cell = e.target.closest('.week-day');
-    if(!cell) return;
-    const key = cell.dataset.date;
-    const [y,m,d] = key.split('-').map(Number);
-    openEditDayModal(key, new Date(y, m-1, d));
-  });
-  document.getElementById('weekRow').addEventListener('keydown', (e) => {
-    if(e.key !== 'Enter' && e.key !== ' ') return;
-    const cell = e.target.closest('.week-day');
-    if(!cell) return;
-    e.preventDefault();
-    const key = cell.dataset.date;
-    const [y,m,d] = key.split('-').map(Number);
-    openEditDayModal(key, new Date(y, m-1, d));
-  });
-
-  editDayUnitSeg.addEventListener('click', (e) => {
-    const btn = e.target.closest('button');
-    if(!btn) return;
-    editDayUnitSeg.querySelectorAll('button').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    editDayUnit = btn.dataset.unit;
-  });
-
-  cancelEditDayBtn.addEventListener('click', closeEditDayModal);
+  document.getElementById('cancelEditDayBtn').addEventListener('click', closeEditDayModal);
   editDayOverlay.addEventListener('click', (e) => { if(e.target === editDayOverlay) closeEditDayModal(); });
+  editDayAmount.addEventListener('keydown', (e) => { if(e.key === 'Enter') saveEditDayBtn.click(); });
 
   saveEditDayBtn.addEventListener('click', () => {
-    if(editDayKeyCurrent === null) return;
+    if(editDayKey === null) return;
+    const lang = activeLang();
     const raw = Number(editDayAmount.value) || 0;
-    const newMinutes = Math.max(0, editDayUnit === 'h' ? raw * 60 : raw);
-    const oldMinutes = data.sessions[editDayKeyCurrent] || 0;
-    const diff = newMinutes - oldMinutes;
-    data.totalMinutes = Math.max(0, data.totalMinutes + diff);
-    if(newMinutes > 0) data.sessions[editDayKeyCurrent] = newMinutes;
-    else delete data.sessions[editDayKeyCurrent];
+    const newMinutes = Math.max(0, editDayUnit === 'h' ? raw*60 : raw);
+    const old = lang.sessions[editDayKey] || 0;
+    lang.totalMinutes = Math.max(0, lang.totalMinutes + (newMinutes - old));
+    if(newMinutes > 0) lang.sessions[editDayKey] = newMinutes;
+    else delete lang.sessions[editDayKey];
     saveData();
-    render();
+    renderPage(activeIndex);
     closeEditDayModal();
   });
 
-  editDayAmount.addEventListener('keydown', (e) => {
-    if(e.key === 'Enter') saveEditDayBtn.click();
-  });
-
-  /* ---------------- Notes de niveau ---------------- */
+  /* ================= Notes de niveau ================= */
   const levelScreen = document.getElementById('levelScreen');
-  const levelsScroll = document.getElementById('levelsScroll');
-  const levelBackBtn = document.getElementById('levelBackBtn');
   const levelNotesArea = document.getElementById('levelNotesArea');
-  let currentNotesLevel = null;
-  let notesSaveTimer = null;
+  let currentNotesLevel = null, notesTimer = null;
 
   function openLevelScreen(levelIdx){
     const lv = LEVELS[levelIdx];
     if(!lv) return;
+    const lang = activeLang();
     currentNotesLevel = levelIdx;
-    document.getElementById('lstHangul').textContent = levelGlyph(lv);
-    document.getElementById('lstName').textContent = `Niveau ${lv.n} · ${langTitle(data.name)}`;
-    document.getElementById('lstDesc').textContent = levelDesc(lv);
-    levelNotesArea.value = data.levelNotes[lv.n] || '';
+    document.getElementById('lstHangul').textContent = levelGlyph(lang, lv);
+    document.getElementById('lstName').textContent = `Niveau ${lv.n} · ${langTitle(lang.name)}`;
+    document.getElementById('lstDesc').textContent = levelDesc(lang, lv);
+    levelNotesArea.value = lang.levelNotes[lv.n] || '';
     levelScreen.classList.add('open');
-    document.body.style.overflow = 'hidden';
     setTimeout(() => levelNotesArea.focus({ preventScroll: true }), 320);
   }
-
+  function flushNotes(){
+    if(currentNotesLevel === null) return;
+    clearTimeout(notesTimer);
+    const lv = LEVELS[currentNotesLevel];
+    if(!lv) return;
+    activeLang().levelNotes[lv.n] = levelNotesArea.value;
+    saveData();
+  }
   function closeLevelScreen(){
     flushNotes();
     levelNotesArea.blur();
     levelScreen.classList.remove('open');
-    document.body.style.overflow = '';
     currentNotesLevel = null;
   }
-
-  function flushNotes(){
-    if(currentNotesLevel === null) return;
-    clearTimeout(notesSaveTimer);
-    const lv = LEVELS[currentNotesLevel];
-    if(!lv) return;
-    data.levelNotes[lv.n] = levelNotesArea.value;
-    saveData();
-  }
-
-  levelsScroll.addEventListener('click', (e) => {
-    const card = e.target.closest('.level-card');
-    if(!card) return;
-    openLevelScreen(Number(card.dataset.levelIndex));
-  });
-
-  levelsScroll.addEventListener('keydown', (e) => {
-    if(e.key !== 'Enter' && e.key !== ' ') return;
-    const card = e.target.closest('.level-card');
-    if(!card) return;
-    e.preventDefault();
-    openLevelScreen(Number(card.dataset.levelIndex));
-  });
-
-  levelBackBtn.addEventListener('click', closeLevelScreen);
-
+  document.getElementById('levelBackBtn').addEventListener('click', closeLevelScreen);
   levelNotesArea.addEventListener('input', () => {
     if(currentNotesLevel === null) return;
-    const lv = LEVELS[currentNotesLevel];
-    clearTimeout(notesSaveTimer);
-    notesSaveTimer = setTimeout(() => {
-      data.levelNotes[lv.n] = levelNotesArea.value;
-      saveData();
-    }, 350);
+    clearTimeout(notesTimer);
+    notesTimer = setTimeout(flushNotes, 350);
   });
-
   window.addEventListener('beforeunload', flushNotes);
 
-  /* ---------------- Clavier ---------------- */
-  function anyOverlayOpen(){
-    return !!document.querySelector('.overlay.open');
-  }
-
-  /* ---------------- Balayage (swipe) ---------------- */
-  // Les langues forment une boucle : après la dernière on revient à la première.
-  const SWIPE_RATIO = 1.3;   // l'horizontal doit clairement dominer le vertical
-  const SWIPE_SLOP = 10;     // avant ça, on ne sait pas encore où va le doigt
-  let swipeX = 0, swipeY = 0, swipeDX = 0;
-  let swipeTracking = false, swipeLocked = false, suppressClick = false;
-
-  function swipeBlocked(target){
-    if(anyOverlayOpen()) return true;
-    if(levelScreen.classList.contains('open')) return true;
-    if(!target || !target.closest) return false;
-    if(target.closest('.levels-scroll')) return true;   // défile déjà à l'horizontale
-    if(target.closest('input, textarea, select')) return true;
-    return false;
-  }
-
-  // Une seule écriture de style par image, quel que soit le débit tactile (60/120/240 Hz).
-  let dragRaf = 0, dragOffset = 0;
-
-  function dragFrame(){
-    dragRaf = 0;
-    wrapEl.style.transform = `translate3d(${dragOffset.toFixed(1)}px,0,0)`;
-  }
-
-  // Élastique : 1:1 sous le doigt au départ, puis résistance croissante.
-  function rubberBand(dx){
-    const max = Math.min(window.innerWidth, 560) * 0.42;
-    const a = Math.abs(dx);
-    return (dx < 0 ? -1 : 1) * (a / (1 + a / max));
-  }
-
-  function snapBack(){
-    if(dragRaf){ cancelAnimationFrame(dragRaf); dragRaf = 0; }
-    wrapEl.classList.remove('is-dragging');
-    if(!MOTION_OK){ clearWrapAnim(); return; }
-    wrapEl.classList.add('is-animating');
-    wrapEl.style.transition = 'transform .32s cubic-bezier(.16,1,.3,1)';
-    wrapEl.style.transform = 'translate3d(0,0,0)';
-    clearTimeout(animTimer);
-    animTimer = setTimeout(clearWrapAnim, 340);
-  }
-
-  document.addEventListener('touchstart', (e) => {
-    swipeTracking = false;
-    swipeLocked = false;
-    swipeDX = 0;
-    if(e.touches.length !== 1) return;
-    if(swipeBlocked(e.target)) return;
-    if(!onNewPage && state.languages.length < 2) return;
-    swipeTracking = true;
-    swipeX = e.touches[0].clientX;
-    swipeY = e.touches[0].clientY;
-    wrapEl.classList.add('is-dragging');   // prépare la couche avant le moindre mouvement
-  }, { passive: true });
-
-  document.addEventListener('touchmove', (e) => {
-    if(!swipeTracking || e.touches.length !== 1) return;
-    const dx = e.touches[0].clientX - swipeX;
-    const dy = e.touches[0].clientY - swipeY;
-    if(!swipeLocked){
-      if(Math.abs(dx) < SWIPE_SLOP && Math.abs(dy) < SWIPE_SLOP) return;
-      if(Math.abs(dx) < Math.abs(dy) * SWIPE_RATIO){   // défilement vertical
-        swipeTracking = false;
-        wrapEl.classList.remove('is-dragging');
-        return;
-      }
-      swipeLocked = true;
-      clearTimeout(animTimer);
-      wrapEl.classList.remove('is-animating');
-      wrapEl.style.transition = 'none';
-      wrapEl.style.opacity = '';   // transform seul pendant le geste : le moins coûteux à composer
-    }
-    swipeDX = dx;
-    e.preventDefault();
-    if(!onNewPage){
-      dragOffset = rubberBand(dx);
-      if(!dragRaf) dragRaf = requestAnimationFrame(dragFrame);
-    }
-  }, { passive: false });
-
-  document.addEventListener('touchend', () => {
-    if(!swipeTracking || !swipeLocked){
-      swipeTracking = false;
-      if(!swipeLocked) wrapEl.classList.remove('is-dragging');
-      return;
-    }
-    const dx = swipeDX;
-    swipeTracking = false;
-    swipeLocked = false;
-
-    if(Math.abs(dx) < Math.max(60, window.innerWidth * 0.12)){
-      snapBack();   // pas assez loin : on revient en place
-      return;
-    }
-
-    if(dragRaf){ cancelAnimationFrame(dragRaf); dragRaf = 0; }
-    wrapEl.classList.remove('is-dragging');
-    suppressClick = true;
-    setTimeout(() => { suppressClick = false; }, 350);
-
-    const dir = dx < 0 ? 1 : -1;   // doigt vers la gauche = page suivante
-    if(onNewPage){
-      if(dir === -1) closeNewScreen();
-      return;
-    }
-    const n = state.languages.length;
-    if(n < 2){ snapBack(); return; }
-    // La sortie repart de la position atteinte sous le doigt : pas de saut.
-    goToLang((state.activeIndex + dir + n) % n, dir);
-  }, { passive: true });
-
-  document.addEventListener('touchcancel', () => {
-    if(swipeLocked) snapBack();
-    swipeTracking = false;
-    swipeLocked = false;
-  }, { passive: true });
-
-  // Un balayage ne doit pas déclencher le clic de l'élément sous le doigt.
-  document.addEventListener('click', (e) => {
-    if(!suppressClick) return;
-    e.preventDefault();
-    e.stopPropagation();
-  }, true);
-
+  /* ================= Clavier ================= */
   document.addEventListener('keydown', (e) => {
     if(e.key === 'Escape'){
-      if(anyOverlayOpen()){
-        closeAddModal();
-        closeSettingsModal();
-        closeEditDayModal();
-        return;
-      }
+      if(anyOverlayOpen()){ closeAddModal(); closeSettingsModal(); closeEditDayModal(); return; }
       if(levelScreen.classList.contains('open')){ closeLevelScreen(); return; }
       if(onNewPage){ closeNewScreen(); return; }
       return;
     }
-
     if(e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
     if(e.metaKey || e.ctrlKey || e.altKey) return;
     if(anyOverlayOpen() || levelScreen.classList.contains('open') || onNewPage) return;
@@ -2295,9 +2228,10 @@
     else goNext();
   });
 
-  /* ---------------- Démarrage ---------------- */
-  applyThemeId(data.theme);
-  render();
+  /* ================= Démarrage ================= */
+  measure();
+  buildAllPages();
+  setActive(activeIndex);
 })();
 </script>
 </body>
