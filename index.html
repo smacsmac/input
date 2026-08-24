@@ -693,6 +693,153 @@
   .confirm-del p{ font-size: 13px; color: var(--text-muted); line-height: 1.5; margin: 0 0 12px; }
   [hidden]{ display: none !important; }
 
+  /* ---------- Tableau de bord ---------- */
+  .dash-head{ margin-bottom: 20px; animation: fadeSlideIn .6s ease both; }
+  .dash-head h1{ font-size: 30px; }
+  .dash-date{ color: var(--text-muted); font-size: 13.5px; margin: 6px 0 0; }
+  .dash-grid{
+    display: grid;
+    gap: 12px;
+    margin: 0 auto;
+    animation: fadeSlideIn .6s .05s ease both;
+  }
+  .dash-card{
+    background: linear-gradient(165deg, var(--surface) 0%, var(--surface-2) 100%);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 18px 10px 16px;
+    min-height: 248px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    min-width: 0;
+    box-shadow: var(--shadow);
+  }
+  .dash-top{ display:flex; flex-direction:column; align-items:center; gap: 2px; min-width: 0; max-width: 100%; }
+  .dash-card.done{ border-color: var(--coral-dim); }
+
+  .dash-flag{
+    background: transparent; border: none; padding: 4px 6px;
+    font-size: 34px; line-height: 1.1; cursor: pointer;
+    border-radius: 12px;
+    transition: transform .15s ease, background .15s ease;
+  }
+  .dash-flag:hover{ transform: translateY(-1px); background: rgba(242,240,233,0.05); }
+  .dash-flag:focus-visible{ outline: 2px solid var(--coral); outline-offset: 2px; }
+  .dash-flag .initial{ font-family: var(--font-display); font-size: 28px; font-weight: 600; color: var(--coral); }
+
+  .dash-name{
+    background: transparent; border: none; padding: 2px 6px;
+    font-family: var(--font-body);
+    font-size: 11px; font-weight: 800;
+    letter-spacing: .07em; text-transform: uppercase;
+    color: var(--text-faint);
+    cursor: pointer;
+    max-width: 100%;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    border-radius: 6px;
+    transition: color .15s ease;
+  }
+  .dash-name:hover{ color: var(--coral); }
+  .dash-name:focus-visible{ outline: 2px solid var(--coral); outline-offset: 2px; }
+
+  .dash-nums{ display:flex; flex-direction: column; align-items: center; line-height: 1.05; }
+  .dash-today{
+    background: transparent; border: none; padding: 2px 8px;
+    font-family: var(--font-display); font-size: 30px; font-weight: 600;
+    color: var(--text); cursor: pointer; border-radius: 8px;
+    font-variant-numeric: tabular-nums;
+    transition: background .15s ease;
+  }
+  .dash-today:hover{ background: rgba(242,240,233,0.06); }
+  .dash-today:focus-visible{ outline: 2px solid var(--coral); outline-offset: 1px; }
+  .dash-card.done .dash-today{ color: var(--coral); }
+  .dash-slash{ color: var(--text-faint); font-size: 15px; line-height: 1; margin: 1px 0; }
+  .dash-goal{
+    font-family: var(--font-display); font-size: 19px; font-weight: 600;
+    color: var(--text-faint); font-variant-numeric: tabular-nums;
+  }
+  .dash-unit{ font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--text-faint); margin-top: 3px; }
+  .dash-input{
+    width: 78px; text-align: center;
+    background: var(--bg);
+    border: 1px solid var(--coral);
+    color: var(--text);
+    font-family: var(--font-display); font-size: 24px; font-weight: 600;
+    padding: 4px 6px; border-radius: 8px;
+    -moz-appearance: textfield;
+  }
+  .dash-input::-webkit-outer-spin-button, .dash-input::-webkit-inner-spin-button{ -webkit-appearance: none; margin: 0; }
+  .dash-input:focus{ outline: none; }
+
+  .dash-check{
+    width: 46px; height: 46px;
+    border-radius: 50%;
+    border: 2px solid rgba(242,240,233,0.18);
+    background: transparent;
+    color: var(--text-faint);
+    display:flex; align-items:center; justify-content:center;
+    cursor: pointer;
+    margin-top: 2px;
+    transition: all .2s cubic-bezier(.16,1,.3,1);
+  }
+  .dash-check svg{ width: 22px; height: 22px; }
+  .dash-check:hover{ border-color: var(--coral); color: var(--coral); }
+  .dash-check:focus-visible{ outline: 2px solid var(--coral); outline-offset: 3px; }
+  .dash-card.done .dash-check{
+    background: var(--coral);
+    border-color: var(--coral);
+    color: #1a1220;
+    box-shadow: 0 8px 20px -8px var(--coral-shadow);
+  }
+  .dash-summary{
+    margin-top: 18px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.6;
+    animation: fadeSlideIn .6s .1s ease both;
+  }
+  .dash-summary strong{ color: var(--text); font-weight: 700; }
+  .dash-empty{ color: var(--text-faint); font-size: 13.5px; text-align:center; padding: 30px 10px; }
+
+  .lang-dot.dash{ width: 12px; height: 8px; border-radius: 3px; }
+  .lang-dot.dash.active{ width: 26px; border-radius: 4px; }
+
+  @media (max-width: 380px){
+    .dash-card{ padding: 14px 6px 12px; }
+    .dash-flag{ font-size: 28px; }
+    .dash-today{ font-size: 26px; }
+    .dash-check{ width: 42px; height: 42px; }
+  }
+
+  /* ---------- Choix du drapeau ---------- */
+  .flag-grid{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(58px, 1fr));
+    gap: 8px;
+    max-height: 46vh;
+    overflow-y: auto;
+    margin-bottom: 18px;
+    padding: 2px;
+  }
+  .flag-opt{
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 9px 4px 7px;
+    cursor: pointer;
+    display:flex; flex-direction:column; align-items:center; gap: 3px;
+    transition: all .15s ease;
+  }
+  .flag-opt:hover{ border-color: var(--coral); transform: translateY(-1px); }
+  .flag-opt:focus-visible{ outline: 2px solid var(--coral); outline-offset: 1px; }
+  .flag-opt.active{ border-color: var(--coral); background: var(--coral-dim); }
+  .flag-opt .fl{ font-size: 24px; line-height: 1.1; }
+  .flag-opt .cn{ font-size: 8.5px; font-weight: 700; color: var(--text-faint); text-align:center; line-height: 1.2; }
+
   @keyframes fadeSlideIn{
     from{ opacity: 0; transform: translateY(10px); }
     to{ opacity: 1; transform: translateY(0); }
@@ -818,6 +965,35 @@
 
       <h2 class="section-title">Les 7 niveaux<span class="rule"></span></h2>
       <div class="levels-scroll" data-el="levels"></div>
+    </div>
+  </div>
+</template>
+
+<!-- Gabarit d'une page de tableau de bord -->
+<template id="dashTpl">
+  <div class="page dash-page">
+    <div class="wrap">
+      <header>
+        <div class="head-titles dash-head-titles">
+          <p class="eyebrow">Aujourd'hui</p>
+          <h1 data-el="title">Mes langues</h1>
+        </div>
+        <div class="head-actions">
+          <button class="icon-btn" data-el="prev" aria-label="Page précédente" title="Page précédente">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+          </button>
+          <button class="icon-btn" data-el="next" aria-label="Page suivante" title="Page suivante">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+          </button>
+          <div class="screen-spacer"></div>
+        </div>
+      </header>
+
+      <div class="lang-dots" data-el="dots" aria-label="Pages"></div>
+
+      <p class="dash-date" data-el="date"></p>
+      <div class="dash-grid" data-el="grid"></div>
+      <p class="dash-summary" data-el="summary"></p>
     </div>
   </div>
 </template>
@@ -993,6 +1169,15 @@
   </div>
 </div>
 
+<!-- Choisir un drapeau -->
+<div class="overlay" id="flagOverlay">
+  <div class="modal">
+    <h2>Drapeau<span class="modal-lang" id="flagModalLang"></span></h2>
+    <div class="flag-grid" id="flagGrid"></div>
+    <button class="btn-text" id="cancelFlagBtn">Annuler</button>
+  </div>
+</div>
+
 <!-- Modifier un jour -->
 <div class="overlay" id="editDayOverlay">
   <div class="modal">
@@ -1070,6 +1255,32 @@
     return DISTANT.indexOf(normalize(name)) !== -1 ? 'kr' : 'ds';
   }
 
+  /* ================= Drapeaux ================= */
+  const FLAGS = [
+    ['🇰🇷','Corée'],['🇯🇵','Japon'],['🇨🇳','Chine'],['🇹🇼','Taïwan'],['🇹🇭','Thaïlande'],
+    ['🇻🇳','Viêt Nam'],['🇮🇩','Indonésie'],['🇵🇭','Philippines'],['🇮🇳','Inde'],
+    ['🇪🇸','Espagne'],['🇲🇽','Mexique'],['🇨🇴','Colombie'],['🇦🇷','Argentine'],['🇨🇱','Chili'],
+    ['🇵🇪','Pérou'],['🇻🇪','Venezuela'],['🇺🇾','Uruguay'],['🇨🇷','Costa Rica'],
+    ['🇫🇷','France'],['🇧🇪','Belgique'],['🇨🇭','Suisse'],['🇨🇦','Canada'],['🇶🇨','Québec'],
+    ['🇮🇹','Italie'],['🇵🇹','Portugal'],['🇧🇷','Brésil'],['🇩🇪','Allemagne'],['🇦🇹','Autriche'],
+    ['🇬🇧','Royaume-Uni'],['🇺🇸','États-Unis'],['🇮🇪','Irlande'],['🇳🇱','Pays-Bas'],
+    ['🇸🇪','Suède'],['🇳🇴','Norvège'],['🇩🇰','Danemark'],['🇫🇮','Finlande'],['🇮🇸','Islande'],
+    ['🇷🇺','Russie'],['🇺🇦','Ukraine'],['🇵🇱','Pologne'],['🇨🇿','Tchéquie'],['🇭🇺','Hongrie'],
+    ['🇷🇴','Roumanie'],['🇬🇷','Grèce'],['🇹🇷','Turquie'],['🇮🇱','Israël'],['🇸🇦','Arabie s.'],
+    ['🇪🇬','Égypte'],['🇲🇦','Maroc'],['🇮🇷','Iran'],['🇰🇪','Kenya'],['🇿🇦','Afrique du S.'],
+    ['🌍','Aucun']
+  ];
+  const NAME_TO_FLAG = {
+    coreen:'🇰🇷', korean:'🇰🇷', japonais:'🇯🇵', japanese:'🇯🇵', chinois:'🇨🇳', mandarin:'🇨🇳',
+    cantonais:'🇭🇰', thai:'🇹🇭', thailandais:'🇹🇭', vietnamien:'🇻🇳', indonesien:'🇮🇩',
+    hindi:'🇮🇳', tagalog:'🇵🇭', espagnol:'🇪🇸', castillan:'🇪🇸', francais:'🇫🇷', italien:'🇮🇹',
+    portugais:'🇵🇹', bresilien:'🇧🇷', allemand:'🇩🇪', anglais:'🇬🇧', neerlandais:'🇳🇱',
+    suedois:'🇸🇪', norvegien:'🇳🇴', danois:'🇩🇰', finnois:'🇫🇮', islandais:'🇮🇸', russe:'🇷🇺',
+    ukrainien:'🇺🇦', polonais:'🇵🇱', tcheque:'🇨🇿', hongrois:'🇭🇺', roumain:'🇷🇴', grec:'🇬🇷',
+    turc:'🇹🇷', hebreu:'🇮🇱', arabe:'🇸🇦', persan:'🇮🇷', farsi:'🇮🇷', swahili:'🇰🇪'
+  };
+  function defaultFlagFor(name){ return NAME_TO_FLAG[normalize(name)] || ''; }
+
   /* ================= Données ================= */
   const STORAGE_KEY = 'inputTrackerV2';
   const LEGACY_KEY = 'krInputTrackerV1';
@@ -1084,6 +1295,7 @@
       id: o.id || uid(),
       name: name,
       korean: isKoreanName(name),
+      flag: typeof o.flag === 'string' ? o.flag.slice(0,8) : defaultFlagFor(name),
       scale: SCALES[o.scale] ? o.scale : defaultScaleFor(name),
       theme: THEMES.some(t => t.id === o.theme) ? o.theme : DEFAULT_THEME,
       totalMinutes: Number(o.totalMinutes) > 0 ? Number(o.totalMinutes) : 0,
@@ -1128,7 +1340,8 @@
   }
 
   let state = loadState();
-  let activeIndex = state.activeIndex;
+  let activeSlide = 0;              // l'appli s'ouvre sur le tableau de bord
+  let activeIndex = 0;              // dernière langue consultée (cible des fenêtres)
   function activeLang(){ return state.languages[activeIndex]; }
 
   function saveData(){
@@ -1192,6 +1405,10 @@
   function formatDateFr(date){
     return new Intl.DateTimeFormat('fr-FR', { day:'numeric', month:'long', year:'numeric' }).format(date);
   }
+  function formatDayFr(date){
+    const s = new Intl.DateTimeFormat('fr-FR', { weekday:'long', day:'numeric', month:'long' }).format(date);
+    return s.charAt(0).toUpperCase() + s.slice(1);
+  }
   function formatDateFrCap(date){
     const parts = formatDateFr(date).split(' ');
     parts[1] = parts[1].charAt(0).toUpperCase() + parts[1].slice(1);
@@ -1244,6 +1461,16 @@
     return best;
   }
 
+  // Écrit une valeur absolue pour un jour (tableau de bord et fenêtre « modifier »).
+  function setDayMinutes(lang, dateKey, minutes){
+    const value = Math.max(0, Math.round(minutes));
+    const old = lang.sessions[dateKey] || 0;
+    lang.totalMinutes = Math.max(0, lang.totalMinutes + (value - old));
+    if(value > 0) lang.sessions[dateKey] = value;
+    else delete lang.sessions[dateKey];
+    saveData();
+  }
+
   function getRates(lang){
     const goalHoursPerDay = lang.dailyGoalMinutes/60;
     const avg7 = sumMinutesInWindow(lang, 7)/60/7;
@@ -1283,40 +1510,164 @@
   const track = document.getElementById('track');
   const viewport = document.getElementById('viewport');
   const tpl = document.getElementById('pageTpl');
-  let pages = [];   // { el, els, lang }
+  const dashTpl = document.getElementById('dashTpl');
+  const PER_DASH = 3;               // langues par page de tableau de bord
 
-  function buildPage(i){
-    const el = tpl.content.firstElementChild.cloneNode(true);
-    el.dataset.index = String(i);
+  // Le carrousel enchaîne : tableaux de bord, puis une page par langue.
+  let slides = [];   // { kind:'dash'|'lang', group?, lang? }
+  let pages = [];    // { el, els, kind, group?, lang? }
+
+  function dashCount(){ return Math.max(1, Math.ceil(state.languages.length / PER_DASH)); }
+
+  function buildSlides(){
+    const out = [];
+    const d = dashCount();
+    for(let g=0; g<d; g++) out.push({ kind:'dash', group:g });
+    state.languages.forEach((l, i) => out.push({ kind:'lang', lang:i }));
+    return out;
+  }
+  function slideOfLang(i){ return dashCount() + i; }
+  function langOfSlide(i){
+    const sl = slides[i];
+    return (sl && sl.kind === 'lang') ? sl.lang : -1;
+  }
+  function groupLangs(group){
+    return state.languages
+      .map((l, i) => ({ lang:l, index:i }))
+      .slice(group*PER_DASH, group*PER_DASH + PER_DASH);
+  }
+
+  function buildPage(slideIdx){
+    const sl = slides[slideIdx];
+    const el = (sl.kind === 'dash' ? dashTpl : tpl).content.firstElementChild.cloneNode(true);
+    el.dataset.index = String(slideIdx);
+    el.dataset.kind = sl.kind;
     const els = {};
     el.querySelectorAll('[data-el]').forEach(n => { els[n.dataset.el] = n; });
-    // Un dégradé par page : sinon toutes les pages piocheraient la couleur de la première.
-    els.ringGrad.id = 'ringGrad-' + i;
-    els.ring.style.stroke = `url(#ringGrad-${i})`;
-    return { el, els, lang: state.languages[i] };
+    if(sl.kind === 'lang'){
+      // Un dégradé par page : sinon toutes piocheraient la couleur de la première.
+      els.ringGrad.id = 'ringGrad-' + slideIdx;
+      els.ring.style.stroke = `url(#ringGrad-${slideIdx})`;
+    }
+    return Object.assign({ el, els }, sl);
   }
 
   function buildAllPages(){
+    slides = buildSlides();
     track.innerHTML = '';
-    pages = state.languages.map((lang, i) => {
+    pages = slides.map((sl, i) => {
       const p = buildPage(i);
       track.appendChild(p.el);
       return p;
     });
-    pages.forEach((p, i) => renderPage(i));
+    if(activeSlide >= slides.length) activeSlide = 0;
+    pages.forEach((p, i) => renderSlide(i));
     updateDots();
     syncInert();
-    setTrackInstant(-activeIndex * pageWidth());
+    setTrackInstant(-activeSlide * pageWidth());
+  }
+
+  function renderSlide(i){
+    const p = pages[i];
+    if(!p) return;
+    if(p.kind === 'dash') renderDash(i);
+    else renderPage(i);
+  }
+  function renderAllSlides(){ pages.forEach((p, i) => renderSlide(i)); }
+
+  // Re-rend les pages qui parlent d'une langue donnée (sa page et son tableau de bord).
+  function refreshLang(langIdx){
+    const dash = Math.floor(langIdx / PER_DASH);
+    pages.forEach((p, i) => {
+      if(p.kind === 'lang' && p.lang === langIdx) renderPage(i);
+      else if(p.kind === 'dash' && p.group === dash) renderDash(i);
+    });
+  }
+
+  /* ================= Tableau de bord ================= */
+  const CHECK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+
+  function renderDash(slideIdx){
+    const p = pages[slideIdx];
+    const items = groupLangs(p.group);
+    const els = p.els;
+    const total = dashCount();
+
+    els.title.textContent = total > 1 ? `Mes langues ${p.group + 1}/${total}` : 'Mes langues';
+    els.date.textContent = formatDayFr(new Date());
+    els.prev.disabled = (slideIdx === 0);
+
+    // Halo composé des couleurs des langues de la page.
+    const accents = items.map(it => themeById(it.lang.theme).accent);
+    applyThemeTo(p.el, items.length ? items[0].lang.theme : DEFAULT_THEME);
+    if(accents.length){
+      const layers = accents.map((c, k) =>
+        `radial-gradient(ellipse 70% 45% at ${15 + k*35}% -8%, ${hexToRgba(c, 0.16)} 0%, transparent 65%)`).join(', ');
+      p.el.style.background = `${layers}, radial-gradient(ellipse 120% 80% at 50% -10%, #201e38 0%, var(--bg) 55%)`;
+    }
+
+    els.grid.style.gridTemplateColumns = `repeat(${Math.max(1, items.length)}, minmax(0, 1fr))`;
+    els.grid.style.maxWidth = (Math.max(1, items.length) * 230) + 'px';
+    els.grid.innerHTML = '';
+
+    if(!items.length){
+      els.grid.innerHTML = '<p class="dash-empty">Aucune langue sur cette page.</p>';
+      els.summary.textContent = '';
+      return;
+    }
+
+    const todayKey = todayISO();
+    let doneCount = 0, totalToday = 0, withGoal = 0;
+
+    items.forEach(it => {
+      const lang = it.lang;
+      const today = Math.round(lang.sessions[todayKey] || 0);
+      const goal = Math.round(lang.dailyGoalMinutes);
+      const done = goal > 0 && today >= goal;
+      totalToday += today;
+      if(goal > 0){ withGoal++; if(done) doneCount++; }
+
+      const card = document.createElement('div');
+      card.className = 'dash-card' + (done ? ' done' : '');
+      card.dataset.lang = String(it.index);
+      applyThemeTo(card, lang.theme);
+
+      const flag = lang.flag || defaultFlagFor(lang.name);
+      const flagHtml = flag
+        ? esc(flag)
+        : `<span class="initial">${esc(langTitle(lang.name).charAt(0))}</span>`;
+
+      card.innerHTML = `
+        <div class="dash-top">
+          <button class="dash-flag" data-act="flag" title="Changer le drapeau" aria-label="Changer le drapeau ${esc(langTitle(lang.name))}">${flagHtml}</button>
+          <button class="dash-name" data-act="open" title="Ouvrir ${esc(langTitle(lang.name))}">${esc(langTitle(lang.name))}</button>
+        </div>
+        <div class="dash-nums">
+          <button class="dash-today" data-act="edit" title="Saisir les minutes du jour" aria-label="Minutes d'aujourd'hui pour ${esc(langTitle(lang.name))}">${today}</button>
+          <input class="dash-input" data-act="input" type="number" min="0" inputmode="numeric" hidden aria-label="Minutes d'aujourd'hui">
+          <span class="dash-slash">/</span>
+          <span class="dash-goal">${goal > 0 ? goal : '—'}</span>
+          <span class="dash-unit">min</span>
+        </div>
+        <button class="dash-check" data-act="check" aria-pressed="${done ? 'true' : 'false'}"
+          title="${goal > 0 ? (done ? 'Objectif atteint — appuyer pour remettre à zéro' : 'Marquer l\'objectif comme atteint') : 'Définir un objectif quotidien'}">${CHECK_SVG}</button>`;
+      els.grid.appendChild(card);
+    });
+
+    const parts = [`<strong>${formatHoursMin(totalToday)}</strong> aujourd'hui`];
+    if(withGoal) parts.push(`<strong>${doneCount}</strong> objectif${doneCount>1?'s':''} sur ${withGoal} atteint${doneCount>1?'s':''}`);
+    els.summary.innerHTML = parts.join(' · ');
   }
 
   const MONTHS_FR_SHORT = ['janv','févr','mars','avr','mai','juin','juil','août','sept','oct','nov','déc'];
   const RING_C = 2 * Math.PI * 74;
 
-  function renderPage(i){
-    const p = pages[i];
-    if(!p) return;
+  function renderPage(slideIdx){
+    const p = pages[slideIdx];
+    if(!p || p.kind !== 'lang') return;
+    const i = p.lang;                      // index de la langue
     const lang = state.languages[i];
-    p.lang = lang;
+    if(!lang) return;
     const els = p.els;
 
     applyThemeTo(p.el, lang.theme);
@@ -1329,12 +1680,9 @@
       els.title.textContent = title;
     }
 
-    els.prev.disabled = (i === 0);
-    if(i > 0){
-      const prevName = langTitle(state.languages[i-1].name);
-      els.prev.title = '← ' + prevName;
-      els.prev.setAttribute('aria-label', 'Langue précédente : ' + prevName);
-    }
+    els.prev.disabled = false;
+    els.prev.title = 'Page précédente';
+    els.prev.setAttribute('aria-label', 'Page précédente');
     const isLast = (i === state.languages.length - 1);
     els.next.classList.toggle('is-add', isLast);
     els.next.title = isLast ? 'Ajouter une langue' : langTitle(state.languages[i+1].name) + ' →';
@@ -1393,7 +1741,7 @@
     renderWeek(lang, els.weekRow);
     renderProjections(lang, els);
     renderLevels(lang, els.levels, idx);
-    renderChart(lang, els.chartCard, i);
+    renderChart(lang, els.chartCard, slideIdx);
   }
 
   function renderWeek(lang, container){
@@ -1537,16 +1885,20 @@
   }
 
   function updateDots(){
-    pages.forEach((p, pi) => {
+    const total = dashCount();
+    pages.forEach((p) => {
       const box = p.els.dots;
       box.innerHTML = '';
-      state.languages.forEach((l, i) => {
+      slides.forEach((sl, i) => {
         const b = document.createElement('button');
         b.type = 'button';
-        b.className = 'lang-dot' + (i === activeIndex ? ' active' : '');
+        const label = sl.kind === 'dash'
+          ? (total > 1 ? `Mes langues ${sl.group+1}` : 'Mes langues')
+          : langTitle(state.languages[sl.lang].name);
+        b.className = 'lang-dot' + (sl.kind === 'dash' ? ' dash' : '') + (i === activeSlide ? ' active' : '');
         b.dataset.index = String(i);
-        b.title = langTitle(l.name);
-        b.setAttribute('aria-label', 'Aller à ' + langTitle(l.name));
+        b.title = label;
+        b.setAttribute('aria-label', 'Aller à ' + label);
         box.appendChild(b);
       });
       const add = document.createElement('button');
@@ -1564,7 +1916,7 @@
     pages.forEach(p => {
       p.els.dots.querySelectorAll('.lang-dot').forEach(d => {
         if(d.dataset.index === 'new') return;
-        d.classList.toggle('active', Number(d.dataset.index) === activeIndex);
+        d.classList.toggle('active', Number(d.dataset.index) === activeSlide);
       });
     });
   }
@@ -1605,37 +1957,48 @@
     if(wrappedPage){ wrappedPage.style.transform = ''; wrappedPage = null; }
   }
   function prepareWrap(dx){
-    const n = state.languages.length;
+    const n = slides.length;
     if(n < 2){ clearWrapOffset(); return; }
-    if(dx < 0 && activeIndex === n-1) setWrapOffset(pages[0].el, n*W);
-    else if(dx > 0 && activeIndex === 0) setWrapOffset(pages[n-1].el, -n*W);
+    if(dx < 0 && activeSlide === n-1) setWrapOffset(pages[0].el, n*W);
+    else if(dx > 0 && activeSlide === 0) setWrapOffset(pages[n-1].el, -n*W);
     else clearWrapOffset();
   }
 
   function syncInert(){
-    pages.forEach((p, i) => { p.el.inert = (i !== activeIndex); });
+    pages.forEach((p, i) => { p.el.inert = (i !== activeSlide); });
   }
 
   function setActive(i){
-    activeIndex = i;
+    activeSlide = i;
+    const sl = slides[i];
+    if(sl && sl.kind === 'lang') activeIndex = sl.lang;
     syncInert();
-    const lang = state.languages[i];
-    applyThemeTo(document.documentElement, lang.theme);
-    document.title = lang.korean ? "Suivi d'input · 한국어" : "Suivi d'input · " + langTitle(lang.name);
+
+    if(sl && sl.kind === 'dash'){
+      const first = groupLangs(sl.group)[0];
+      applyThemeTo(document.documentElement, first ? first.lang.theme : DEFAULT_THEME);
+      document.title = "Suivi d'input · Mes langues";
+    } else {
+      const lang = state.languages[activeIndex];
+      applyThemeTo(document.documentElement, lang.theme);
+      document.title = lang.korean ? "Suivi d'input · 한국어" : "Suivi d'input · " + langTitle(lang.name);
+    }
+    // Le bouton d'ajout rapide n'a pas de langue cible sur un tableau de bord.
+    fabBtn.hidden = !(sl && sl.kind === 'lang');
     updateActiveDot();
     saveData();
   }
 
   function goTo(target, dir, animate){
-    const n = state.languages.length;
+    const n = slides.length;
     if(target < 0 || target >= n) return;
     closeNewScreen(true);
 
     const isWrap = wrappedPage && pages[target] && wrappedPage === pages[target].el;
-    const destX = isWrap ? -(activeIndex + dir) * W : -target * W;
-    const same = (target === activeIndex);
+    const destX = isWrap ? -(activeSlide + dir) * W : -target * W;
+    const same = (target === activeSlide);
 
-    if(target !== activeIndex) setActive(target);
+    if(target !== activeSlide) setActive(target);
 
     if(!animate || !MOTION_OK || (same && !isWrap)){
       clearWrapOffset();
@@ -1652,17 +2015,17 @@
 
   function goNext(){
     if(onNewPage) return;
-    if(activeIndex < state.languages.length - 1) goTo(activeIndex + 1, 1, true);
-    else openNewScreen();
+    if(activeSlide < slides.length - 1) goTo(activeSlide + 1, 1, true);
+    else openNewScreen();          // après la dernière langue : créer une langue
   }
   function goPrev(){
     if(onNewPage){ closeNewScreen(); return; }
-    if(activeIndex > 0) goTo(activeIndex - 1, -1, true);
+    if(activeSlide > 0) goTo(activeSlide - 1, -1, true);
   }
   function step(dir){
-    const n = state.languages.length;
+    const n = slides.length;
     if(n < 2) return;
-    goTo((activeIndex + dir + n) % n, dir, true);
+    goTo((activeSlide + dir + n) % n, dir, true);
   }
 
   // Un focus programmé peut pousser un conteneur à défiler même en overflow:hidden.
@@ -1674,7 +2037,7 @@
   window.addEventListener('resize', () => {
     measure();
     clearWrapOffset();
-    setTrackInstant(-activeIndex * W);
+    setTrackInstant(-activeSlide * W);
   });
 
   /* ================= Balayage ================= */
@@ -1703,7 +2066,7 @@
     tracking = false; locked = false; swipeDX = 0; velocity = 0;
     if(e.touches.length !== 1) return;
     if(swipeBlocked(e.target)) return;
-    if(!onNewPage && state.languages.length < 2) return;
+    if(!onNewPage && slides.length < 2) return;
     tracking = true;
     swipeX = lastX = e.touches[0].clientX;
     swipeY = e.touches[0].clientY;
@@ -1728,7 +2091,7 @@
     e.preventDefault();
     if(!onNewPage){
       prepareWrap(dx);
-      trackX = -activeIndex * W + dx;          // suivi exact du doigt
+      trackX = -activeSlide * W + dx;          // suivi exact du doigt
       if(!dragRaf) dragRaf = requestAnimationFrame(dragFrame);
     }
   }, { passive: false });
@@ -1744,8 +2107,8 @@
 
     if(!far && !flick){
       clearWrapOffset();
-      if(MOTION_OK) animateTrack(-activeIndex * W);
-      else setTrackInstant(-activeIndex * W);
+      if(MOTION_OK) animateTrack(-activeSlide * W);
+      else setTrackInstant(-activeSlide * W);
       return;
     }
 
@@ -1764,7 +2127,7 @@
     if(locked){
       if(dragRaf){ cancelAnimationFrame(dragRaf); dragRaf = 0; }
       clearWrapOffset();
-      animateTrack(-activeIndex * W);
+      animateTrack(-activeSlide * W);
     }
     tracking = false; locked = false;
   }, { passive: true });
@@ -1779,15 +2142,14 @@
   track.addEventListener('click', (e) => {
     const pageEl = e.target.closest('.page');
     if(!pageEl) return;
-    const i = Number(pageEl.dataset.index);
-    if(i !== activeIndex) return;          // seule la page affichée est interactive
-    const lang = state.languages[i];
+    const slideIdx = Number(pageEl.dataset.index);
+    if(slideIdx !== activeSlide) return;    // seule la page affichée est interactive
 
     const dot = e.target.closest('.lang-dot');
     if(dot){
       if(dot.dataset.index === 'new'){ openNewScreen(); return; }
       const t = Number(dot.dataset.index);
-      if(t !== activeIndex) goTo(t, t > activeIndex ? 1 : -1, true);
+      if(t !== activeSlide) goTo(t, t > activeSlide ? 1 : -1, true);
       return;
     }
 
@@ -1795,23 +2157,91 @@
     const name = named ? named.dataset.el : '';
     if(name === 'prev'){ goPrev(); return; }
     if(name === 'next'){ goNext(); return; }
-    if(name === 'settings'){ openSettingsModal(false); return; }
-    if(name === 'editGoal'){ openSettingsModal(true); return; }
+
+    // ----- Cartes du tableau de bord -----
+    const dashCard = e.target.closest('.dash-card');
+    if(dashCard){
+      const li = Number(dashCard.dataset.lang);
+      const act = (e.target.closest('[data-act]') || {}).dataset;
+      if(!act) return;
+      if(act.act === 'flag'){ openFlagPicker(li); return; }
+      if(act.act === 'open'){ goTo(slideOfLang(li), 1, true); return; }
+      if(act.act === 'edit'){ startDashEdit(dashCard, li); return; }
+      if(act.act === 'check'){ toggleDashGoal(li); return; }
+      return;
+    }
+
+    // ----- Page d'une langue -----
+    const p = pages[slideIdx];
+    if(!p || p.kind !== 'lang') return;
+    const li = p.lang;
+    const lang = state.languages[li];
+    if(name === 'settings'){ openSettingsModal(li, false); return; }
+    if(name === 'editGoal'){ openSettingsModal(li, true); return; }
 
     const paceBtn = e.target.closest('.mini-seg button');
     if(paceBtn){
       lang.paceMode = VALID_MODES.includes(paceBtn.dataset.mode) ? paceBtn.dataset.mode : '7d';
       saveData();
-      renderPage(i);
+      renderPage(slideIdx);
       return;
     }
 
     const day = e.target.closest('.week-day');
-    if(day){ openEditDayModal(day.dataset.date); return; }
+    if(day){ openEditDayModal(li, day.dataset.date); return; }
 
     const card = e.target.closest('.level-card');
-    if(card){ openLevelScreen(Number(card.dataset.levelIndex)); return; }
+    if(card){ openLevelScreen(li, Number(card.dataset.levelIndex)); return; }
   });
+
+  /* ---- Saisie directe des minutes du jour sur une carte ---- */
+  function startDashEdit(card, langIdx){
+    const btn = card.querySelector('.dash-today');
+    const input = card.querySelector('.dash-input');
+    if(!btn || !input) return;
+    const todayKey = todayISO();
+    input.value = Math.round(state.languages[langIdx].sessions[todayKey] || 0);
+    btn.hidden = true;
+    input.hidden = false;
+    input.focus();
+    input.select();
+
+    let closed = false;
+    const finish = (commit) => {
+      if(closed) return;
+      closed = true;
+      input.removeEventListener('blur', onBlur);
+      input.removeEventListener('keydown', onKey);
+      if(commit){
+        const v = Math.max(0, Math.round(Number(input.value) || 0));
+        setDayMinutes(state.languages[langIdx], todayKey, v);
+        refreshLang(langIdx);
+      } else {
+        input.hidden = true;
+        btn.hidden = false;
+      }
+    };
+    const onBlur = () => finish(true);
+    const onKey = (ev) => {
+      if(ev.key === 'Enter'){ ev.preventDefault(); finish(true); }
+      else if(ev.key === 'Escape'){ ev.preventDefault(); finish(false); }
+    };
+    input.addEventListener('blur', onBlur);
+    input.addEventListener('keydown', onKey);
+  }
+
+  /* ---- Coche : atteindre l'objectif, ou revenir à zéro ---- */
+  function toggleDashGoal(langIdx){
+    const lang = state.languages[langIdx];
+    if(!(lang.dailyGoalMinutes > 0)){
+      openSettingsModal(langIdx, true);      // pas d'objectif : on va le définir
+      return;
+    }
+    const todayKey = todayISO();
+    const today = lang.sessions[todayKey] || 0;
+    setDayMinutes(lang, todayKey, today >= lang.dailyGoalMinutes ? 0 : lang.dailyGoalMinutes);
+    refreshLang(langIdx);
+  }
 
   track.addEventListener('keydown', (e) => {
     if(e.key !== 'Enter' && e.key !== ' ') return;
@@ -1819,8 +2249,10 @@
     const card = e.target.closest && e.target.closest('.level-card');
     if(!day && !card) return;
     e.preventDefault();
-    if(day) openEditDayModal(day.dataset.date);
-    else openLevelScreen(Number(card.dataset.levelIndex));
+    const p = pages[activeSlide];
+    if(!p || p.kind !== 'lang') return;
+    if(day) openEditDayModal(p.lang, day.dataset.date);
+    else openLevelScreen(p.lang, Number(card.dataset.levelIndex));
   });
 
   /* ================= Nuancier et échelle ================= */
@@ -1955,8 +2387,9 @@
     state.languages.push(lang);
     closeNewScreen(true);
     activeIndex = state.languages.length - 1;
+    activeSlide = slideOfLang(activeIndex);
     rebuildAll();
-    setActive(activeIndex);
+    setActive(activeSlide);
   }
   document.getElementById('createLangBtn').addEventListener('click', createLanguage);
   [newLangName, newLangGoal, newLangBase].forEach(inp => {
@@ -1968,7 +2401,59 @@
     buildAllPages();
   }
 
+  /* ================= Choix du drapeau ================= */
+  const flagOverlay = document.getElementById('flagOverlay');
+  const flagGrid = document.getElementById('flagGrid');
+  let flagTarget = -1;
+
+  function openFlagPicker(langIdx){
+    flagTarget = langIdx;
+    const lang = state.languages[langIdx];
+    document.getElementById('flagModalLang').textContent = langTitle(lang.name);
+    applyThemeTo(document.documentElement, lang.theme);
+    const current = lang.flag || defaultFlagFor(lang.name);
+    flagGrid.innerHTML = '';
+    FLAGS.forEach(([fl, country]) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'flag-opt' + (fl === current ? ' active' : '');
+      b.dataset.flag = fl;
+      b.innerHTML = `<span class="fl">${fl}</span><span class="cn">${esc(country)}</span>`;
+      flagGrid.appendChild(b);
+    });
+    flagOverlay.classList.add('open');
+  }
+  function closeFlagPicker(){
+    flagOverlay.classList.remove('open');
+    flagTarget = -1;
+    restoreSlideTheme();
+  }
+  flagGrid.addEventListener('click', (e) => {
+    const opt = e.target.closest('.flag-opt');
+    if(!opt || flagTarget < 0) return;
+    const chosen = opt.dataset.flag;
+    state.languages[flagTarget].flag = (chosen === '🌍') ? '' : chosen;
+    saveData();
+    const li = flagTarget;
+    closeFlagPicker();
+    refreshLang(li);
+  });
+  document.getElementById('cancelFlagBtn').addEventListener('click', closeFlagPicker);
+  flagOverlay.addEventListener('click', (e) => { if(e.target === flagOverlay) closeFlagPicker(); });
+
+  // Rend à :root la couleur de la diapositive affichée (après une fenêtre).
+  function restoreSlideTheme(){
+    const sl = slides[activeSlide];
+    if(sl && sl.kind === 'dash'){
+      const first = groupLangs(sl.group)[0];
+      applyThemeTo(document.documentElement, first ? first.lang.theme : DEFAULT_THEME);
+    } else {
+      applyThemeTo(document.documentElement, activeLang().theme);
+    }
+  }
+
   /* ================= Ajouter une session ================= */
+  const fabBtn = document.getElementById('fabBtn');
   const addOverlay = document.getElementById('addOverlay');
   const customAmount = document.getElementById('customAmount');
   const addDateInput = document.getElementById('addDateInput');
@@ -1986,7 +2471,7 @@
   }
   function closeAddModal(){ addOverlay.classList.remove('open'); }
 
-  document.getElementById('fabBtn').addEventListener('click', openAddModal);
+  fabBtn.addEventListener('click', openAddModal);
   document.getElementById('cancelAddBtn').addEventListener('click', closeAddModal);
   addOverlay.addEventListener('click', (e) => { if(e.target === addOverlay) closeAddModal(); });
   unitSegHandler(document.getElementById('addUnitSeg'), u => { addUnit = u; });
@@ -2009,7 +2494,7 @@
     const key = dateKey || todayISO();
     lang.sessions[key] = (lang.sessions[key] || 0) + minutes;
     saveData();
-    renderPage(activeIndex);
+    refreshLang(activeIndex);
     closeAddModal();
   }
 
@@ -2032,9 +2517,13 @@
   unitSegHandler(goalUnitSeg, u => { goalUnit = u; });
   unitSegHandler(baseUnitSeg, u => { baseUnit = u; });
 
-  function openSettingsModal(focusGoal){
+  let settingsTarget = 0;
+
+  function openSettingsModal(langIdx, focusGoal){
     if(onNewPage) return;
-    const lang = activeLang();
+    settingsTarget = (typeof langIdx === 'number' && state.languages[langIdx]) ? langIdx : activeIndex;
+    const lang = state.languages[settingsTarget];
+    applyThemeTo(document.documentElement, lang.theme);
     pendingTheme = lang.theme;
     pendingScale = lang.scale;
     settingsName.value = lang.name;
@@ -2066,8 +2555,8 @@
   }
   function closeSettingsModal(){
     settingsOverlay.classList.remove('open');
-    applyThemeTo(document.documentElement, activeLang().theme);
-    applyThemeTo(pages[activeIndex].el, activeLang().theme);
+    restoreSlideTheme();
+    refreshLang(settingsTarget);      // annule l'aperçu de couleur
   }
 
   document.getElementById('cancelSettingsBtn').addEventListener('click', closeSettingsModal);
@@ -2079,7 +2568,8 @@
     pendingTheme = sw.dataset.theme;
     renderSwatches(themeSwatches, pendingTheme);
     applyThemeTo(document.documentElement, pendingTheme);   // aperçu en direct
-    applyThemeTo(pages[activeIndex].el, pendingTheme);
+    const sp = pages.find(pg => pg.kind === 'lang' && pg.lang === settingsTarget);
+    if(sp) applyThemeTo(sp.el, pendingTheme);
   });
 
   scaleSeg.addEventListener('click', (e) => {
@@ -2090,7 +2580,7 @@
   });
 
   document.getElementById('saveSettingsBtn').addEventListener('click', () => {
-    const lang = activeLang();
+    const lang = state.languages[settingsTarget];
     const newName = settingsName.value.trim();
     if(newName){
       lang.name = newName.slice(0,40);
@@ -2104,9 +2594,9 @@
     lang.scale = pendingScale;
     saveData();
     settingsOverlay.classList.remove('open');
-    pages.forEach((p, i) => renderPage(i));   // les voisines affichent son nom
+    renderAllSlides();                 // les voisines affichent son nom
     updateDots();
-    setActive(activeIndex);
+    setActive(activeSlide);
   });
 
   settingsName.addEventListener('keydown', (e) => { if(e.key === 'Enter') document.getElementById('saveSettingsBtn').click(); });
@@ -2115,7 +2605,7 @@
 
   document.getElementById('deleteLangBtn').addEventListener('click', () => {
     document.getElementById('confirmDelText').textContent =
-      `Supprimer « ${langTitle(activeLang().name)} » et tout son historique (heures, notes, objectif) ? C'est définitif.`;
+      `Supprimer « ${langTitle(state.languages[settingsTarget].name)} » et tout son historique (heures, notes, objectif) ? C'est définitif.`;
     deleteBlock.hidden = true;
     confirmDelBlock.hidden = false;
   });
@@ -2125,23 +2615,25 @@
   });
   document.getElementById('confirmDelBtn').addEventListener('click', () => {
     if(state.languages.length <= 1) return;
-    state.languages.splice(activeIndex, 1);
-    activeIndex = Math.max(0, Math.min(activeIndex, state.languages.length - 1));
+    state.languages.splice(settingsTarget, 1);
+    activeIndex = Math.max(0, Math.min(settingsTarget, state.languages.length - 1));
     settingsOverlay.classList.remove('open');
+    activeSlide = slideOfLang(activeIndex);
     rebuildAll();
-    setActive(activeIndex);
+    setActive(activeSlide);
   });
 
   /* ================= Modifier un jour ================= */
   const editDayOverlay = document.getElementById('editDayOverlay');
   const editDayAmount = document.getElementById('editDayAmount');
   const saveEditDayBtn = document.getElementById('saveEditDayBtn');
-  let editDayUnit = 'min', editDayKey = null;
+  let editDayUnit = 'min', editDayKey = null, editDayTarget = 0;
 
   unitSegHandler(document.getElementById('editDayUnitSeg'), u => { editDayUnit = u; });
 
-  function openEditDayModal(dateKey){
-    const lang = activeLang();
+  function openEditDayModal(langIdx, dateKey){
+    editDayTarget = (typeof langIdx === 'number' && state.languages[langIdx]) ? langIdx : activeIndex;
+    const lang = state.languages[editDayTarget];
     const [y,m,d] = dateKey.split('-').map(Number);
     editDayKey = dateKey;
     document.getElementById('editDayTitle').textContent = `Modifier le ${formatDateFr(new Date(y, m-1, d))}`;
@@ -2159,27 +2651,22 @@
 
   saveEditDayBtn.addEventListener('click', () => {
     if(editDayKey === null) return;
-    const lang = activeLang();
     const raw = Number(editDayAmount.value) || 0;
-    const newMinutes = Math.max(0, editDayUnit === 'h' ? raw*60 : raw);
-    const old = lang.sessions[editDayKey] || 0;
-    lang.totalMinutes = Math.max(0, lang.totalMinutes + (newMinutes - old));
-    if(newMinutes > 0) lang.sessions[editDayKey] = newMinutes;
-    else delete lang.sessions[editDayKey];
-    saveData();
-    renderPage(activeIndex);
+    setDayMinutes(state.languages[editDayTarget], editDayKey, editDayUnit === 'h' ? raw*60 : raw);
+    refreshLang(editDayTarget);
     closeEditDayModal();
   });
 
   /* ================= Notes de niveau ================= */
   const levelScreen = document.getElementById('levelScreen');
   const levelNotesArea = document.getElementById('levelNotesArea');
-  let currentNotesLevel = null, notesTimer = null;
+  let currentNotesLevel = null, notesTimer = null, notesTarget = 0;
 
-  function openLevelScreen(levelIdx){
+  function openLevelScreen(langIdx, levelIdx){
     const lv = LEVELS[levelIdx];
     if(!lv) return;
-    const lang = activeLang();
+    notesTarget = (typeof langIdx === 'number' && state.languages[langIdx]) ? langIdx : activeIndex;
+    const lang = state.languages[notesTarget];
     currentNotesLevel = levelIdx;
     document.getElementById('lstHangul').textContent = levelGlyph(lang, lv);
     document.getElementById('lstName').textContent = `Niveau ${lv.n} · ${langTitle(lang.name)}`;
@@ -2193,7 +2680,7 @@
     clearTimeout(notesTimer);
     const lv = LEVELS[currentNotesLevel];
     if(!lv) return;
-    activeLang().levelNotes[lv.n] = levelNotesArea.value;
+    state.languages[notesTarget].levelNotes[lv.n] = levelNotesArea.value;
     saveData();
   }
   function closeLevelScreen(){
@@ -2213,7 +2700,7 @@
   /* ================= Clavier ================= */
   document.addEventListener('keydown', (e) => {
     if(e.key === 'Escape'){
-      if(anyOverlayOpen()){ closeAddModal(); closeSettingsModal(); closeEditDayModal(); return; }
+      if(anyOverlayOpen()){ closeAddModal(); closeSettingsModal(); closeEditDayModal(); closeFlagPicker(); return; }
       if(levelScreen.classList.contains('open')){ closeLevelScreen(); return; }
       if(onNewPage){ closeNewScreen(); return; }
       return;
@@ -2228,10 +2715,36 @@
     else goNext();
   });
 
+  /* ================= Changement de jour ================= */
+  // Le tableau de bord lit les sessions du jour : à minuit tout repart de zéro.
+  let shownDay = todayISO();
+  let midnightTimer = null;
+
+  function refreshIfNewDay(){
+    const today = todayISO();
+    if(today === shownDay) return;
+    shownDay = today;
+    renderAllSlides();
+  }
+  function scheduleMidnight(){
+    clearTimeout(midnightTimer);
+    const now = new Date();
+    const next = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 2);
+    midnightTimer = setTimeout(() => {
+      refreshIfNewDay();
+      scheduleMidnight();
+    }, Math.min(next - now, 2147483000));
+  }
+  document.addEventListener('visibilitychange', () => {
+    if(!document.hidden) refreshIfNewDay();
+  });
+  window.addEventListener('focus', refreshIfNewDay);
+
   /* ================= Démarrage ================= */
   measure();
   buildAllPages();
-  setActive(activeIndex);
+  setActive(0);            // l'appli s'ouvre sur le tableau de bord
+  scheduleMidnight();
 })();
 </script>
 </body>
