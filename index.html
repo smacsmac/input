@@ -861,6 +861,69 @@
   .flag-opt .fl{ font-size: 24px; line-height: 1.1; }
   .flag-opt .cn{ font-size: 8.5px; font-weight: 700; color: var(--text-faint); text-align:center; line-height: 1.2; }
 
+  /* ---------- Calendrier ---------- */
+  .cal-card{
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 16px 16px 14px;
+    animation: fadeSlideIn .6s .22s ease both;
+  }
+  .cal-head{ display:flex; align-items:center; justify-content:space-between; gap: 10px; margin-bottom: 14px; }
+  .cal-month{ font-family: var(--font-display); font-size: 16px; font-weight: 600; text-align:center; flex:1; }
+  .cal-nav{
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    width: 30px; height: 30px; border-radius: 50%;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; flex-shrink:0;
+    transition: all .15s ease;
+  }
+  .cal-nav svg{ width: 15px; height: 15px; }
+  .cal-nav:hover:not(:disabled){ color: var(--text); border-color: rgba(242,240,233,0.25); }
+  .cal-nav:disabled{ opacity: .25; cursor: default; }
+  .cal-nav:focus-visible{ outline: 2px solid var(--coral); outline-offset: 2px; }
+
+  .cal-grid{ display:grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+  .cal-dow{
+    font-size: 10px; font-weight: 800; letter-spacing: .04em;
+    color: var(--text-faint); text-align:center; text-transform: uppercase;
+    padding-bottom: 4px;
+  }
+  .cal-cell{
+    aspect-ratio: 1 / 1;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    background: rgba(242,240,233,0.045);
+    color: var(--text-faint);
+    font-family: var(--font-body);
+    font-size: 11px;
+    font-weight: 700;
+    display:flex; align-items:center; justify-content:center;
+    cursor: pointer;
+    padding: 0;
+    transition: transform .12s ease, border-color .12s ease;
+  }
+  .cal-cell:hover{ transform: translateY(-1px); border-color: rgba(242,240,233,0.3); }
+  .cal-cell:focus-visible{ outline: 2px solid var(--coral); outline-offset: 1px; }
+  .cal-cell.empty{ background: none; cursor: default; }
+  .cal-cell.empty:hover{ transform:none; border-color: transparent; }
+  .cal-cell.future{ opacity: .3; cursor: default; }
+  .cal-cell.future:hover{ transform:none; border-color: transparent; }
+  .cal-cell.today{ border-color: var(--coral); }
+  .cal-cell.has{ color: #14131f; }
+  .cal-foot{
+    margin-top: 12px;
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.55;
+    display:flex; align-items:center; justify-content:space-between; gap: 10px; flex-wrap: wrap;
+  }
+  .cal-foot strong{ color: var(--text); font-weight: 700; }
+  .cal-legend{ display:flex; align-items:center; gap: 4px; font-size: 10px; color: var(--text-faint); font-weight: 700; }
+  .cal-legend i{ width: 11px; height: 11px; border-radius: 3px; display:inline-block; }
+
   /* ---------- Sauvegarde ---------- */
   .app-section{ margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--border); }
   .save-state{ font-size: 12px; color: var(--text-faint); text-align:center; margin: 10px 0 0; line-height: 1.5; }
@@ -1039,6 +1102,21 @@
 
       <h2 class="section-title">Progression cumulée<span class="rule"></span></h2>
       <div class="chart-card" data-el="chartCard"></div>
+
+      <h2 class="section-title">Mois par mois<span class="rule"></span></h2>
+      <div class="cal-card">
+        <div class="cal-head">
+          <button class="cal-nav" data-el="calPrev" aria-label="Mois précédent">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+          </button>
+          <div class="cal-month" data-el="calMonth"></div>
+          <button class="cal-nav" data-el="calNext" aria-label="Mois suivant">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </button>
+        </div>
+        <div class="cal-grid" data-el="calGrid"></div>
+        <div class="cal-foot" data-el="calFoot"></div>
+      </div>
 
       <h2 class="section-title">Les 7 niveaux<span class="rule"></span></h2>
       <div class="levels-scroll" data-el="levels"></div>
@@ -1957,10 +2035,78 @@
       els.streakChip.title = 'Aucune session pour le moment';
     }
 
+    renderCalendar(p, lang);
     renderWeek(lang, els.weekRow);
     renderProjections(lang, els);
     renderLevels(lang, els.levels, idx);
     renderChart(lang, els.chartCard, slideIdx);
+  }
+
+  const MONTHS_FR = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+  const DOW_FR = ['L','M','M','J','V','S','D'];
+
+  function renderCalendar(p, lang){
+    const els = p.els;
+    if(typeof p.calOffset !== 'number') p.calOffset = 0;    // 0 = mois en cours
+
+    const now = new Date();
+    const shown = new Date(now.getFullYear(), now.getMonth() + p.calOffset, 1);
+    const year = shown.getFullYear(), month = shown.getMonth();
+    els.calMonth.textContent = MONTHS_FR[month].charAt(0).toUpperCase() + MONTHS_FR[month].slice(1) + ' ' + year;
+    els.calNext.disabled = (p.calOffset >= 0);
+
+    // On ne remonte pas avant la première session (ni avant la création).
+    const first = firstSessionDate(lang);
+    const floor = first ? new Date(first.getFullYear(), first.getMonth(), 1) : new Date(now.getFullYear(), now.getMonth(), 1);
+    els.calPrev.disabled = (shown <= floor);
+
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const firstDow = (new Date(year, month, 1).getDay() + 6) % 7;   // lundi = 0
+    const todayKey = todayISO();
+
+    // Intensité relative au meilleur jour du mois (au moins l'objectif).
+    let best = 0, total = 0, count = 0, bestDay = 0;
+    for(let d=1; d<=daysInMonth; d++){
+      const v = lang.sessions[toISODate(new Date(year, month, d))] || 0;
+      if(v > 0){ total += v; count++; }
+      if(v > best){ best = v; bestDay = d; }
+    }
+    const scale = Math.max(best, lang.dailyGoalMinutes || 0, 30);
+
+    let html = DOW_FR.map(d => `<div class="cal-dow">${d}</div>`).join('');
+    for(let i=0; i<firstDow; i++) html += '<div class="cal-cell empty"></div>';
+    for(let d=1; d<=daysInMonth; d++){
+      const date = new Date(year, month, d);
+      const key = toISODate(date);
+      const v = Math.round(lang.sessions[key] || 0);
+      const future = key > todayKey;
+      let cls = 'cal-cell';
+      let style = '';
+      if(future) cls += ' future';
+      if(key === todayKey) cls += ' today';
+      if(v > 0){
+        cls += ' has';
+        const t = Math.min(1, v / scale);
+        style = ` style="background: color-mix(in srgb, var(--coral) ${Math.round(28 + t*72)}%, transparent)"`;
+      }
+      html += `<button type="button" class="${cls}"${style} data-date="${key}"${future ? ' disabled' : ''}` +
+              ` title="${d} ${MONTHS_FR[month]} — ${v > 0 ? formatHoursMin(v) : 'rien'}"` +
+              ` aria-label="${d} ${MONTHS_FR[month]} : ${v > 0 ? formatHoursMin(v) : 'aucune session'}">${d}</button>`;
+    }
+    els.calGrid.innerHTML = html;
+
+    const parts = [];
+    if(count){
+      parts.push(`<strong>${formatHoursMin(total)}</strong> ce mois-ci · ${count} jour${count>1?'s':''}`);
+      if(best > 0) parts.push(`meilleur : ${formatHoursMin(best)} le ${bestDay}`);
+    } else {
+      parts.push('Aucune session ce mois-ci.');
+    }
+    els.calFoot.innerHTML =
+      `<span>${parts.join(' · ')}</span>` +
+      `<span class="cal-legend">moins <i style="background: color-mix(in srgb, var(--coral) 30%, transparent)"></i>` +
+      `<i style="background: color-mix(in srgb, var(--coral) 60%, transparent)"></i>` +
+      `<i style="background: var(--coral)"></i> plus</span>`;
   }
 
   function renderWeek(lang, container){
@@ -2420,6 +2566,15 @@
 
     const day = e.target.closest('.week-day');
     if(day){ openEditDayModal(li, day.dataset.date); return; }
+
+    if(name === 'calPrev' || name === 'calNext'){
+      p.calOffset = (typeof p.calOffset === 'number' ? p.calOffset : 0) + (name === 'calNext' ? 1 : -1);
+      if(p.calOffset > 0) p.calOffset = 0;
+      renderCalendar(p, lang);
+      return;
+    }
+    const cell = e.target.closest('.cal-cell[data-date]');
+    if(cell && !cell.disabled){ openEditDayModal(li, cell.dataset.date); return; }
 
     const card = e.target.closest('.level-card');
     if(card){ openLevelScreen(li, Number(card.dataset.levelIndex)); return; }
