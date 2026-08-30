@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#14131f">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Input">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png">
 <title>Suivi d'input · 한국어</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -855,6 +861,59 @@
   .flag-opt .fl{ font-size: 24px; line-height: 1.1; }
   .flag-opt .cn{ font-size: 8.5px; font-weight: 700; color: var(--text-faint); text-align:center; line-height: 1.2; }
 
+  /* ---------- Sauvegarde ---------- */
+  .app-section{ margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--border); }
+  .save-state{ font-size: 12px; color: var(--text-faint); text-align:center; margin: 10px 0 0; line-height: 1.5; }
+  .save-state.warn{ color: var(--gold); }
+  .import-preview{
+    background: var(--surface);
+    border: 1px solid var(--coral-dim);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    margin-top: 14px;
+  }
+  .import-preview p{ font-size: 13px; color: var(--text-muted); line-height: 1.55; margin: 0 0 14px; }
+  .import-preview p strong{ color: var(--text); }
+  .btn-secondary{
+    width: 100%;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 13px;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    margin-top: 8px;
+  }
+  .btn-secondary:hover{ border-color: rgba(242,240,233,0.25); }
+  .btn-secondary:focus-visible{ outline: 2px solid var(--coral); outline-offset: 2px; }
+
+  .dash-banner{
+    display: flex; align-items: center; gap: 10px;
+    width: 100%;
+    margin-top: 20px;
+    background: rgba(242,193,78,0.09);
+    border: 1px solid rgba(242,193,78,0.3);
+    border-radius: var(--radius-md);
+    padding: 12px 14px;
+    color: var(--gold);
+    font-family: var(--font-body);
+    font-size: 12.5px;
+    font-weight: 700;
+    line-height: 1.45;
+    text-align: left;
+    animation: fadeSlideIn .6s .15s ease both;
+  }
+  .dash-banner .bn-text{ flex: 1; background:none; border:none; color:inherit; font:inherit; text-align:left; cursor:pointer; padding:0; }
+  .dash-banner .bn-close{
+    background: none; border: none; color: var(--gold);
+    opacity: .6; cursor: pointer; font-size: 17px; line-height: 1;
+    padding: 2px 4px; flex-shrink: 0;
+  }
+  .dash-banner .bn-close:hover{ opacity: 1; }
+
   @keyframes fadeSlideIn{
     from{ opacity: 0; transform: translateY(10px); }
     to{ opacity: 1; transform: translateY(0); }
@@ -1003,7 +1062,9 @@
           <button class="icon-btn" data-el="next" aria-label="Page suivante" title="Page suivante">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
           </button>
-          <div class="screen-spacer"></div>
+          <button class="icon-btn" data-el="appSettings" aria-label="Réglages de l'appli" title="Réglages de l'appli">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+          </button>
         </div>
       </header>
 
@@ -1012,6 +1073,11 @@
       <p class="dash-date" data-el="date"></p>
       <div class="dash-grid" data-el="grid"></div>
       <p class="dash-summary" data-el="summary"></p>
+
+      <div class="dash-banner" data-el="banner" hidden>
+        <button type="button" class="bn-text" data-act="backup"></button>
+        <button type="button" class="bn-close" data-act="snooze" aria-label="Masquer ce rappel">×</button>
+      </div>
     </div>
   </div>
 </template>
@@ -1187,6 +1253,35 @@
   </div>
 </div>
 
+<!-- Réglages de l'appli -->
+<div class="overlay" id="appOverlay">
+  <div class="modal">
+    <h2>Réglages de l'appli</h2>
+
+    <span class="field-label">Sauvegarde</span>
+    <p class="field-hint">Tes données ne vivent que dans ce navigateur. Une sauvegarde est la seule copie qui survit à un changement d'appareil ou à un nettoyage des données du site.</p>
+    <button class="btn-primary" id="exportBtn">Sauvegarder mes données</button>
+    <button class="btn-secondary" id="importBtn">Restaurer une sauvegarde…</button>
+    <input type="file" id="importInput" accept="application/json,.json" hidden>
+    <p class="save-state" id="lastSaveLine"></p>
+
+    <div class="import-preview" id="importPreview" hidden>
+      <p id="importSummary"></p>
+      <button class="btn-primary" id="importMergeBtn">Fusionner avec mes données</button>
+      <button class="btn-danger" id="importReplaceBtn" style="margin-top:8px">Tout remplacer</button>
+      <button class="btn-text" id="importCancelBtn">Annuler</button>
+    </div>
+
+    <div class="app-section" id="installSection" hidden>
+      <span class="field-label">Installer sur l'écran d'accueil</span>
+      <p class="field-hint" id="installHint"></p>
+      <button class="btn-secondary" id="installBtn" hidden>Installer l'appli</button>
+    </div>
+
+    <button class="btn-text" id="closeAppBtn">Fermer</button>
+  </div>
+</div>
+
 <!-- Choisir un drapeau -->
 <div class="overlay" id="flagOverlay">
   <div class="modal">
@@ -1338,7 +1433,12 @@
         if(!langs.length) langs = [makeKorean()];
         let idx = Number(p.activeIndex);
         if(!Number.isInteger(idx) || idx < 0 || idx >= langs.length) idx = 0;
-        return { languages: langs, activeIndex: idx };
+        return {
+          languages: langs,
+          activeIndex: idx,
+          lastExportAt: typeof p.lastExportAt === 'string' ? p.lastExportAt : '',
+          snoozeBackupUntil: typeof p.snoozeBackupUntil === 'string' ? p.snoozeBackupUntil : ''
+        };
       }
       const legacy = localStorage.getItem(LEGACY_KEY);
       if(legacy){
@@ -1369,6 +1469,90 @@
     }catch(e){
       console.error("Erreur d'enregistrement des données", e);
     }
+  }
+
+  /* ================= Sauvegarde et restauration ================= */
+  const EXPORT_APP = 'suivi-input';
+  const BACKUP_STALE_DAYS = 60;
+
+  function countDays(lang){ return Object.keys(lang.sessions).filter(k => lang.sessions[k] > 0).length; }
+  function sumSessions(lang){
+    return Object.keys(lang.sessions).reduce((t,k) => t + (Number(lang.sessions[k]) || 0), 0);
+  }
+
+  function exportData(){
+    const payload = {
+      app: EXPORT_APP,
+      version: 2,
+      exportedAt: new Date().toISOString(),
+      languages: state.languages
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `suivi-input-${todayISO()}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+    state.lastExportAt = new Date().toISOString();
+    state.snoozeBackupUntil = '';
+    saveData();
+    updateSaveLine();
+    renderAllSlides();
+  }
+
+  // Accepte l'export de l'appli, un état brut, ou l'ancienne version coréenne.
+  function parseBackup(raw){
+    const data = JSON.parse(raw);
+    if(Array.isArray(data.languages)) return data.languages.map(makeLang);
+    if(data.sessions && typeof data.sessions === 'object' && ('totalMinutes' in data)){
+      return [makeKorean({
+        totalMinutes: data.totalMinutes,
+        dailyGoalMinutes: data.dailyGoalMinutes,
+        sessions: data.sessions,
+        paceMode: data.paceMode || data.realPaceMode,
+        levelNotes: data.levelNotes
+      })];
+    }
+    throw new Error('format inconnu');
+  }
+
+  function mergeLanguages(incoming){
+    incoming.forEach(imp => {
+      const local = state.languages.find(l => l.id === imp.id)
+                 || state.languages.find(l => normalize(l.name) === normalize(imp.name));
+      if(!local){ state.languages.push(imp); return; }
+      // Jour par jour, on garde la valeur la plus élevée : jamais de perte.
+      Object.keys(imp.sessions).forEach(k => {
+        const a = Number(local.sessions[k]) || 0;
+        const b = Number(imp.sessions[k]) || 0;
+        if(b > a) local.sessions[k] = b;
+      });
+      local.totalMinutes = sumSessions(local);
+      local.baseMinutes = Math.max(local.baseMinutes, imp.baseMinutes);
+      Object.keys(imp.levelNotes).forEach(k => {
+        if(!String(local.levelNotes[k] || '').trim()) local.levelNotes[k] = imp.levelNotes[k];
+      });
+      // Les réglages locaux (couleur, échelle, objectif, drapeau) sont conservés.
+    });
+  }
+
+  function daysSince(iso){
+    if(!iso) return null;
+    const t = Date.parse(iso);
+    if(isNaN(t)) return null;
+    return Math.floor((Date.now() - t) / 86400000);
+  }
+
+  function backupIsStale(){
+    const recorded = state.languages.reduce((t,l) => t + countDays(l), 0);
+    if(recorded < 15) return false;                     // pas encore assez à perdre
+    if(state.snoozeBackupUntil && todayISO() < state.snoozeBackupUntil) return false;
+    const d = daysSince(state.lastExportAt);
+    return d === null || d >= BACKUP_STALE_DAYS;
   }
 
   /* ================= Texte ================= */
@@ -1672,6 +1856,17 @@
           title="${goal > 0 ? (done ? 'Objectif atteint — appuyer pour remettre à zéro' : 'Marquer l\'objectif comme atteint') : 'Définir un objectif quotidien'}">${CHECK_SVG}</button>`;
       els.grid.appendChild(card);
     });
+
+    const banner = els.banner;
+    if(p.group === 0 && backupIsStale()){
+      const d = daysSince(state.lastExportAt);
+      banner.querySelector('.bn-text').textContent = d === null
+        ? 'Tes données ne sont sauvegardées nulle part. Faire une sauvegarde →'
+        : `Dernière sauvegarde il y a ${d} jours. En refaire une →`;
+      banner.hidden = false;
+    } else {
+      banner.hidden = true;
+    }
 
     const parts = [`<strong>${formatHoursMin(totalToday)}</strong> aujourd'hui`];
     if(withGoal) parts.push(`<strong>${doneCount}</strong> objectif${doneCount>1?'s':''} sur ${withGoal} atteint${doneCount>1?'s':''}`);
@@ -2181,6 +2376,18 @@
     const name = named ? named.dataset.el : '';
     if(name === 'prev'){ goPrev(); return; }
     if(name === 'next'){ goNext(); return; }
+    if(name === 'appSettings'){ openAppModal(); return; }
+
+    const bannerBtn = e.target.closest('.dash-banner [data-act]');
+    if(bannerBtn){
+      if(bannerBtn.dataset.act === 'backup'){ openAppModal(); }
+      else {
+        state.snoozeBackupUntil = toISODate(addDays(new Date(), 14));
+        saveData();
+        renderAllSlides();
+      }
+      return;
+    }
 
     // ----- Cartes du tableau de bord -----
     const dashCard = e.target.closest('.dash-card');
@@ -2424,6 +2631,138 @@
     measure();
     buildAllPages();
   }
+
+  /* ================= Réglages de l'appli ================= */
+  const appOverlay = document.getElementById('appOverlay');
+  const importInput = document.getElementById('importInput');
+  const importPreview = document.getElementById('importPreview');
+  const lastSaveLine = document.getElementById('lastSaveLine');
+  let pendingImport = null;
+
+  function updateSaveLine(){
+    const d = daysSince(state.lastExportAt);
+    if(d === null){
+      lastSaveLine.textContent = 'Aucune sauvegarde pour le moment.';
+      lastSaveLine.classList.add('warn');
+    } else {
+      const when = d === 0 ? "aujourd'hui" : (d === 1 ? 'hier' : `il y a ${d} jours`);
+      lastSaveLine.textContent = 'Dernière sauvegarde : ' + when + '.';
+      lastSaveLine.classList.toggle('warn', d >= BACKUP_STALE_DAYS);
+    }
+  }
+
+  function openAppModal(){
+    pendingImport = null;
+    importPreview.hidden = true;
+    importInput.value = '';
+    updateSaveLine();
+    updateInstallSection();
+    appOverlay.classList.add('open');
+  }
+  function closeAppModal(){ appOverlay.classList.remove('open'); }
+
+  document.getElementById('closeAppBtn').addEventListener('click', closeAppModal);
+  appOverlay.addEventListener('click', (e) => { if(e.target === appOverlay) closeAppModal(); });
+  document.getElementById('exportBtn').addEventListener('click', exportData);
+  document.getElementById('importBtn').addEventListener('click', () => importInput.click());
+
+  importInput.addEventListener('change', () => {
+    const file = importInput.files && importInput.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try{
+        const langs = parseBackup(String(reader.result));
+        if(!langs.length) throw new Error('vide');
+        pendingImport = langs;
+        const days = langs.reduce((t,l) => t + countDays(l), 0);
+        const hours = Math.round(langs.reduce((t,l) => t + l.baseMinutes + l.totalMinutes, 0) / 60);
+        document.getElementById('importSummary').innerHTML =
+          `Sauvegarde lue : <strong>${langs.length} langue${langs.length>1?'s':''}</strong> ` +
+          `(${langs.map(l => esc(langTitle(l.name))).join(', ')}), ` +
+          `<strong>${fmtInt(days)} jour${days>1?'s':''}</strong> enregistré${days>1?'s':''}, <strong>${fmtInt(hours)} h</strong> au total.<br><br>` +
+          `<em>Fusionner</em> ajoute les langues absentes et garde, pour chaque jour, la valeur la plus élevée des deux. ` +
+          `<em>Tout remplacer</em> efface ce qui est ici et met la sauvegarde à la place.`;
+        importPreview.hidden = false;
+      }catch(err){
+        pendingImport = null;
+        importPreview.hidden = true;
+        lastSaveLine.textContent = "Ce fichier n'est pas une sauvegarde lisible.";
+        lastSaveLine.classList.add('warn');
+      }
+      importInput.value = '';
+    };
+    reader.readAsText(file);
+  });
+
+  function finishImport(){
+    pendingImport = null;
+    importPreview.hidden = true;
+    activeIndex = 0;
+    activeSlide = 0;
+    saveData();
+    rebuildAll();
+    setActive(0);
+    updateSaveLine();
+    closeAppModal();
+  }
+
+  document.getElementById('importMergeBtn').addEventListener('click', () => {
+    if(!pendingImport) return;
+    mergeLanguages(pendingImport);
+    finishImport();
+  });
+  document.getElementById('importReplaceBtn').addEventListener('click', () => {
+    if(!pendingImport) return;
+    state.languages = pendingImport;
+    finishImport();
+  });
+  document.getElementById('importCancelBtn').addEventListener('click', () => {
+    pendingImport = null;
+    importPreview.hidden = true;
+    importInput.value = '';
+  });
+
+  /* ---- Installation sur l'écran d'accueil ---- */
+  let installPrompt = null;
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    installPrompt = e;
+    updateInstallSection();
+  });
+
+  function isStandalone(){
+    return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  }
+
+  function updateInstallSection(){
+    const section = document.getElementById('installSection');
+    const hint = document.getElementById('installHint');
+    const btn = document.getElementById('installBtn');
+    if(isStandalone()){
+      section.hidden = true;
+      return;
+    }
+    section.hidden = false;
+    if(installPrompt){
+      hint.textContent = "L'appli s'ouvrira en plein écran, avec sa propre icône, et fonctionnera hors ligne.";
+      btn.hidden = false;
+    } else {
+      btn.hidden = true;
+      const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      hint.textContent = iOS
+        ? "Sur iPhone : bouton Partager, puis « Sur l'écran d'accueil ». L'appli s'ouvrira en plein écran, sans barre d'adresse, et fonctionnera hors ligne."
+        : "Depuis le menu de ton navigateur : « Installer l'application » ou « Ajouter à l'écran d'accueil ». L'appli s'ouvrira en plein écran et fonctionnera hors ligne.";
+    }
+  }
+
+  document.getElementById('installBtn').addEventListener('click', async () => {
+    if(!installPrompt) return;
+    installPrompt.prompt();
+    await installPrompt.userChoice;
+    installPrompt = null;
+    updateInstallSection();
+  });
 
   /* ================= Choix du drapeau ================= */
   const flagOverlay = document.getElementById('flagOverlay');
@@ -2724,7 +3063,7 @@
   /* ================= Clavier ================= */
   document.addEventListener('keydown', (e) => {
     if(e.key === 'Escape'){
-      if(anyOverlayOpen()){ closeAddModal(); closeSettingsModal(); closeEditDayModal(); closeFlagPicker(); return; }
+      if(anyOverlayOpen()){ closeAddModal(); closeSettingsModal(); closeEditDayModal(); closeFlagPicker(); closeAppModal(); return; }
       if(levelScreen.classList.contains('open')){ closeLevelScreen(); return; }
       if(onNewPage){ closeNewScreen(); return; }
       return;
@@ -2763,6 +3102,13 @@
     if(!document.hidden) refreshIfNewDay();
   });
   window.addEventListener('focus', refreshIfNewDay);
+
+  /* ================= Service worker (hors ligne) ================= */
+  if('serviceWorker' in navigator && location.protocol.indexOf('http') === 0){
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js').catch(() => {});
+    });
+  }
 
   /* ================= Démarrage ================= */
   measure();
