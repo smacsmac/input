@@ -861,6 +861,118 @@
   .flag-opt .fl{ font-size: 24px; line-height: 1.1; }
   .flag-opt .cn{ font-size: 8.5px; font-weight: 700; color: var(--text-faint); text-align:center; line-height: 1.2; }
 
+  /* ---------- Planificateur ---------- */
+  .plan-screen{ overflow-y: auto; }
+  .plan-body{ width: 100%; max-width: 520px; margin: 0 auto; padding-bottom: 40px; }
+  .plan-intro{ color: var(--text-muted); font-size: 13.5px; line-height: 1.55; margin: 0 0 18px; text-align:center; }
+
+  .budget-card{
+    background: linear-gradient(165deg, var(--surface) 0%, var(--surface-2) 100%);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 18px;
+    margin-bottom: 16px;
+  }
+  .budget-row{ display:flex; align-items:center; justify-content:space-between; gap: 12px; }
+  .budget-label{ font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; color: var(--text-faint); }
+  .budget-val{ display:flex; align-items:baseline; gap: 6px; }
+  .budget-val input{
+    width: 78px; text-align: right;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: var(--font-display); font-size: 26px; font-weight: 600;
+    padding: 4px 8px; border-radius: 8px;
+    -moz-appearance: textfield;
+  }
+  .budget-val input::-webkit-outer-spin-button, .budget-val input::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
+  .budget-val input:focus-visible{ outline: 2px solid var(--coral); outline-offset: 1px; }
+  .budget-val span{ font-size: 12px; font-weight: 800; text-transform: uppercase; color: var(--text-faint); }
+  .budget-bar{ display:flex; height: 10px; border-radius: 99px; overflow:hidden; background: rgba(242,240,233,0.07); margin-top: 14px; }
+  .budget-bar i{ display:block; height: 100%; transition: width .18s ease; }
+  .budget-presets{ display:flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+
+  .plan-lang{
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 14px 16px 16px;
+    margin-bottom: 12px;
+  }
+  .plan-lang-head{ display:flex; align-items:center; gap: 10px; margin-bottom: 4px; }
+  .plan-flag{ font-size: 20px; line-height: 1; }
+  .plan-name{ font-family: var(--font-display); font-size: 16px; font-weight: 600; flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .plan-mins{ font-family: var(--font-display); font-size: 20px; font-weight: 600; color: var(--coral); font-variant-numeric: tabular-nums; }
+  .plan-mins small{ font-family: var(--font-body); font-size: 10px; font-weight: 800; text-transform: uppercase; color: var(--text-faint); margin-left: 3px; }
+
+  input[type="range"].plan-slider{
+    -webkit-appearance: none; appearance: none;
+    width: 100%; height: 26px; background: transparent; cursor: pointer; margin: 2px 0 6px;
+  }
+  input[type="range"].plan-slider::-webkit-slider-runnable-track{
+    height: 6px; border-radius: 99px; background: rgba(242,240,233,0.1);
+  }
+  input[type="range"].plan-slider::-moz-range-track{
+    height: 6px; border-radius: 99px; background: rgba(242,240,233,0.1);
+  }
+  input[type="range"].plan-slider::-webkit-slider-thumb{
+    -webkit-appearance: none; appearance: none;
+    width: 20px; height: 20px; border-radius: 50%;
+    background: var(--coral); border: 2px solid var(--bg);
+    margin-top: -7px;
+    box-shadow: 0 2px 8px -2px var(--coral-shadow);
+  }
+  input[type="range"].plan-slider::-moz-range-thumb{
+    width: 20px; height: 20px; border-radius: 50%;
+    background: var(--coral); border: 2px solid var(--bg);
+  }
+  input[type="range"].plan-slider:focus-visible{ outline: 2px solid var(--coral); outline-offset: 4px; }
+
+  .plan-out{ font-size: 12.5px; color: var(--text-muted); line-height: 1.55; }
+  .plan-out strong{ color: var(--text); font-weight: 700; }
+  .plan-delta{ font-weight: 800; }
+  .plan-delta.up{ color: var(--teal); }
+  .plan-delta.down{ color: var(--gold); }
+  .plan-goal-btn{
+    background: var(--surface-2); border: 1px solid var(--border);
+    color: var(--text-muted); font-family: var(--font-body);
+    font-size: 11.5px; font-weight: 700;
+    padding: 6px 11px; border-radius: 99px; cursor: pointer;
+    margin-top: 10px;
+  }
+  .plan-goal-btn:hover{ border-color: var(--coral); color: var(--coral); }
+  .plan-goal-btn:focus-visible{ outline: 2px solid var(--coral); outline-offset: 2px; }
+
+  .plan-cost{
+    background: var(--coral-dim);
+    border: 1px solid var(--coral-dim);
+    border-radius: var(--radius-md);
+    padding: 14px 16px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text-muted);
+    margin: 4px 0 18px;
+  }
+  .plan-cost strong{ color: var(--text); font-weight: 700; }
+  .plan-cost .none{ color: var(--text-faint); }
+
+  .dash-plan-btn{
+    display:flex; align-items:center; justify-content:center; gap: 8px;
+    width: 100%; max-width: 320px; margin: 22px auto 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    color: var(--text);
+    font-family: var(--font-body); font-weight: 700; font-size: 13.5px;
+    padding: 13px;
+    cursor: pointer;
+    animation: fadeSlideIn .6s .12s ease both;
+    transition: border-color .15s ease, transform .15s ease;
+  }
+  .dash-plan-btn:hover{ border-color: var(--coral); transform: translateY(-1px); }
+  .dash-plan-btn:focus-visible{ outline: 2px solid var(--coral); outline-offset: 2px; }
+  .dash-plan-btn svg{ width: 17px; height: 17px; color: var(--coral); }
+
   /* ---------- Calendrier ---------- */
   .cal-card{
     background: var(--surface);
@@ -1152,6 +1264,11 @@
       <div class="dash-grid" data-el="grid"></div>
       <p class="dash-summary" data-el="summary"></p>
 
+      <button type="button" class="dash-plan-btn" data-el="plan">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>
+        Répartir mes minutes
+      </button>
+
       <div class="dash-banner" data-el="banner" hidden>
         <button type="button" class="bn-text" data-act="backup"></button>
         <button type="button" class="bn-close" data-act="snooze" aria-label="Masquer ce rappel">×</button>
@@ -1328,6 +1445,58 @@
       </div>
       <p class="danger-note" id="lastLangNote" hidden>C'est ta seule langue : ajoute-en une autre avant de pouvoir la supprimer.</p>
     </div>
+  </div>
+</div>
+
+<!-- Planificateur -->
+<div class="screen plan-screen" id="planScreen">
+  <div class="screen-header">
+    <button class="icon-btn" id="planBackBtn" aria-label="Retour au tableau de bord">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+    </button>
+    <div class="screen-title"><span class="lst-name">Répartir mes minutes</span></div>
+    <div class="screen-spacer"></div>
+  </div>
+
+  <div class="plan-body">
+    <p class="plan-intro">Chaque minute donnée à une langue est prise à une autre. Déplace les curseurs : les dates de tes prochains niveaux bougent en direct.</p>
+
+    <div class="budget-card">
+      <div class="budget-row">
+        <span class="budget-label">Budget par jour</span>
+        <div class="budget-val">
+          <input type="number" id="planBudget" min="0" max="1440" inputmode="numeric">
+          <span>min</span>
+        </div>
+      </div>
+      <div class="budget-bar" id="planBar"></div>
+      <div class="budget-presets">
+        <button class="chip small" type="button" data-preset="real">Mon rythme réel</button>
+        <button class="chip small" type="button" data-preset="goals">Mes objectifs actuels</button>
+        <button class="chip small" type="button" data-preset="equal">Répartir également</button>
+      </div>
+    </div>
+
+    <div id="planList"></div>
+
+    <div class="plan-cost" id="planCost"></div>
+
+    <button class="btn-primary" id="planApplyBtn">Appliquer comme objectifs quotidiens</button>
+    <button class="btn-text" id="planResetBtn">Revenir au point de départ</button>
+  </div>
+</div>
+
+<!-- Objectif inverse -->
+<div class="overlay" id="reverseOverlay">
+  <div class="modal">
+    <h2>Viser une date<span class="modal-lang" id="reverseLang"></span></h2>
+    <span class="field-label">Quel niveau veux-tu atteindre ?</span>
+    <div class="seg" id="reverseLevelSeg" style="margin-bottom:18px; flex-wrap:wrap"></div>
+    <span class="field-label">Avant quelle date ?</span>
+    <input type="date" class="date-input" id="reverseDate">
+    <p class="plan-cost" id="reverseResult" style="margin-bottom:18px"></p>
+    <button class="btn-primary" id="reverseApplyBtn">Régler le curseur là-dessus</button>
+    <button class="btn-text" id="reverseCancelBtn">Annuler</button>
   </div>
 </div>
 
@@ -2416,6 +2585,7 @@
   function swipeBlocked(target){
     if(anyOverlayOpen()) return true;
     if(levelScreen.classList.contains('open')) return true;
+    if(planOpen) return true;
     if(!target || !target.closest) return false;
     if(target.closest('.levels-scroll')) return true;
     if(target.closest('input, textarea, select')) return true;
@@ -2523,6 +2693,7 @@
     if(name === 'prev'){ goPrev(); return; }
     if(name === 'next'){ goNext(); return; }
     if(name === 'appSettings'){ openAppModal(); return; }
+    if(name === 'plan'){ openPlanner(); return; }
 
     const bannerBtn = e.target.closest('.dash-banner [data-act]');
     if(bannerBtn){
@@ -2786,6 +2957,317 @@
     measure();
     buildAllPages();
   }
+
+  /* ================= Planificateur d'arbitrage ================= */
+  const planScreen = document.getElementById('planScreen');
+  const planList = document.getElementById('planList');
+  const planBudgetInput = document.getElementById('planBudget');
+  const planBar = document.getElementById('planBar');
+  const planCost = document.getElementById('planCost');
+  let planOpen = false;
+  let planMins = [];        // minutes/jour par langue, dans l'ordre de state.languages
+  let planBaseline = [];    // point de départ, pour mesurer le coût d'un choix
+  let planBudget = 0;
+
+  // Rythme réel des 30 derniers jours, en minutes par jour.
+  function realPace(lang){ return sumMinutesInWindow(lang, 30) / 30; }
+
+  function planPresetValues(kind){
+    const langs = state.languages;
+    if(kind === 'goals'){
+      const v = langs.map(l => l.dailyGoalMinutes || 0);
+      if(v.some(x => x > 0)) return v;
+    }
+    if(kind === 'real'){
+      const v = langs.map(l => Math.round(realPace(l)));
+      if(v.some(x => x > 0)) return v;
+    }
+    const each = Math.round((planBudget || 60) / langs.length);
+    return langs.map(() => each);
+  }
+
+  function roundTo5(x){ return Math.max(0, Math.round(x / 5) * 5); }
+  // Pour un minimum requis, on arrondit vers le haut : sinon on vise juste en dessous.
+  function ceilTo5(x){ return Math.max(0, Math.ceil(x / 5) * 5); }
+
+  // Le budget est fixe : ce qu'on donne à une langue est repris aux autres,
+  // au prorata de ce qu'elles ont déjà.
+  function redistribute(changedIdx){
+    const others = planMins.map((v,i) => i === changedIdx ? 0 : v);
+    const rest = planBudget - planMins[changedIdx];
+    const sumOthers = others.reduce((a,b) => a+b, 0);
+    if(rest <= 0){
+      planMins = planMins.map((v,i) => i === changedIdx ? Math.min(v, planBudget) : 0);
+      return;
+    }
+    if(sumOthers === 0){
+      const n = planMins.length - 1;
+      if(n > 0){
+        const each = Math.floor(rest / n);
+        planMins = planMins.map((v,i) => i === changedIdx ? v : each);
+      }
+      return;
+    }
+    planMins = planMins.map((v,i) => i === changedIdx ? v : Math.round(rest * (v / sumOthers)));
+    // On recale l'arrondi sur la plus grosse des autres langues.
+    const drift = planBudget - planMins.reduce((a,b) => a+b, 0);
+    if(drift !== 0){
+      let target = -1, bestV = -1;
+      planMins.forEach((v,i) => { if(i !== changedIdx && v > bestV){ bestV = v; target = i; } });
+      if(target >= 0) planMins[target] = Math.max(0, planMins[target] + drift);
+    }
+  }
+
+  // Date d'arrivée au niveau suivant pour un rythme donné (minutes/jour).
+  function projectNext(lang, minutesPerDay){
+    const totalHours = grandTotal(lang)/60;
+    const idx = getLevelIndex(lang, totalHours);
+    const next = LEVELS[idx+1];
+    if(!next) return { maxed:true };
+    const remaining = Math.max(0, levelHours(lang, idx+1) - totalHours);
+    if(minutesPerDay <= 0) return { maxed:false, next, nextHours: levelHours(lang, idx+1), days:null };
+    const days = Math.ceil(remaining / (minutesPerDay/60));
+    return { maxed:false, next, nextHours: levelHours(lang, idx+1), days, date: addDays(new Date(), days) };
+  }
+
+  function renderPlan(){
+    const langs = state.languages;
+
+    // Barre du budget, un segment par langue dans sa couleur.
+    const total = planMins.reduce((a,b) => a+b, 0) || 1;
+    planBar.innerHTML = langs.map((l,i) =>
+      `<i style="width:${(planMins[i]/total*100).toFixed(1)}%; background:${themeById(l.theme).accent}"></i>`).join('');
+
+    planList.innerHTML = '';
+    langs.forEach((lang, i) => {
+      const row = document.createElement('div');
+      row.className = 'plan-lang';
+      applyThemeTo(row, lang.theme);
+      row.dataset.lang = String(i);
+
+      const p = projectNext(lang, planMins[i]);
+      const base = projectNext(lang, planBaseline[i]);
+      let out;
+      if(p.maxed){
+        out = 'Niveau maximum déjà atteint 🎉';
+      } else if(p.days === null){
+        out = `<strong>Niveau ${p.next.n}</strong> jamais atteint à ce rythme.`;
+      } else {
+        let delta = '';
+        if(base.days !== null && base.days !== undefined && p.days !== base.days){
+          const diff = p.days - base.days;
+          const cls = diff < 0 ? 'up' : 'down';
+          delta = ` <span class="plan-delta ${cls}">(${diff < 0 ? '−' : '+'}${fmtInt(Math.abs(diff))} j)</span>`;
+        }
+        out = `<strong>Niveau ${p.next.n}</strong> le ${formatDateFr(p.date)} · dans ${fmtInt(p.days)} jour${p.days>1?'s':''}${delta}`;
+      }
+
+      row.innerHTML = `
+        <div class="plan-lang-head">
+          <span class="plan-flag">${lang.flag ? esc(lang.flag) : ''}</span>
+          <span class="plan-name">${esc(langTitle(lang.name))}</span>
+          <span class="plan-mins">${planMins[i]}<small>min</small></span>
+        </div>
+        <input type="range" class="plan-slider" min="0" max="${Math.max(planBudget, planMins[i], 5)}" step="5" value="${planMins[i]}" data-idx="${i}" aria-label="Minutes par jour pour ${esc(langTitle(lang.name))}">
+        <div class="plan-out">${out}</div>
+        <button type="button" class="plan-goal-btn" data-reverse="${i}">Viser une date…</button>`;
+      planList.appendChild(row);
+    });
+
+    renderPlanCost();
+  }
+
+  function renderPlanCost(){
+    const langs = state.languages;
+    const moved = [];
+    langs.forEach((lang, i) => {
+      const d = planMins[i] - planBaseline[i];
+      if(Math.abs(d) < 1) return;
+      const p = projectNext(lang, planMins[i]);
+      const b = projectNext(lang, planBaseline[i]);
+      if(p.maxed || b.maxed) return;
+      const shift = (p.days === null || b.days === null) ? null : (p.days - b.days);
+      moved.push({ name: langTitle(lang.name), d, shift, level: p.next ? p.next.n : null });
+    });
+
+    if(!moved.length){
+      planCost.innerHTML = '<span class="none">Déplace un curseur pour voir ce que ce choix coûte aux autres langues.</span>';
+      return;
+    }
+    planCost.innerHTML = moved.map(m => {
+      const sign = m.d > 0 ? '+' : '−';
+      const mins = `${sign}${fmtInt(Math.abs(Math.round(m.d)))} min/j en <strong>${esc(m.name)}</strong>`;
+      if(m.shift === null) return `${mins} : niveau ${m.level} hors d'atteinte.`;
+      if(m.shift === 0) return `${mins} : aucun changement de date.`;
+      return m.shift < 0
+        ? `${mins} → niveau ${m.level} atteint <strong>${fmtInt(-m.shift)} jours plus tôt</strong>.`
+        : `${mins} → niveau ${m.level} repoussé de <strong>${fmtInt(m.shift)} jours</strong>.`;
+    }).join('<br>');
+  }
+
+  function openPlanner(){
+    if(planOpen) return;
+    planOpen = true;
+    const langs = state.languages;
+    planMins = planPresetValues('goals').map(roundTo5);
+    planBudget = planMins.reduce((a,b) => a+b, 0);
+    if(planBudget <= 0){
+      planMins = planPresetValues('real').map(roundTo5);
+      planBudget = planMins.reduce((a,b) => a+b, 0);
+    }
+    if(planBudget <= 0){
+      planBudget = 60;
+      const each = roundTo5(60 / langs.length);
+      planMins = langs.map(() => each);
+      planBudget = planMins.reduce((a,b) => a+b, 0);
+    }
+    planBaseline = planMins.slice();
+    planBudgetInput.value = planBudget;
+    renderPlan();
+    planScreen.classList.add('open');
+  }
+  function closePlanner(){
+    if(!planOpen) return;
+    planOpen = false;
+    planScreen.classList.remove('open');
+  }
+
+  document.getElementById('planBackBtn').addEventListener('click', closePlanner);
+
+  planList.addEventListener('input', (e) => {
+    const slider = e.target.closest('.plan-slider');
+    if(!slider) return;
+    const i = Number(slider.dataset.idx);
+    planMins[i] = roundTo5(Number(slider.value));
+    redistribute(i);
+    renderPlan();
+  });
+
+  planList.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-reverse]');
+    if(!btn) return;
+    openReverse(Number(btn.dataset.reverse));
+  });
+
+  planBudgetInput.addEventListener('input', () => {
+    const v = Math.max(0, Math.min(1440, Math.round(Number(planBudgetInput.value) || 0)));
+    const old = planMins.reduce((a,b) => a+b, 0);
+    planBudget = v;
+    if(old > 0){
+      planMins = planMins.map(x => roundTo5(x * v / old));   // on garde les proportions
+    } else if(state.languages.length){
+      const each = roundTo5(v / state.languages.length);
+      planMins = state.languages.map(() => each);
+    }
+    renderPlan();
+  });
+
+  document.querySelector('.budget-presets').addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-preset]');
+    if(!btn) return;
+    planMins = planPresetValues(btn.dataset.preset).map(roundTo5);
+    planBudget = planMins.reduce((a,b) => a+b, 0);
+    planBudgetInput.value = planBudget;
+    renderPlan();
+  });
+
+  document.getElementById('planResetBtn').addEventListener('click', () => {
+    planMins = planBaseline.slice();
+    planBudget = planMins.reduce((a,b) => a+b, 0);
+    planBudgetInput.value = planBudget;
+    renderPlan();
+  });
+
+  document.getElementById('planApplyBtn').addEventListener('click', () => {
+    state.languages.forEach((lang, i) => { lang.dailyGoalMinutes = Math.max(0, Math.round(planMins[i])); });
+    saveData();
+    planBaseline = planMins.slice();
+    closePlanner();
+    renderAllSlides();
+  });
+
+  /* ---- Question inverse : viser une date ---- */
+  const reverseOverlay = document.getElementById('reverseOverlay');
+  const reverseDate = document.getElementById('reverseDate');
+  const reverseResult = document.getElementById('reverseResult');
+  let reverseIdx = -1, reverseLevel = 0, reverseNeeded = 0;
+
+  function openReverse(i){
+    reverseIdx = i;
+    const lang = state.languages[i];
+    document.getElementById('reverseLang').textContent = langTitle(lang.name);
+    applyThemeTo(document.documentElement, lang.theme);
+
+    const cur = getLevelIndex(lang, grandTotal(lang)/60);
+    const seg = document.getElementById('reverseLevelSeg');
+    seg.innerHTML = '';
+    for(let k = cur+1; k < LEVELS.length; k++){
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.dataset.level = String(k);
+      b.textContent = 'Niv. ' + LEVELS[k].n;
+      seg.appendChild(b);
+    }
+    if(!seg.children.length){
+      reverseResult.innerHTML = 'Niveau maximum déjà atteint 🎉';
+      reverseLevel = -1;
+    } else {
+      reverseLevel = cur + 1;
+      seg.children[0].classList.add('active');
+    }
+    const d = addDays(new Date(), 365);
+    reverseDate.value = toISODate(d);
+    reverseDate.min = toISODate(addDays(new Date(), 1));
+    computeReverse();
+    reverseOverlay.classList.add('open');
+  }
+  function closeReverse(){
+    reverseOverlay.classList.remove('open');
+    reverseIdx = -1;
+    restoreSlideTheme();
+  }
+
+  function computeReverse(){
+    if(reverseIdx < 0 || reverseLevel < 0) return;
+    const lang = state.languages[reverseIdx];
+    const target = levelHours(lang, reverseLevel);
+    const remaining = Math.max(0, target - grandTotal(lang)/60);
+    const [y,m,d] = reverseDate.value.split('-').map(Number);
+    const days = Math.max(1, Math.round((new Date(y, m-1, d) - new Date()) / 86400000));
+    reverseNeeded = Math.ceil(remaining * 60 / days);
+    const share = planBudget > 0 ? Math.round(reverseNeeded / planBudget * 100) : 0;
+    reverseResult.innerHTML = remaining <= 0
+      ? 'Niveau déjà atteint 🎉'
+      : `Il te faut <strong>${fmtInt(reverseNeeded)} min par jour</strong> pendant ${fmtInt(days)} jours ` +
+        `(${fmtInt(Math.round(remaining))} h à faire).` +
+        (planBudget > 0 ? `<br>C'est <strong>${fmtInt(share)} %</strong> de ton budget de ${fmtInt(planBudget)} min.` : '');
+  }
+
+  document.getElementById('reverseLevelSeg').addEventListener('click', (e) => {
+    const b = e.target.closest('button');
+    if(!b) return;
+    reverseLevel = Number(b.dataset.level);
+    document.querySelectorAll('#reverseLevelSeg button').forEach(x => x.classList.toggle('active', x === b));
+    computeReverse();
+  });
+  reverseDate.addEventListener('change', computeReverse);
+  reverseDate.addEventListener('input', computeReverse);
+  document.getElementById('reverseCancelBtn').addEventListener('click', closeReverse);
+  reverseOverlay.addEventListener('click', (e) => { if(e.target === reverseOverlay) closeReverse(); });
+
+  document.getElementById('reverseApplyBtn').addEventListener('click', () => {
+    if(reverseIdx < 0 || reverseLevel < 0) return;
+    const i = reverseIdx;
+    const need = ceilTo5(reverseNeeded);
+    if(need > planBudget){                   // le budget doit suivre
+      planBudget = need;
+      planBudgetInput.value = planBudget;
+    }
+    planMins[i] = need;
+    redistribute(i);
+    closeReverse();
+    renderPlan();
+  });
 
   /* ================= Réglages de l'appli ================= */
   const appOverlay = document.getElementById('appOverlay');
@@ -3220,12 +3702,13 @@
     if(e.key === 'Escape'){
       if(anyOverlayOpen()){ closeAddModal(); closeSettingsModal(); closeEditDayModal(); closeFlagPicker(); closeAppModal(); return; }
       if(levelScreen.classList.contains('open')){ closeLevelScreen(); return; }
+      if(planOpen){ closePlanner(); return; }
       if(onNewPage){ closeNewScreen(); return; }
       return;
     }
     if(e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
     if(e.metaKey || e.ctrlKey || e.altKey) return;
-    if(anyOverlayOpen() || levelScreen.classList.contains('open') || onNewPage) return;
+    if(anyOverlayOpen() || levelScreen.classList.contains('open') || onNewPage || planOpen) return;
     const t = e.target;
     if(t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
     e.preventDefault();
