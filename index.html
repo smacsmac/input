@@ -891,6 +891,10 @@
   .budget-bar{ display:flex; height: 10px; border-radius: 99px; overflow:hidden; background: rgba(242,240,233,0.07); margin-top: 14px; }
   .budget-bar i{ display:block; height: 100%; transition: width .18s ease; }
   .budget-presets{ display:flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+  .plan-warn{
+    font-size: 12px; font-weight: 700; color: var(--gold);
+    line-height: 1.5; margin: 10px 0 0;
+  }
 
   .plan-lang{
     background: var(--surface);
@@ -905,10 +909,28 @@
   .plan-mins{ font-family: var(--font-display); font-size: 20px; font-weight: 600; color: var(--coral); font-variant-numeric: tabular-nums; }
   .plan-mins small{ font-family: var(--font-body); font-size: 10px; font-weight: 800; text-transform: uppercase; color: var(--text-faint); margin-left: 3px; }
 
+  .plan-lock{
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--text-faint);
+    width: 32px; height: 32px; border-radius: 50%;
+    display:flex; align-items:center; justify-content:center;
+    cursor: pointer; flex-shrink: 0;
+    transition: all .15s ease;
+  }
+  .plan-lock svg{ width: 15px; height: 15px; }
+  .plan-lock:hover{ color: var(--text); border-color: rgba(242,240,233,0.25); }
+  .plan-lock:focus-visible{ outline: 2px solid var(--coral); outline-offset: 2px; }
+  .plan-lang.locked .plan-lock{ background: var(--coral-dim); border-color: var(--coral); color: var(--coral); }
+  .plan-lang.locked{ border-color: var(--coral-dim); }
+  .plan-lang.locked .plan-out{ opacity: .75; }
+
   input[type="range"].plan-slider{
     -webkit-appearance: none; appearance: none;
     width: 100%; height: 26px; background: transparent; cursor: pointer; margin: 2px 0 6px;
+    touch-action: none;          /* le geste appartient au curseur, pas au défilement */
   }
+  input[type="range"].plan-slider:disabled{ opacity: .45; cursor: default; }
   input[type="range"].plan-slider::-webkit-slider-runnable-track{
     height: 6px; border-radius: 99px; background: rgba(242,240,233,0.1);
   }
@@ -1470,6 +1492,7 @@
         </div>
       </div>
       <div class="budget-bar" id="planBar"></div>
+      <p class="plan-warn" id="planWarn" hidden></p>
       <div class="budget-presets">
         <button class="chip small" type="button" data-preset="real">Mon rythme réel</button>
         <button class="chip small" type="button" data-preset="goals">Mes objectifs actuels</button>
@@ -2967,7 +2990,19 @@
   let planOpen = false;
   let planMins = [];        // minutes/jour par langue, dans l'ordre de state.languages
   let planBaseline = [];    // point de départ, pour mesurer le coût d'un choix
+  let planLocked = [];      // langues figées : la redistribution ne les touche pas
+  let planRows = [];        // lignes construites une fois, mises à jour en place
   let planBudget = 0;
+
+  const LOCK_OPEN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path></svg>';
+  const LOCK_SHUT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>';
+
+  function lockedSumExcept(idx){
+    return planMins.reduce((t,v,i) => (i !== idx && planLocked[i]) ? t + v : t, 0);
+  }
+  function freeIndexes(idx){
+    return planMins.map((_,i) => i).filter(i => i !== idx && !planLocked[i]);
+  }
 
   // Rythme réel des 30 derniers jours, en minutes par jour.
   function realPace(lang){ return sumMinutesInWindow(lang, 30) / 30; }
@@ -2991,31 +3026,36 @@
   function ceilTo5(x){ return Math.max(0, Math.ceil(x / 5) * 5); }
 
   // Le budget est fixe : ce qu'on donne à une langue est repris aux autres,
-  // au prorata de ce qu'elles ont déjà.
+  // au prorata de ce qu'elles ont déjà. Les langues verrouillées ne bougent pas.
   function redistribute(changedIdx){
-    const others = planMins.map((v,i) => i === changedIdx ? 0 : v);
-    const rest = planBudget - planMins[changedIdx];
-    const sumOthers = others.reduce((a,b) => a+b, 0);
+    const locked = lockedSumExcept(changedIdx);
+    const pool = freeIndexes(changedIdx);
+    const available = Math.max(0, planBudget - locked);          // pour la langue tirée + les libres
+    if(planMins[changedIdx] > available) planMins[changedIdx] = available;
+    if(!pool.length) return;                                     // tout le reste est verrouillé
+
+    const rest = available - planMins[changedIdx];
+    const sumPool = pool.reduce((t,i) => t + planMins[i], 0);
     if(rest <= 0){
-      planMins = planMins.map((v,i) => i === changedIdx ? Math.min(v, planBudget) : 0);
-      return;
+      pool.forEach(i => { planMins[i] = 0; });
+    } else if(sumPool === 0){
+      const each = Math.floor(rest / pool.length);
+      pool.forEach(i => { planMins[i] = each; });
+    } else {
+      pool.forEach(i => { planMins[i] = Math.round(rest * planMins[i] / sumPool); });
     }
-    if(sumOthers === 0){
-      const n = planMins.length - 1;
-      if(n > 0){
-        const each = Math.floor(rest / n);
-        planMins = planMins.map((v,i) => i === changedIdx ? v : each);
-      }
-      return;
-    }
-    planMins = planMins.map((v,i) => i === changedIdx ? v : Math.round(rest * (v / sumOthers)));
-    // On recale l'arrondi sur la plus grosse des autres langues.
+    // On recale l'arrondi sur la plus grosse des langues libres.
     const drift = planBudget - planMins.reduce((a,b) => a+b, 0);
     if(drift !== 0){
-      let target = -1, bestV = -1;
-      planMins.forEach((v,i) => { if(i !== changedIdx && v > bestV){ bestV = v; target = i; } });
-      if(target >= 0) planMins[target] = Math.max(0, planMins[target] + drift);
+      let target = pool[0], best = -1;
+      pool.forEach(i => { if(planMins[i] > best){ best = planMins[i]; target = i; } });
+      planMins[target] = Math.max(0, planMins[target] + drift);
     }
+  }
+
+  // Le maximum atteignable par une langue : le budget moins ce qui est figé ailleurs.
+  function sliderMax(i){
+    return Math.max(planMins[i], planBudget - lockedSumExcept(i), 5);
   }
 
   // Date d'arrivée au niveau suivant pour un rythme donné (minutes/jour).
@@ -3030,48 +3070,97 @@
     return { maxed:false, next, nextHours: levelHours(lang, idx+1), days, date: addDays(new Date(), days) };
   }
 
-  function renderPlan(){
-    const langs = state.languages;
-
-    // Barre du budget, un segment par langue dans sa couleur.
-    const total = planMins.reduce((a,b) => a+b, 0) || 1;
-    planBar.innerHTML = langs.map((l,i) =>
-      `<i style="width:${(planMins[i]/total*100).toFixed(1)}%; background:${themeById(l.theme).accent}"></i>`).join('');
-
+  // Les lignes sont créées une seule fois : reconstruire le HTML à chaque
+  // mouvement détruisait le curseur en cours de glissement (et baladait le focus).
+  function buildPlanRows(){
     planList.innerHTML = '';
-    langs.forEach((lang, i) => {
+    planRows = state.languages.map((lang, i) => {
       const row = document.createElement('div');
       row.className = 'plan-lang';
       applyThemeTo(row, lang.theme);
       row.dataset.lang = String(i);
-
-      const p = projectNext(lang, planMins[i]);
-      const base = projectNext(lang, planBaseline[i]);
-      let out;
-      if(p.maxed){
-        out = 'Niveau maximum déjà atteint 🎉';
-      } else if(p.days === null){
-        out = `<strong>Niveau ${p.next.n}</strong> jamais atteint à ce rythme.`;
-      } else {
-        let delta = '';
-        if(base.days !== null && base.days !== undefined && p.days !== base.days){
-          const diff = p.days - base.days;
-          const cls = diff < 0 ? 'up' : 'down';
-          delta = ` <span class="plan-delta ${cls}">(${diff < 0 ? '−' : '+'}${fmtInt(Math.abs(diff))} j)</span>`;
-        }
-        out = `<strong>Niveau ${p.next.n}</strong> le ${formatDateFr(p.date)} · dans ${fmtInt(p.days)} jour${p.days>1?'s':''}${delta}`;
-      }
-
       row.innerHTML = `
         <div class="plan-lang-head">
           <span class="plan-flag">${lang.flag ? esc(lang.flag) : ''}</span>
           <span class="plan-name">${esc(langTitle(lang.name))}</span>
-          <span class="plan-mins">${planMins[i]}<small>min</small></span>
+          <span class="plan-mins"></span>
+          <button type="button" class="plan-lock" data-lock="${i}" aria-pressed="false"></button>
         </div>
-        <input type="range" class="plan-slider" min="0" max="${Math.max(planBudget, planMins[i], 5)}" step="5" value="${planMins[i]}" data-idx="${i}" aria-label="Minutes par jour pour ${esc(langTitle(lang.name))}">
-        <div class="plan-out">${out}</div>
+        <input type="range" class="plan-slider" min="0" step="5" data-idx="${i}" aria-label="Minutes par jour pour ${esc(langTitle(lang.name))}">
+        <div class="plan-out"></div>
         <button type="button" class="plan-goal-btn" data-reverse="${i}">Viser une date…</button>`;
       planList.appendChild(row);
+      return {
+        el: row,
+        mins: row.querySelector('.plan-mins'),
+        slider: row.querySelector('.plan-slider'),
+        out: row.querySelector('.plan-out'),
+        lock: row.querySelector('.plan-lock')
+      };
+    });
+  }
+
+  function renderPlan(){
+    const langs = state.languages;
+
+    // Barre du budget, un segment par langue dans sa couleur.
+    const sum = planMins.reduce((a,b) => a+b, 0);
+    const total = sum || 1;
+    planBar.innerHTML = langs.map((l,i) =>
+      `<i style="width:${(planMins[i]/total*100).toFixed(1)}%; background:${themeById(l.theme).accent}"></i>`).join('');
+
+    // Un curseur qui ne bouge pas mérite une explication.
+    const lockedSum = planMins.reduce((t,v,i) => planLocked[i] ? t + v : t, 0);
+    const anyLock = planLocked.some(Boolean);
+    const warn = document.getElementById('planWarn');
+    const freeIdx = planLocked.map((l,i) => l ? -1 : i).filter(i => i >= 0);
+    const freeSum = freeIdx.reduce((t,i) => t + planMins[i], 0);
+    const room = planBudget - lockedSum;     // ce qui reste aux langues libres
+    if(anyLock && lockedSum > planBudget){
+      warn.textContent = `Tes langues figées demandent déjà ${fmtInt(lockedSum)} min : c'est au-dessus du budget.`;
+      warn.hidden = false;
+    } else if(anyLock && freeIdx.length === 0){
+      warn.textContent = 'Toutes les langues sont figées : déverrouilles-en une pour pouvoir répartir.';
+      warn.hidden = false;
+    } else if(anyLock && freeIdx.length === 1 && freeSum >= room){
+      // Avec une seule langue libre déjà au plafond, tirer son curseur ne ferait rien.
+      warn.textContent = 'Une seule langue est libre, et elle a déjà tout le budget restant : déverrouilles-en une autre ou augmente le budget.';
+      warn.hidden = false;
+    } else {
+      warn.hidden = true;
+    }
+
+    langs.forEach((lang, i) => {
+      const r = planRows[i];
+      if(!r) return;
+      const locked = !!planLocked[i];
+
+      r.mins.innerHTML = `${planMins[i]}<small>min</small>`;
+      r.el.classList.toggle('locked', locked);
+      r.lock.innerHTML = locked ? LOCK_SHUT : LOCK_OPEN;
+      r.lock.setAttribute('aria-pressed', locked ? 'true' : 'false');
+      r.lock.title = locked ? 'Déverrouiller cette langue' : 'Figer cette langue';
+      r.lock.setAttribute('aria-label', (locked ? 'Déverrouiller ' : 'Figer ') + langTitle(lang.name));
+
+      const max = sliderMax(i);
+      if(Number(r.slider.max) !== max) r.slider.max = String(max);
+      if(Number(r.slider.value) !== planMins[i]) r.slider.value = String(planMins[i]);
+      r.slider.disabled = locked;
+
+      const p = projectNext(lang, planMins[i]);
+      const base = projectNext(lang, planBaseline[i]);
+      if(p.maxed){
+        r.out.innerHTML = 'Niveau maximum déjà atteint 🎉';
+      } else if(p.days === null){
+        r.out.innerHTML = `<strong>Niveau ${p.next.n}</strong> jamais atteint à ce rythme.`;
+      } else {
+        let delta = '';
+        if(base.days !== null && base.days !== undefined && p.days !== base.days){
+          const diff = p.days - base.days;
+          delta = ` <span class="plan-delta ${diff < 0 ? 'up' : 'down'}">(${diff < 0 ? '−' : '+'}${fmtInt(Math.abs(diff))} j)</span>`;
+        }
+        r.out.innerHTML = `<strong>Niveau ${p.next.n}</strong> le ${formatDateFr(p.date)} · dans ${fmtInt(p.days)} jour${p.days>1?'s':''}${delta}`;
+      }
     });
 
     renderPlanCost();
@@ -3122,7 +3211,9 @@
       planBudget = planMins.reduce((a,b) => a+b, 0);
     }
     planBaseline = planMins.slice();
+    planLocked = langs.map(() => false);
     planBudgetInput.value = planBudget;
+    buildPlanRows();
     renderPlan();
     planScreen.classList.add('open');
   }
@@ -3144,20 +3235,36 @@
   });
 
   planList.addEventListener('click', (e) => {
+    const lock = e.target.closest('[data-lock]');
+    if(lock){
+      const i = Number(lock.dataset.lock);
+      planLocked[i] = !planLocked[i];
+      renderPlan();
+      return;
+    }
     const btn = e.target.closest('[data-reverse]');
     if(!btn) return;
     openReverse(Number(btn.dataset.reverse));
   });
 
+  // Toucher un curseur referme le clavier du champ « budget » s'il est ouvert.
+  ['touchstart','pointerdown'].forEach(evt => {
+    planList.addEventListener(evt, (e) => {
+      if(!e.target.closest('.plan-slider, .plan-lock')) return;
+      if(document.activeElement === planBudgetInput) planBudgetInput.blur();
+    }, { passive: true });
+  });
+
   planBudgetInput.addEventListener('input', () => {
     const v = Math.max(0, Math.min(1440, Math.round(Number(planBudgetInput.value) || 0)));
-    const old = planMins.reduce((a,b) => a+b, 0);
-    planBudget = v;
-    if(old > 0){
-      planMins = planMins.map(x => roundTo5(x * v / old));   // on garde les proportions
-    } else if(state.languages.length){
-      const each = roundTo5(v / state.languages.length);
-      planMins = state.languages.map(() => each);
+    const locked = planMins.reduce((t,x,i) => planLocked[i] ? t + x : t, 0);
+    const pool = planMins.map((_,i) => i).filter(i => !planLocked[i]);
+    planBudget = v;                            // on garde ce qui est tapé, et on le dit si ça coince
+    const free = Math.max(0, planBudget - locked);
+    const oldFree = pool.reduce((t,i) => t + planMins[i], 0);
+    if(pool.length){
+      if(oldFree > 0) pool.forEach(i => { planMins[i] = roundTo5(planMins[i] * free / oldFree); });
+      else { const each = roundTo5(free / pool.length); pool.forEach(i => { planMins[i] = each; }); }
     }
     renderPlan();
   });
@@ -3165,7 +3272,8 @@
   document.querySelector('.budget-presets').addEventListener('click', (e) => {
     const btn = e.target.closest('[data-preset]');
     if(!btn) return;
-    planMins = planPresetValues(btn.dataset.preset).map(roundTo5);
+    const vals = planPresetValues(btn.dataset.preset).map(roundTo5);
+    planMins = planMins.map((v,i) => planLocked[i] ? v : vals[i]);
     planBudget = planMins.reduce((a,b) => a+b, 0);
     planBudgetInput.value = planBudget;
     renderPlan();
@@ -3173,6 +3281,7 @@
 
   document.getElementById('planResetBtn').addEventListener('click', () => {
     planMins = planBaseline.slice();
+    planLocked = planMins.map(() => false);
     planBudget = planMins.reduce((a,b) => a+b, 0);
     planBudgetInput.value = planBudget;
     renderPlan();
