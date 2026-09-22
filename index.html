@@ -2543,11 +2543,10 @@
     // Le bouton d'ajout rapide n'a pas de langue cible sur un tableau de bord.
     fabBtn.hidden = !(sl && sl.kind === 'lang');
     updateActiveDot();
-    if(typeof syncSentinel === 'function') syncSentinel();
     saveData();
   }
 
-  function goTo(target, dir, animate){
+  function goTo(target, dir, animate, silent){
     const n = slides.length;
     if(target < 0 || target >= n) return;
     closeNewScreen(true);
@@ -2556,7 +2555,11 @@
     const destX = isWrap ? -(activeSlide + dir) * W : -target * W;
     const same = (target === activeSlide);
 
-    if(target !== activeSlide) setActive(target);
+    if(target !== activeSlide){
+      // « silent » : on revient en arrière, il ne faut pas réempiler l'étape.
+      if(!silent) navPush({ t:'slide', from: activeSlide });
+      setActive(target);
+    }
 
     if(!animate || !MOTION_OK || (same && !isWrap)){
       clearWrapOffset();
@@ -3809,73 +3812,86 @@
 
   /* ================= Retour arrière (bouton du système) ================= */
   // Installée en écran d'accueil, l'appli n'a pas d'historique : le bouton
-  // retour d'Android la quitte. On lui en donne un.
-  //
-  // Une seule entrée sentinelle est maintenue tant qu'il y a quelque chose à
-  // fermer (une fenêtre, un écran) ou qu'on a quitté le tableau de bord. Un
-  // appui sur « retour » la consomme, ferme la couche du dessus, et la
-  // sentinelle est reposée s'il reste quelque chose. Depuis le tableau de bord
-  // sans rien d'ouvert, le retour quitte l'appli comme avant.
-  let sentinelOn = false, suppressPop = 0;
+  // retour d'Android la quitte. On lui en fabrique un, une entrée par étape —
+  // chaque page visitée, chaque fenêtre ouverte. Un retour défait exactement
+  // une étape ; depuis le tableau de bord sans rien d'ouvert, il quitte l'appli.
+  let navStack = [];
 
-  function needsSentinel(){
-    return anyOverlayOpen()
-        || levelScreen.classList.contains('open')
-        || planOpen
-        || onNewPage
-        || activeSlide !== 0;
-  }
-
-  function syncSentinel(){
-    const need = needsSentinel();
-    if(need === sentinelOn) return;
-    if(need){
-      if(suppressPop > 0) return;        // un retour est en vol : on reposera après
-      sentinelOn = true;
-      try{ history.pushState({ sv: 1 }, ''); }catch(err){ sentinelOn = false; }
-    } else {
-      sentinelOn = false;
-      suppressPop++;
-      history.back();
+  function navPush(entry){
+    navStack.push(entry);
+    try{
+      history.pushState({ nav: navStack.length }, '');
+    }catch(err){
+      navStack.pop();               // pas d'historique disponible : on s'en passe
     }
   }
 
-  // Ferme la couche la plus haute. Rend false s'il n'y a plus rien à fermer.
-  function stepBack(allowHome){
-    if(reverseOverlay.classList.contains('open')){ closeReverse(); return true; }
-    if(anyOverlayOpen()){
-      closeAddModal(); closeSettingsModal(); closeEditDayModal();
-      closeFlagPicker(); closeAppModal();
+  function layerEls(){
+    return [addOverlay, settingsOverlay, editDayOverlay, flagOverlay, appOverlay,
+            reverseOverlay, levelScreen, newLangScreen, planScreen];
+  }
+  function isLayerOpen(el){ return !!el && el.classList.contains('open'); }
+  function closeLayer(el){
+    switch(el.id){
+      case 'addOverlay': closeAddModal(); break;
+      case 'settingsOverlay': closeSettingsModal(); break;
+      case 'editDayOverlay': closeEditDayModal(); break;
+      case 'flagOverlay': closeFlagPicker(); break;
+      case 'appOverlay': closeAppModal(); break;
+      case 'reverseOverlay': closeReverse(); break;
+      case 'levelScreen': closeLevelScreen(); break;
+      case 'newLangScreen': closeNewScreen(); break;
+      case 'planScreen': closePlanner(); break;
+    }
+  }
+
+  // Tenue à jour de la pile quand une couche s'ouvre ou se ferme par l'interface.
+  // Aucun compteur : on retire d'abord côté pile, puis on demande le retour, si
+  // bien que le popstate qui suit trouve tout déjà aligné.
+  function navReconcile(){
+    let removed = 0;
+    while(navStack.length){
+      const top = navStack[navStack.length - 1];
+      if(top.t === 'layer' && !isLayerOpen(top.el)){ navStack.pop(); removed++; }
+      else break;
+    }
+    if(removed > 0){ history.go(-removed); return; }
+    layerEls().forEach(el => {
+      if(isLayerOpen(el) && !navStack.some(e => e.el === el)) navPush({ t:'layer', el });
+    });
+  }
+
+  // Défait une étape. Rend false si elle était déjà défaite.
+  function navUndo(entry){
+    if(entry.t === 'layer'){
+      if(!isLayerOpen(entry.el)) return false;
+      closeLayer(entry.el);
       return true;
     }
-    if(levelScreen.classList.contains('open')){ closeLevelScreen(); return true; }
-    if(planOpen){ closePlanner(); return true; }
-    if(onNewPage){ closeNewScreen(); return true; }
-    if(allowHome && activeSlide !== 0){ goTo(0, -1, true); return true; }
+    if(entry.t === 'slide'){
+      if(entry.from === activeSlide || entry.from >= slides.length) return false;
+      goTo(entry.from, entry.from > activeSlide ? 1 : -1, true, true);
+      return true;
+    }
     return false;
   }
 
-  window.addEventListener('popstate', () => {
-    if(suppressPop > 0){          // c'est notre propre retour : on resynchronise
-      suppressPop--;
-      syncSentinel();
-      return;
-    }
-    sentinelOn = false;           // la sentinelle vient d'être consommée
-    stepBack(true);
-    syncSentinel();               // on la repose s'il reste quelque chose
+  window.addEventListener('popstate', (e) => {
+    const target = (e.state && typeof e.state.nav === 'number') ? e.state.nav : 0;
+    // On redescend jusqu'à la profondeur de l'entrée atteinte. Si la pile est
+    // déjà à la bonne hauteur (notre propre retrait), il n'y a rien à faire.
+    while(navStack.length > target) navUndo(navStack.pop());
   });
 
-  // Toute ouverture ou fermeture de couche passe par une classe : on observe.
-  const layerWatch = new MutationObserver(() => syncSentinel());
-  document.querySelectorAll('.overlay, .screen').forEach(el => {
-    layerWatch.observe(el, { attributes: true, attributeFilter: ['class'] });
-  });
+  const layerWatch = new MutationObserver(() => navReconcile());
+  layerEls().forEach(el => layerWatch.observe(el, { attributes: true, attributeFilter: ['class'] }));
 
   /* ================= Clavier ================= */
   document.addEventListener('keydown', (e) => {
     if(e.key === 'Escape'){
-      stepBack(false);            // Échap ferme une couche, mais ne quitte pas la page
+      // Échap ne ferme qu'une couche : jamais de sortie de page.
+      const top = navStack[navStack.length - 1];
+      if(top && top.t === 'layer') history.back();
       return;
     }
     if(e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
