@@ -783,6 +783,14 @@
     color: var(--text-faint); font-variant-numeric: tabular-nums;
   }
   .dash-unit{ font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--text-faint); margin-top: 3px; }
+  /* La veille : juste le chiffre, en retrait sous le compte du jour. */
+  .dash-prev{
+    font-family: var(--font-display);
+    font-size: 14px; font-weight: 600;
+    color: var(--gold);
+    font-variant-numeric: tabular-nums;
+    margin-top: 7px;
+  }
   .dash-input{
     width: 78px; text-align: center;
     background: var(--bg);
@@ -2090,11 +2098,13 @@
     }
 
     const todayKey = todayISO();
+    const prevKey = toISODate(addDays(new Date(), -1));
     let doneCount = 0, totalToday = 0, withGoal = 0;
 
     items.forEach(it => {
       const lang = it.lang;
       const today = Math.round(lang.sessions[todayKey] || 0);
+      const prev = Math.round(lang.sessions[prevKey] || 0);
       const goal = Math.round(lang.dailyGoalMinutes);
       const done = goal > 0 && today >= goal;
       totalToday += today;
@@ -2121,6 +2131,7 @@
           <span class="dash-slash">/</span>
           <span class="dash-goal">${goal > 0 ? goal : '—'}</span>
           <span class="dash-unit">min</span>
+          <span class="dash-prev" title="Hier : ${prev} min" aria-label="Hier : ${prev} minutes">(${prev})</span>
         </div>
         <button class="dash-check" data-act="check" aria-pressed="${done ? 'true' : 'false'}"
           title="${goal > 0 ? (done ? 'Objectif atteint — appuyer pour remettre à zéro' : 'Marquer l\'objectif comme atteint') : 'Définir un objectif quotidien'}">${CHECK_SVG}</button>`;
