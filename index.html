@@ -1550,6 +1550,20 @@
       <button class="btn-text" id="importCancelBtn">Annuler</button>
     </div>
 
+    <!-- Le serveur du PC. Facultatif, et il le reste : sans adresse, rien
+         de tout ceci n'existe et l'appli se comporte exactement comme
+         avant, données dans le navigateur. Avec, elles vivent AUSSI dans
+         un fichier sur le PC — un localStorage de téléphone est un
+         exemplaire unique qu'un nettoyage efface sans prévenir. -->
+    <div class="app-section" id="srvSection">
+      <span class="field-label">Serveur du PC</span>
+      <p class="field-hint">Une deuxième copie, dans un fichier sur le PC, qui se met à jour toute seule quand la maison est à portée. Laisse vide si tu n'en veux pas.</p>
+      <input type="text" id="srvUrl" inputmode="url" autocomplete="off" spellcheck="false"
+             placeholder="https://192.168.50.184:8793">
+      <button class="btn-secondary" id="srvBtn">Synchroniser maintenant</button>
+      <p class="save-state" id="srvLine"></p>
+    </div>
+
     <div class="app-section" id="installSection" hidden>
       <span class="field-label">Installer sur l'écran d'accueil</span>
       <p class="field-hint" id="installHint"></p>
@@ -1747,6 +1761,71 @@
     }catch(e){
       console.error("Erreur d'enregistrement des données", e);
     }
+    srvBientot();
+  }
+
+  /* ================= Le serveur du PC ================= */
+  // FACULTATIF, et il le reste. Sans adresse — ou hors de la maison —
+  // l'appli se comporte exactement comme avant : les données vivent dans
+  // le navigateur, et c'est ce qui lui permet de marcher dans l'autobus.
+  // Le serveur n'est qu'un deuxième endroit où elles vivent aussi, dans un
+  // fichier qu'on peut copier et lire. Un localStorage de téléphone est un
+  // exemplaire unique qu'un nettoyage efface sans prévenir.
+  //
+  // LA SYNCHRO NE DÉCIDE RIEN. Elle prend ce que le PC a, le passe par la
+  // MÊME fusion que « restaurer une sauvegarde » — jour par jour, la
+  // valeur la plus haute, jamais de perte — puis renvoie le résultat. Les
+  // deux côtés finissent identiques, et la question « qui gagne ? » ne se
+  // pose jamais.
+  const SRV_KEY = 'inputServeur';
+  let srvEnCours = false, srvT = null;
+  const srvAdresse = () => (localStorage.getItem(SRV_KEY) || '').trim().replace(/\/+$/, '');
+
+  function srvDit(t, ennui){
+    const el = document.getElementById('srvLine');
+    if(!el) return;
+    el.textContent = t || '';
+    el.classList.toggle('warn', !!ennui);
+  }
+
+  async function srvSync(manuel){
+    const base = srvAdresse();
+    if(!base){ if(manuel) srvDit('Aucune adresse : le serveur est désactivé.', true); return false; }
+    if(srvEnCours) return false;
+    srvEnCours = true;
+    if(manuel) srvDit('Je parle au PC…');
+    try{
+      const r = await fetch(base + '/donnees', { cache:'no-store' });
+      if(!r.ok) throw new Error('le PC a répondu ' + r.status);
+      const recu = await r.json();
+      if(Array.isArray(recu.languages) && recu.languages.length)
+        mergeLanguages(recu.languages.map(makeLang));
+      saveData();
+      const envoi = await fetch(base + '/donnees', {
+        method:'PUT', headers:{ 'content-type':'application/json' },
+        body: JSON.stringify({ app:EXPORT_APP, version:2, languages: state.languages }),
+      });
+      if(!envoi.ok) throw new Error('envoi refusé (' + envoi.status + ')');
+      renderAllSlides();
+      updateSaveLine();
+      srvDit('À jour avec le PC — ' + new Date().toLocaleTimeString('fr-CA',
+        { hour:'2-digit', minute:'2-digit' }));
+      return true;
+    }catch(err){
+      // Hors de la maison, le PC ne répond pas : c'est la situation
+      // NORMALE, pas une panne. On ne le dit que si on l'a demandé.
+      if(manuel) srvDit('Le PC ne répond pas — ' + err.message, true);
+      else srvDit('');
+      return false;
+    }finally{ srvEnCours = false; }
+  }
+
+  // Après une modification. Sans précipitation : on tape une durée en
+  // plusieurs chiffres, et chaque chiffre enregistre.
+  function srvBientot(){
+    if(srvEnCours || !srvAdresse()) return;
+    clearTimeout(srvT);
+    srvT = setTimeout(() => srvSync(false), 4000);
   }
 
   /* ================= Sauvegarde et restauration ================= */
@@ -3425,6 +3504,21 @@
   document.getElementById('closeAppBtn').addEventListener('click', closeAppModal);
   appOverlay.addEventListener('click', (e) => { if(e.target === appOverlay) closeAppModal(); });
   document.getElementById('exportBtn').addEventListener('click', exportData);
+
+  // Le serveur du PC : l'adresse se retient, le bouton force la synchro.
+  {
+    const champ = document.getElementById('srvUrl');
+    champ.value = localStorage.getItem(SRV_KEY) || '';
+    const retient = () => {
+      const v = champ.value.trim();
+      localStorage.setItem(SRV_KEY, v);
+      srvDit(v ? 'Adresse enregistrée.' : 'Serveur désactivé — tout reste dans ce navigateur.');
+      if(v) srvSync(true);
+    };
+    champ.addEventListener('change', retient);
+    champ.addEventListener('blur', retient);
+    document.getElementById('srvBtn').addEventListener('click', () => srvSync(true));
+  }
   document.getElementById('importBtn').addEventListener('click', () => importInput.click());
 
   importInput.addEventListener('change', () => {
@@ -3952,6 +4046,15 @@
   buildAllPages();
   setActive(0);            // l'appli s'ouvre sur le tableau de bord
   scheduleMidnight();
+  // Le PC, s'il est là. En silence : hors de la maison il ne répond pas,
+  // et ce n'est pas une panne. Au retour — l'appli revient au premier plan
+  // — on réessaie, parce que c'est précisément le moment où l'on rentre.
+  if(srvAdresse()){
+    srvSync(false);
+    document.addEventListener('visibilitychange', () => {
+      if(!document.hidden) srvBientot();
+    });
+  }
 })();
 </script>
 </body>

@@ -12,6 +12,48 @@ fichiers, avec leur emplacement ; ce que le dépôt ne peut pas savoir est marqu
 > Plusieurs rubriques du gabarit sont donc sans objet ici : elles sont
 > conservées dans l'ordre demandé, avec la réponse réelle et ce que le hub peut
 > faire à la place. Le point le plus important pour le hub est le §8.1.
+>
+> **Ceci reste vrai de l'application. Depuis, un serveur FACULTATIF est
+> venu se poser à côté : voir le §0 juste en dessous.**
+
+---
+
+## 0. Ce qui a changé : un serveur, et il reste facultatif
+
+Tout ce qui suit reste vrai de l'application elle-même. Ce qui s'ajoute,
+c'est **`input-sync.mjs`** : un serveur d'environ 250 lignes, Node seul,
+aucune dépendance, qui fait deux choses et pas une de plus.
+
+1. **Il sert les cinq fichiers** — et eux seuls : la liste est fermée, le
+   `.git` et cette fiche répondent 404. Sur `http://localhost:8792` pour le
+   PC, et sur `https://<ip-du-pc>:8793` pour le téléphone, avec **le
+   certificat de noter**, lu sans rien y écrire : le téléphone fait déjà
+   confiance à cette autorité, et une deuxième serait une deuxième à
+   installer pour rien.
+2. **Il garde les données dans un fichier** — `input-donnees.json`, lisible
+   à l'œil nu, avec une copie datée à chaque écriture différente de la
+   précédente (`input-copies/`, les trente dernières).
+
+**L'application ne lui demande jamais la permission d'exister.** Sans
+adresse de serveur, ou hors de la maison, elle se comporte exactement comme
+avant : les données vivent dans le navigateur, et c'est ce qui lui permet de
+marcher dans l'autobus. Le réglage est dans « Réglages de l'appli → Serveur
+du PC » ; laissé vide, il n'y a pas de serveur.
+
+**La synchro ne décide rien.** Elle prend ce que le PC a, le passe par
+`mergeLanguages()` — la fonction qui servait déjà à restaurer une sauvegarde :
+jour par jour, la valeur la plus haute, jamais de perte — puis renvoie le
+résultat. Il n'y a donc **aucun** « qui gagne » à départager, aucun
+horodatage à comparer, et deux appareils qui se rencontrent finissent
+identiques quel que soit l'ordre. `tests/test-serveur.mjs` éprouve exactement
+ce cas, avec deux vrais navigateurs.
+
+> **Le §8.1 reste le point le plus important — et le serveur ne le règle
+> pas : il le déclenche.** Servie depuis le PC, l'application est sur une
+> **nouvelle origine** : elle s'ouvre donc VIDE la première fois, et les
+> données de GitHub Pages sont toujours là, invisibles. La marche à suivre,
+> une fois : exporter depuis l'ancienne adresse, importer dans la nouvelle.
+> Les deux boutons existent déjà.
 
 ---
 
