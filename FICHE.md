@@ -48,6 +48,17 @@ horodatage à comparer, et deux appareils qui se rencontrent finissent
 identiques quel que soit l'ordre. `tests/test-serveur.mjs` éprouve exactement
 ce cas, avec deux vrais navigateurs.
 
+**La synchro n'attend jamais longtemps.** Chaque requête est coupée par un
+`AbortController` : 4 s pour aller chercher, 8 s pour envoyer (l'envoi porte
+tout l'historique). Sans cela, un PC hors de portée laissait la synchro « en
+cours » pendant une minute — et pendant tout ce temps elle refusait la
+suivante. Hors de la maison, l'appli ne dit rien du tout : être dehors est la
+situation normale, pas une panne. Elle ne parle que si on a appuyé sur
+« Synchroniser maintenant ». Et **un appui pendant une synchro déjà partie est
+adopté**, pas avalé : celle qui est en l'air rendra des comptes comme si on
+l'avait demandée — sinon le bouton semblait mort pendant les secondes qui
+suivent l'ouverture, où une synchro part toute seule.
+
 > **Le §8.1 reste le point le plus important — et le serveur ne le règle
 > pas : il le déclenche.** Servie depuis le PC, l'application est sur une
 > **nouvelle origine** : elle s'ouvre donc VIDE la première fois, et les
@@ -211,23 +222,47 @@ Il n'y a **aucune route dynamique, aucune API** : seulement des fichiers.
 ### Service worker
 
 Fichier `sw.js`, enregistré au chargement de la page et **uniquement en
-http(s)** (`index.html:3933-3935`). Nom du cache : `suivi-input-v1`
-(`sw.js:2`).
+http(s)** (`index.html:4064-4066`). Nom du cache : `suivi-input-v2`
+(`sw.js:18`).
 
-**Mis en cache** (`sw.js:3`) : `./`, `./index.html`, `./manifest.webmanifest`,
-`./icon-192.png`, `./icon-512.png`.
+**Mis en cache** (`sw.js:19`) : `./`, `./index.html`, `./manifest.webmanifest`,
+`./icon-192.png`, `./icon-512.png`. L'installation les demande **un par un**,
+en `cache:'reload'`, et réussit même s'il en manque un (`sw.js:34-37`) :
+`addAll` est tout ou rien, et un seul raté — le Wi-Fi qui hoquette au mauvais
+moment — laissait l'ancien service worker en place.
 
-**Stratégies :**
-- navigation (la page elle-même) : **réseau d'abord**, copie en cache à chaque
-  réussite, repli sur le cache hors ligne (`sw.js:22-33`) ;
-- le reste : **cache d'abord**, réseau ensuite (`sw.js:36-44`).
+**Stratégie, la même pour tout : la copie gardée, ou le réseau si elle manque,
+mais on n'attend le réseau que `ATTENTE` = 1200 ms** (`sw.js:20`, `92-95`).
+Passé ce délai on sert la copie et la requête continue en arrière-plan
+(`e.waitUntil`, `sw.js:72`) : la version fraîche est déjà là à l'ouverture
+suivante. Sans copie en réserve, il faut bien attendre le réseau, et seule une
+navigation a droit à l'appli en secours (`sw.js:89-91`).
+
+> **La leçon, et elle a coûté une minute par lancement.** « Réseau d'abord »
+> sans limite de temps est un piège : une adresse en 192.168 hors de la maison
+> ne répond pas « non », elle ne répond **rien**. Le téléphone attend que le
+> système abandonne — trente à soixante secondes d'écran blanc, alors que la
+> copie de l'appli était prête depuis le début. noter l'avait appris avant ;
+> cette appli a répété la faute mot pour mot. Un `Promise.race` contre une
+> minuterie est tout ce qu'il fallait. Le test
+> `tests/test-serveur.mjs` le tient : il monte un serveur qui **accepte la
+> connexion et se tait** — un serveur qui refuse net ne reproduirait rien,
+> l'échec étant immédiat — et exige que la page s'ouvre en moins de 5 s.
+
+**L'application est une PAGE** (`sw.js:27-28`, `estPage`). Une navigation n'est
+pas toujours une page : télécharger un fichier, c'est aussi « naviguer ». Ranger
+ces octets sous la clé de l'appli servirait un téléchargement à la place de
+l'application à l'ouverture suivante — là encore, la leçon vient de noter. Le
+garde joue aux deux bouts : à l'enregistrement (`sw.js:68`) et à la lecture,
+où une réserve déjà empoisonnée est jetée (`sw.js:77-80`).
 
 **Jamais mis en cache :**
-- toute requête qui n'est pas un `GET` (`sw.js:19` : la fonction sort sans
+- toute requête qui n'est pas un `GET` (`sw.js:50` : la fonction sort sans
   répondre) ;
-- toute réponse **d'une autre origine** — le test `sw.js:38` n'enregistre que
-  les réponses de la même origine, donc la feuille Google Fonts n'est jamais
-  stockée.
+- toute requête **d'une autre origine** — la feuille Google Fonts passe sans
+  qu'on y touche (`sw.js:55`) ;
+- **`/donnees` et `/health`** (`sw.js:58`) : une réponse d'hier serait un
+  mensonge, et c'est précisément ce que la synchro va chercher.
 
 ---
 
@@ -342,11 +377,12 @@ l'adresse que l'utilisateur utilise déjà** (§3), pas une adresse locale
 **2. Un service worker déjà installé sur une origine locale.**
 Si le hub sert l'application sur un port de `localhost` qu'un autre projet a
 utilisé, un service worker enregistré par cet autre projet peut encore répondre
-pour cette origine. Par ailleurs le nom du cache est écrit en dur,
-`suivi-input-v1` (`sw.js:2`), et n'a jamais été incrémenté : `activate` ne
-supprime que les caches **portant un autre nom** (`sw.js:12`), donc un futur
-changement de la liste des fichiers ne purgera pas les anciennes entrées. Un
-hub qui épingle l'application sur un port local hérite de ce comportement.
+pour cette origine. Le nom du cache est écrit en dur dans `sw.js:18` ; il est
+passé à `suivi-input-v2` avec la réécriture, et `activate` supprime tout cache
+**portant un autre nom** (`sw.js:43`) — l'ancienne réserve est donc jetée au
+premier chargement qui atteint le réseau. **Tout changement de la liste des
+fichiers doit à nouveau changer ce nom**, sinon les anciennes entrées
+survivent.
 
 **3. Ouvrir le fichier directement.**
 Double-cliquer `index.html` ouvre une `file://` : pas de service worker
@@ -354,14 +390,13 @@ Double-cliquer `index.html` ouvre une `file://` : pas de service worker
 distincte donc aucune donnée. Le hub doit ouvrir une URL http, jamais le
 fichier.
 
-**4. Une sous-ressource absente du cache, hors ligne.**
-`sw.js:43` fait `.catch(() => hit)` alors que `hit` est forcément faux dans
-cette branche : la promesse se résout sur `undefined` et la requête devient une
-erreur réseau au lieu d'un échec propre. Aujourd'hui cela ne concerne que la
-feuille Google Fonts (autre origine, jamais mise en cache) : hors ligne, la
-page s'affiche avec les polices de repli, sans conséquence. Mais ce serait un
-vrai défaut si un fichier était ajouté à l'application sans être ajouté à
-`ASSETS` (`sw.js:3`). Signalé, non corrigé.
+**4. Une sous-ressource absente du cache, hors ligne.** *(corrigé)*
+L'ancien `sw.js` faisait `.catch(() => hit)` dans une branche où `hit` est
+forcément faux : la promesse se résolvait sur `undefined` et la requête
+devenait une erreur réseau au lieu d'un échec propre. C'est maintenant un
+`Response.error()` explicite, et une navigation retombe sur la page gardée
+(`sw.js:89-91`). Le piège de fond reste : **un fichier ajouté à l'application
+sans être ajouté à `ASSETS`** (`sw.js:19`) n'existe pas hors ligne.
 
 **5. Compter sur un processus ou un port.**
 Il n'y en a pas. Un hub qui cherche un PID, un port à l'écoute ou une fenêtre
@@ -382,9 +417,11 @@ préciser de quelle origine induirait en erreur.
 **8. Déploiement et cache après un `git push`.**
 Pousser sur `main` déclenche la publication Pages, qui prend un moment, et le
 CDN comme le navigateur peuvent encore servir l'ancienne page. Le service
-worker étant « réseau d'abord » pour la navigation (`sw.js:22-33`), il
-n'aggrave pas le problème, mais un rechargement forcé reste parfois nécessaire.
-Le hub ne doit pas conclure à un échec si la page ne change pas dans la minute.
+worker servant la copie gardée dès que le réseau tarde plus de 1200 ms
+(`sw.js:92-95`), **la première ouverture après un déploiement peut montrer
+l'ancienne page** : la neuve arrive en arrière-plan et s'affiche au lancement
+suivant. Un rechargement forcé l'obtient tout de suite. Le hub ne doit pas
+conclure à un échec si la page ne change pas dans la minute.
 
 **9. Le manifeste n'a pas d'`id`** (§4). L'identité de l'application installée
 dérive donc de `start_url`. Si le hub servait un jour l'application à un autre

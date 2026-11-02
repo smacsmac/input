@@ -1778,8 +1778,24 @@
   // deux côtés finissent identiques, et la question « qui gagne ? » ne se
   // pose jamais.
   const SRV_KEY = 'inputServeur';
-  let srvEnCours = false, srvT = null;
+  let srvEnCours = false, srvT = null, srvDire = false;
   const srvAdresse = () => (localStorage.getItem(SRV_KEY) || '').trim().replace(/\/+$/, '');
+
+  // UN PC ABSENT NE RÉPOND PAS « NON » : IL NE RÉPOND RIEN. Une adresse en
+  // 192.168 hors de la maison laisse la requête en l'air jusqu'à ce que le
+  // système abandonne de lui-même — trente secondes, parfois plus d'une
+  // minute. Pendant tout ce temps la synchro se croyait en cours et
+  // refusait la suivante. On coupe nous-mêmes, et court : être dehors est
+  // la situation normale, pas une panne qu'il faut attendre.
+  function srvFetch(url, { ms = 4000, ...reste } = {}){
+    const a = new AbortController();
+    const t = setTimeout(() => a.abort(), ms);
+    return fetch(url, { ...reste, signal:a.signal })
+      .finally(() => clearTimeout(t));
+  }
+  const srvPourquoi = err =>
+    (err && (err.name === 'AbortError' || /abort/i.test(err.message || '')))
+      ? 'pas de réponse' : (err && err.message) || 'erreur';
 
   function srvDit(t, ennui){
     const el = document.getElementById('srvLine');
@@ -1791,17 +1807,27 @@
   async function srvSync(manuel){
     const base = srvAdresse();
     if(!base){ if(manuel) srvDit('Aucune adresse : le serveur est désactivé.', true); return false; }
-    if(srvEnCours) return false;
+    // UN APPUI PENDANT UNE SYNCHRO DÉJÀ PARTIE. L'appli en lance une seule
+    // toute seule à l'ouverture ; si elle est encore en l'air quand on
+    // appuie sur le bouton, refuser en silence donne un bouton mort. On
+    // ADOPTE l'appui : la synchro en cours rendra des comptes comme si on
+    // l'avait demandée.
+    if(srvEnCours){
+      if(manuel){ srvDire = true; srvDit('Je parle au PC…'); }
+      return false;
+    }
     srvEnCours = true;
-    if(manuel) srvDit('Je parle au PC…');
+    srvDire = !!manuel;
+    if(srvDire) srvDit('Je parle au PC…');
     try{
-      const r = await fetch(base + '/donnees', { cache:'no-store' });
+      const r = await srvFetch(base + '/donnees', { cache:'no-store' });
       if(!r.ok) throw new Error('le PC a répondu ' + r.status);
       const recu = await r.json();
       if(Array.isArray(recu.languages) && recu.languages.length)
         mergeLanguages(recu.languages.map(makeLang));
       saveData();
-      const envoi = await fetch(base + '/donnees', {
+      const envoi = await srvFetch(base + '/donnees', {
+        ms: 8000,        // l'envoi porte tout l'historique : un peu plus de temps
         method:'PUT', headers:{ 'content-type':'application/json' },
         body: JSON.stringify({ app:EXPORT_APP, version:2, languages: state.languages }),
       });
@@ -1814,10 +1840,10 @@
     }catch(err){
       // Hors de la maison, le PC ne répond pas : c'est la situation
       // NORMALE, pas une panne. On ne le dit que si on l'a demandé.
-      if(manuel) srvDit('Le PC ne répond pas — ' + err.message, true);
+      if(srvDire) srvDit('Le PC ne répond pas — ' + srvPourquoi(err), true);
       else srvDit('');
       return false;
-    }finally{ srvEnCours = false; }
+    }finally{ srvEnCours = false; srvDire = false; }
   }
 
   // Après une modification. Sans précipitation : on tape une durée en

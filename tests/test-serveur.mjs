@@ -160,6 +160,73 @@ try{
       'et l’appli ne crie pas : être dehors est normal');
     await ctx.close(); }
 
+  console.log('── L’APPLI S’OUVRE VITE QUAND LE PC NE RÉPOND PAS ──');
+  // LE BOGUE, tel qu'il se présentait : soixante secondes d'écran blanc
+  // pour ouvrir l'appli hors de la maison. Le service worker demandait le
+  // réseau d'abord et l'attendait SANS LIMITE — or une adresse en 192.168
+  // hors de portée ne répond pas « non », elle ne répond rien, et le
+  // téléphone attend que le système abandonne.
+  //
+  // Un serveur refusé net (connexion impossible) ne reproduirait pas la
+  // panne : l'échec est immédiat. Il faut un serveur qui ACCEPTE et se
+  // taise — c'est ce que fait ce relais, et c'est tout l'intérêt du test.
+  { const { createServer } = await import('node:http');
+    let muet = false;
+    const enAttente = [];
+    const relais = createServer((req, res) => {
+      if(muet){ enAttente.push(res); return; }          // accepté, jamais répondu
+      relaye(req, res).catch(() => { try{ res.writeHead(502); res.end(); }catch{} });
+    });
+    async function relaye(req, res){
+      const amont = await fetch(BASE + req.url, { method:req.method });
+      const corps = Buffer.from(await amont.arrayBuffer());
+      res.writeHead(amont.status, {
+        'content-type': amont.headers.get('content-type') || 'text/plain',
+        'content-length': corps.length, 'cache-control':'no-store' });
+      res.end(corps);
+    }
+    await new Promise(r => relais.listen(0, '127.0.0.1', r));
+    const VIA = `http://127.0.0.1:${relais.address().port}`;
+
+    const ctx = await b.newContext({ viewport:{ width:412, height:915 },
+      hasTouch:true, isMobile:true });
+    const p = await ctx.newPage();
+    // 1. une visite normale : le service worker s'installe et garde l'appli
+    await p.goto(VIA + '/', { waitUntil:'domcontentloaded' });
+    await p.evaluate(a => localStorage.setItem('inputServeur', a), VIA);
+    await p.reload({ waitUntil:'domcontentloaded' });
+    await p.waitForTimeout(1800);
+    chk(await p.evaluate(() => navigator.serviceWorker.ready.then(r => !!r.active)),
+      'le service worker s’installe');
+
+    // 2. le PC devient muet — la maison n'est plus à portée
+    muet = true;
+    const t0 = Date.now();
+    let ouverte = true;
+    try{ await p.goto(VIA + '/', { waitUntil:'domcontentloaded', timeout:15000 }); }
+    catch(_){ ouverte = false; }
+    const mis = Date.now() - t0;
+    chk(ouverte, 'l’appli s’ouvre quand même', { ms:mis });
+    chk(mis < 5000, `et vite : ${mis} ms, pas soixante secondes`, mis);
+    chk(await p.evaluate(() => !!document.getElementById('srvLine')),
+      'c’est bien l’application, pas une page d’erreur');
+    // 3. et la synchro ne reste pas accrochée une minute à un PC muet
+    const t1 = Date.now();
+    await p.evaluate(() => document.getElementById('srvBtn').click());
+    let dit = '';
+    for(let i = 0; i < 60; i++){
+      dit = await p.evaluate(() => (document.getElementById('srvLine') || {}).textContent || '');
+      if(/ne répond pas/.test(dit)) break;
+      await new Promise(r => setTimeout(r, 250));
+    }
+    chk(Date.now() - t1 < 9000,
+      'la synchro abandonne au bout de quelques secondes', Date.now() - t1);
+    chk(/ne répond pas/.test(dit), 'et le dit sans mentir', dit);
+
+    for(const r of enAttente){ try{ r.destroy(); }catch{} }
+    await ctx.close();
+    relais.close(); }
+
   console.log('── UN ENVOI ABÎMÉ NE CASSE RIEN ──');
   { const avant = await duPc();
     const r = await fetch(BASE + '/donnees', { method:'PUT',
