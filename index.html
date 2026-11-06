@@ -783,14 +783,35 @@
     color: var(--text-faint); font-variant-numeric: tabular-nums;
   }
   .dash-unit{ font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--text-faint); margin-top: 3px; }
-  /* La veille : juste le chiffre, en retrait sous le compte du jour. */
+  /* La veille : juste le chiffre, en retrait sous le compte du jour.
+     Appuyer dessus ouvre la même saisie que pour le jour en cours. */
   .dash-prev{
+    background: transparent;
+    border: none;
+    padding: 1px 7px;
     font-family: var(--font-display);
     font-size: 14px; font-weight: 600;
     color: var(--gold);
     font-variant-numeric: tabular-nums;
     margin-top: 7px;
+    cursor: pointer;
+    border-radius: 7px;
+    transition: background .15s ease;
   }
+  .dash-prev:hover{ background: rgba(242,193,78,0.12); }
+  .dash-prev:focus-visible{ outline: 2px solid var(--gold); outline-offset: 1px; }
+  .dash-prev-input{
+    width: 64px; text-align: center;
+    background: var(--bg);
+    border: 1px solid var(--gold);
+    color: var(--text);
+    font-family: var(--font-display); font-size: 16px; font-weight: 600;
+    padding: 2px 5px; border-radius: 7px;
+    margin-top: 7px;
+    -moz-appearance: textfield;
+  }
+  .dash-prev-input::-webkit-outer-spin-button, .dash-prev-input::-webkit-inner-spin-button{ -webkit-appearance: none; margin: 0; }
+  .dash-prev-input:focus{ outline: none; }
   .dash-input{
     width: 78px; text-align: center;
     background: var(--bg);
@@ -2131,7 +2152,8 @@
           <span class="dash-slash">/</span>
           <span class="dash-goal">${goal > 0 ? goal : '—'}</span>
           <span class="dash-unit">min</span>
-          <span class="dash-prev" title="Hier : ${prev} min" aria-label="Hier : ${prev} minutes">(${prev})</span>
+          <button class="dash-prev" data-act="edit-prev" title="Hier : ${prev} min — appuyer pour corriger" aria-label="Minutes d'hier pour ${esc(langTitle(lang.name))} : ${prev}, appuyer pour corriger">(${prev})</button>
+          <input class="dash-prev-input" data-act="input" type="number" min="0" inputmode="numeric" hidden aria-label="Minutes d'hier">
         </div>
         <button class="dash-check" data-act="check" aria-pressed="${done ? 'true' : 'false'}"
           title="${goal > 0 ? (done ? 'Objectif atteint — appuyer pour remettre à zéro' : 'Marquer l\'objectif comme atteint') : 'Définir un objectif quotidien'}">${CHECK_SVG}</button>`;
@@ -2751,7 +2773,8 @@
       const act = (e.target.closest('[data-act]') || {}).dataset;
       if(!act) return;
       if(act.act === 'open'){ goTo(slideOfLang(li), 1, true); return; }
-      if(act.act === 'edit'){ startDashEdit(dashCard, li); return; }
+      if(act.act === 'edit'){ startDashEdit(dashCard, li, 'today'); return; }
+      if(act.act === 'edit-prev'){ startDashEdit(dashCard, li, 'prev'); return; }
       if(act.act === 'check'){ toggleDashGoal(li); return; }
       return;
     }
@@ -2789,12 +2812,14 @@
     if(card){ openLevelScreen(li, Number(card.dataset.levelIndex)); return; }
   });
 
-  /* ---- Saisie directe des minutes du jour sur une carte ---- */
-  function startDashEdit(card, langIdx){
-    const btn = card.querySelector('.dash-today');
-    const input = card.querySelector('.dash-input');
+  /* ---- Saisie directe des minutes sur une carte ----
+     « which » vaut 'today' (le grand chiffre) ou 'prev' (celui de la veille). */
+  function startDashEdit(card, langIdx, which){
+    const isPrev = which === 'prev';
+    const btn = card.querySelector(isPrev ? '.dash-prev' : '.dash-today');
+    const input = card.querySelector(isPrev ? '.dash-prev-input' : '.dash-input');
     if(!btn || !input) return;
-    const todayKey = todayISO();
+    const todayKey = isPrev ? toISODate(addDays(new Date(), -1)) : todayISO();
     input.value = Math.round(state.languages[langIdx].sessions[todayKey] || 0);
     btn.hidden = true;
     input.hidden = false;
